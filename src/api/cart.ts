@@ -1,0 +1,38 @@
+import { getAxios, postAxios } from '@/lib/api';
+import { AddToCartRequest, ApiResponse, Cart } from '@/types';
+
+const addToCart = async (params: AddToCartRequest) => {
+  return postAxios<ApiResponse<void>>({
+    url: '/cart/add',
+    params,
+  });
+};
+
+const updateCartList = async (params: Cart[]) => {
+  return postAxios<ApiResponse<void>>({
+    url: '/cart/update',
+    params,
+  });
+};
+
+const getCartList = async () => {
+  return getAxios<ApiResponse<Cart[]>>({
+    url: '/cart/list',
+  });
+};
+
+const deleteCartList = async (params: string[]) => {
+  return postAxios<ApiResponse<void>>({
+    url: '/cart/delete',
+    params,
+  });
+};
+
+const updateCartQuantity = async (params: AddToCartRequest) => {
+  return postAxios<ApiResponse<void>>({
+    url: '/cart/update/quantity',
+    params,
+  });
+};
+
+export { addToCart, getCartList, updateCartList, deleteCartList, updateCartQuantity };
