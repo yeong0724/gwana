@@ -1,7 +1,8 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { concat, filter, isEmpty } from 'lodash-es';
 import { ChevronDown, User, X } from 'lucide-react';
+import { createPortal } from 'react-dom';
 
 import { RouterWrapperContext } from '@/contexts';
 import { useLoginStore } from '@/stores';
@@ -19,6 +20,12 @@ const Navigation = ({ isMenuOpen, moveToLoginPage, toggleMenu, menuGroup }: Prop
   const { wrappedPush } = useContext(RouterWrapperContext);
   const { isLogin } = useLoginStore();
   const [currentMenu, setCurrentMenu] = useState<string>('');
+  const [mounted, setMounted] = useState(false);
+
+  // Portal을 위한 클라이언트 마운트 확인
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const getFilteredCategory = (menuId: string) => {
     const init =
@@ -59,13 +66,18 @@ const Navigation = ({ isMenuOpen, moveToLoginPage, toggleMenu, menuGroup }: Prop
    */
   const moveToOrderHistory = () => {};
 
-  return (
+  // 클라이언트 마운트 전에는 렌더링하지 않음
+  if (!mounted) return null;
+
+  // Portal로 body에 직접 렌더링 (PageTransitionTemplate의 transform 영향 회피)
+  return createPortal(
     <>
       {/* 오버레이 */}
       <div
         className={`fixed inset-0 bg-gray-800 bg-opacity-5 z-[70] transition-opacity duration-600 ${
           isMenuOpen ? 'opacity-30 visible' : 'opacity-0 invisible'
         }`}
+        onClick={closeSidebar}
       />
 
       {/* 사이드바 메뉴 */}
@@ -171,7 +183,8 @@ const Navigation = ({ isMenuOpen, moveToLoginPage, toggleMenu, menuGroup }: Prop
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 };
 
