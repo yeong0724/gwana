@@ -5,10 +5,11 @@ import Image from 'next/image';
 
 import ProductDetailSkeleton from '@components/features/product/detail/ProductDetailSkeleton';
 import { useQueryClient } from '@tanstack/react-query';
-import { clone, findIndex } from 'lodash-es';
+import { clone, find, findIndex } from 'lodash-es';
 import { ChevronDown, ChevronUp, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { productMockData } from '@/api/mock';
 import { CartGuideModal, PurchaseGuideModal } from '@/components/common/modal';
 import { Button } from '@/components/ui/button';
 import {
@@ -59,16 +60,22 @@ const ProductDetailContainer = ({ productId }: Props) => {
   // 모바일 하단 패널 토글 상태
   const [isBottomPanelOpen, setIsBottomPanelOpen] = useState(false);
 
-  const { data: productDetailData, isFetching } = useProductDetailQuery(
-    { productId },
-    { enabled: !!productId }
-  );
+  // const { data: productDetailData, isFetching } = useProductDetailQuery(
+  //   { productId },
+  //   { enabled: !!productId }
+  // );
 
   const { mutate: addToCartMutate } = useAddToCartMutation();
 
+  // useEffect(() => {
+  //   if (productDetailData) setProduct(productDetailData.data);
+  // }, [productDetailData]);
+
+  const isFetching = false;
   useEffect(() => {
-    if (productDetailData) setProduct(productDetailData.data);
-  }, [productDetailData]);
+    const data = find(productMockData, { productId }) ?? initial;
+    setProduct(data);
+  }, [productId]);
 
   useEffect(() => {
     if (!api) return;

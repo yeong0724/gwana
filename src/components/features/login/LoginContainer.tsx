@@ -14,7 +14,8 @@ const LoginContainer = () => {
   };
 
   const onKakaoLogin = async () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/kakao`;
+    // window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/kakao`;
+    console.log('카카오 로그인');
   };
 
   const onNaverLogin = async () => {

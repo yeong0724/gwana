@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { map } from 'lodash-es';
+import { filter, map } from 'lodash-es';
 
+import { productMockData } from '@/api/mock';
 import { useProductService } from '@/service';
 import { Product } from '@/types';
 
@@ -18,17 +19,23 @@ const ProductList = ({ categoryId }: Props) => {
   const { useProductListQuery } = useProductService();
   const [productList, setProductList] = useState<Array<Product>>([]);
 
-  const { data: productListData, isFetching } = useProductListQuery(
-    { categoryId: categoryId === 'all' ? '' : categoryId },
-    { enabled: true, staleTime: 0 }
-  );
+  // const { data: productListData, isFetching } = useProductListQuery(
+  //   { categoryId: categoryId === 'all' ? '' : categoryId },
+  //   { enabled: true, staleTime: 0 }
+  // );
+
+  // useEffect(() => {
+  //   if (productListData) {
+  //     const { data } = productListData;
+  //     setProductList(data);
+  //   }
+  // }, [productListData, categoryId]);
 
   useEffect(() => {
-    if (productListData) {
-      const { data } = productListData;
-      setProductList(data);
-    }
-  }, [productListData, categoryId]);
+    const data = categoryId === 'all' ? productMockData : filter(productMockData, { categoryId });
+
+    setProductList(data);
+  }, [categoryId]);
 
   const onClickProduct = (productId: string) => {
     router.push(`/product/${productId}`);
@@ -36,7 +43,7 @@ const ProductList = ({ categoryId }: Props) => {
 
   return (
     <>
-      {isFetching ? (
+      {false ? (
         <ProductSkeleton />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
