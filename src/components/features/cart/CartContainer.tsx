@@ -2,7 +2,6 @@
 
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 
 import { cloneDeep, filter, first, isEmpty, map, reject, size, some, sumBy } from 'lodash-es';
 import { ChevronLeft, Info, Minus, Plus, ShoppingCart, X } from 'lucide-react';
@@ -15,7 +14,6 @@ import { useCartStore, useLoginStore } from '@/stores';
 import { Cart } from '@/types';
 
 const CartContainer = () => {
-  const router = useRouter();
   const { wrappedBack } = useContext(RouterWrapperContext);
   const { cart: cartStore, setCart: setCartStore, _hasHydrated } = useCartStore();
   const { isLogin } = useLoginStore();

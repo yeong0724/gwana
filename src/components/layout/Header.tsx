@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import { useQueryClient } from '@tanstack/react-query';
 import { filter, size } from 'lodash-es';
-import { Menu as MenuIcon, ShoppingCart, User } from 'lucide-react';
+import { ChevronLeft, Menu as MenuIcon, ShoppingCart, User } from 'lucide-react';
 
 import Navigation from '@/components/layout/Navigation';
 import UserDropdownContent from '@/components/layout/UserDropdownContent';
@@ -21,7 +21,7 @@ type HeaderProps = {
 };
 
 const Header = ({ menuGroup }: HeaderProps) => {
-  const { wrappedPush } = useContext(RouterWrapperContext);
+  const { wrappedPush, wrappedBack } = useContext(RouterWrapperContext);
   const { main, category } = menuGroup;
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -255,11 +255,11 @@ const Header = ({ menuGroup }: HeaderProps) => {
         <div className="flex items-center justify-between px-4 py-3">
           {/* 햄버거 메뉴 버튼 */}
           <button
-            onClick={toggleMenu}
+            onClick={wrappedBack}
             className="p-2 hover:bg-gray-100 rounded-md transition-colors z-50 relative"
-            aria-label="메뉴 열기"
           >
-            <MenuIcon size={24} className="text-gray-700" />
+            {/* <MenuIcon size={24} className="text-gray-700" /> */}
+            <ChevronLeft size={24} className="text-gray-700 sm:w-6 sm:h-6" />
           </button>
 
           {/* 로고 */}
@@ -274,18 +274,9 @@ const Header = ({ menuGroup }: HeaderProps) => {
           </div>
 
           {/* 우측 아이콘들 */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2" onClick={toggleMenu}>
             <button className="relative p-2 hover:bg-gray-100 rounded-md transition-colors">
-              <ShoppingCart
-                size={16}
-                className="text-gray-700 scale-[1.4]"
-                onClick={moveToCartPage}
-              />
-              <span
-                className={`absolute top-[-3px] flex items-center justify-center min-w-[15px] h-[15px] px-1 bg-red-500 text-white text-[8px] font-bold rounded-full ${cartCount > 99 ? 'right-[-10px]' : 'right-[-4px]'}`}
-              >
-                {cartCount > 99 ? '99+' : cartCount}
-              </span>
+              <MenuIcon size={24} className="text-gray-700" />
             </button>
           </div>
         </div>

@@ -104,11 +104,7 @@ export const productMockData = [
     productName: '관아수제차 홍차 드립백',
     categoryId: 'blackTea',
     categoryName: '발효차',
-    images: [
-      '/images/product/blackTea/thumbnail/fermentedTeaDripBag_1.webp',
-      '/images/product/blackTea/thumbnail/fermentedTeaDripBag_2.webp',
-      '/images/product/blackTea/thumbnail/fermentedTeaDripBag_3.webp',
-    ],
+    images: ['/images/product/blackTea/thumbnail/fermentedTeaDripBag_1.webp'],
     infos: [
       '/images/product/blackTea/info/fermentedTeaDripBag_1.webp',
       '/images/product/blackTea/info/fermentedTeaDripBag_2.webp',
