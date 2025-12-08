@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
@@ -11,6 +11,7 @@ import { Menu as MenuIcon, ShoppingCart, User } from 'lucide-react';
 import Navigation from '@/components/layout/Navigation';
 import UserDropdownContent from '@/components/layout/UserDropdownContent';
 import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { RouterWrapperContext } from '@/contexts/RouterWrapperContext';
 import { useCartService } from '@/service';
 import { useCartStore, useLoginStore, useMenuStore } from '@/stores';
 import type { Menu, MenuGroup } from '@/types';
@@ -20,6 +21,7 @@ type HeaderProps = {
 };
 
 const Header = ({ menuGroup }: HeaderProps) => {
+  const { wrappedPush } = useContext(RouterWrapperContext);
   const { main, category } = menuGroup;
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -73,7 +75,7 @@ const Header = ({ menuGroup }: HeaderProps) => {
    * 장바구니 이동
    */
   const moveToCartPage = () => {
-    router.push('/cart');
+    wrappedPush('/cart');
   };
 
   const onClickMain = (menuId: string) => {

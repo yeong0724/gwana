@@ -1,16 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { useContext } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 
-import { X } from 'lucide-react';
+import { ChevronLeft, X } from 'lucide-react';
+
+import { RouterWrapperContext } from '@/contexts/RouterWrapperContext';
 
 const LoginContainer = () => {
-  const router = useRouter();
+  const { wrappedBack } = useContext(RouterWrapperContext);
 
   const moveToBackpage = () => {
-    router.back();
+    wrappedBack();
   };
 
   const onKakaoLogin = async () => {
@@ -34,10 +35,10 @@ const LoginContainer = () => {
       <header className="relative flex items-center justify-center p-4 border-b border-gray-200 w-full flex-shrink-0">
         <h1 className="text-[20px] font-bold text-gray-900">로그인</h1>
         <button
-          className="absolute right-4 p-2 hover:bg-gray-100 rounded-md transition-colors"
+          className="absolute left-4 p-2 hover:bg-gray-100 rounded-md transition-colors"
           onClick={moveToBackpage}
         >
-          <X size={24} className="text-gray-700" />
+          <ChevronLeft size={20} className="text-gray-700 sm:w-6 sm:h-6" />
         </button>
       </header>
 

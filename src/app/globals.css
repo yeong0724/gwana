@@ -201,6 +201,16 @@
   animation: shimmer 2s infinite;
 }
 
+/* styles/transitions.css */
+.cached-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
 /* 스크롤바 숨김 클래스 */
 .scrollbar-hide {
   /* Firefox */

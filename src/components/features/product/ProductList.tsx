@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { filter, map } from 'lodash-es';
 
 import { productMockData } from '@/api/mock';
+import { RouterWrapperContext } from '@/contexts/RouterWrapperContext';
 import { useProductService } from '@/service';
 import { Product } from '@/types';
 
@@ -15,7 +16,7 @@ type Props = {
 };
 
 const ProductList = ({ categoryId }: Props) => {
-  const router = useRouter();
+  const { wrappedPush } = useContext(RouterWrapperContext);
   const { useProductListQuery } = useProductService();
   const [productList, setProductList] = useState<Array<Product>>([]);
 
@@ -38,7 +39,7 @@ const ProductList = ({ categoryId }: Props) => {
   }, [categoryId]);
 
   const onClickProduct = (productId: string) => {
-    router.push(`/product/${productId}`);
+    wrappedPush(`/product/${productId}`);
   };
 
   return (
