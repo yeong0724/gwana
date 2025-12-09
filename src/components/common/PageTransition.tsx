@@ -23,7 +23,7 @@ function PageTransition({ children }: PageTransitionProps) {
   const variants = {
     initial: shouldApplyAnimation ? { x: direction === 'forward' ? '100%' : '-100%' } : { x: 0 },
     animate: { x: 0 },
-    exit: shouldApplyAnimation ? { x: direction === 'forward' ? '-100%' : '100%' } : { x: 0 },
+    exit: { opacity: 0, visibility: 'hidden' as const, transition: { duration: 0 } },
   };
 
   return (

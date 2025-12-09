@@ -21,7 +21,14 @@ export default function RootPageTransition({ children }: RootPageTransitionProps
   return (
     <div className={cn('flex flex-col', isMainGroup ? 'min-h-screen' : 'h-full')}>
       {isMainGroup && <Header menuGroup={menuGroup} />}
-      <main className={cn('flex-1', isMainGroup ? 'min-h-[1800px]' : '')}>
+      <main
+        className={cn(
+          'flex-1',
+          isMainGroup ? 'min-h-[1800px]' : '',
+          // 모바일에서만 CSS 미디어쿼리로 트랜지션 wrapper 스타일 적용
+          'page-transition-wrapper'
+        )}
+      >
         <MainContainer>
           <PageTransition>{children}</PageTransition>
         </MainContainer>
