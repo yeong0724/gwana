@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { isEmpty } from 'lodash-es';
+import { cloneDeep, isEmpty } from 'lodash-es';
 
 import { useCartService, useLoginService } from '@/service';
 import { useAlertStore, useCartStore, useLoginStore } from '@/stores';
@@ -16,13 +16,13 @@ interface Props {
 const KakaoRedirectContainer = ({ code }: Props) => {
   const router = useRouter();
   const { showConfirmAlert } = useAlertStore();
-  const { setLoginInfo, clearLoginInfo } = useLoginStore();
+  const { setLoginInfo, clearLoginInfo, from } = useLoginStore();
   const { cart, _hasHydrated } = useCartStore();
 
   const { useGetAccessTokenByKakaoCode } = useLoginService();
   const { useUpdateCartListMutation } = useCartService();
 
-  const { mutate: getAccessTokenByKakaoCode, isPending } = useGetAccessTokenByKakaoCode();
+  const { mutate: getAccessTokenByKakaoCode } = useGetAccessTokenByKakaoCode();
   const { mutate: updateCartListMutate } = useUpdateCartListMutation();
 
   const callbackKakaoLogin = () => {
@@ -31,11 +31,13 @@ const KakaoRedirectContainer = ({ code }: Props) => {
       {
         onSuccess: async ({ code, data }) => {
           if (code === ResultCode.SUCCESS) {
-            setLoginInfo({ accessToken: data, isLogin: true });
+            const backUrl = cloneDeep(from);
+
+            setLoginInfo({ accessToken: data, isLogin: true, from: '/' });
 
             if (!isEmpty(cart)) updateCartListMutate(cart);
 
-            router.push('/');
+            router.push(backUrl);
           }
         },
         onError: async () => {
@@ -58,7 +60,7 @@ const KakaoRedirectContainer = ({ code }: Props) => {
     if (_hasHydrated) callbackKakaoLogin();
   }, [_hasHydrated]);
 
-  return isPending && <p className="mt-[150px] text-lg">Kakao Login Processing...</p>;
+  return <p className="mt-[150px] text-lg">Kakao Login Processing...</p>;
 };
 
 export default KakaoRedirectContainer;

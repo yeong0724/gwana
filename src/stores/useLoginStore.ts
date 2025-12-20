@@ -7,6 +7,7 @@ import { LoginInfo, UserStore } from '@/types';
 const initailState: LoginInfo = {
   isLogin: false,
   accessToken: '',
+  from: '/',
 };
 
 type ExtendedUserStore = UserStore & {
@@ -26,6 +27,10 @@ export const loginStore = create<ExtendedUserStore>()(
       setAccessToken: (accessToken: string) =>
         set((state) => ({
           loginInfo: { ...state.loginInfo, accessToken },
+        })),
+      setFrom: (from: string) =>
+        set((state) => ({
+          loginInfo: { ...state.loginInfo, from },
         })),
       setLoginInfo: (loginInfo: LoginInfo) => set({ loginInfo }),
       clearLoginInfo: () => set({ loginInfo: initailState }),
@@ -52,9 +57,11 @@ const useLoginStore = () =>
       loginInfo: state.loginInfo,
       isLogin: state.loginInfo.isLogin,
       accessToken: state.loginInfo.accessToken,
+      from: state.loginInfo.from,
       _hasHydrated: state._hasHydrated,
       setIsLogin: state.setIsLogin,
       setAccessToken: state.setAccessToken,
+      setFrom: state.setFrom,
       setLoginInfo: state.setLoginInfo,
       clearLoginInfo: state.clearLoginInfo,
     }))

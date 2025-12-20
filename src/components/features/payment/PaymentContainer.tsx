@@ -17,6 +17,7 @@ import { SearchPostcodeModal } from '@/components/common/modal';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { deliveryRequestOptions } from '@/constants';
+import { usePageTransitions } from '@/hooks/usePageTransitions';
 import { getIsMobile, localeFormat } from '@/lib/utils';
 import { useCartService } from '@/service';
 import { useAlertStore } from '@/stores';
@@ -44,6 +45,7 @@ type Props = {
 const PaymentContainer = ({ sessionId }: Props) => {
   const isMobile = getIsMobile();
   const router = useRouter();
+  const transitions = usePageTransitions();
   const { showConfirmAlert } = useAlertStore();
 
   const { useGetPaymentSessionQuery } = useCartService();
@@ -61,7 +63,7 @@ const PaymentContainer = ({ sessionId }: Props) => {
 
   const { data: paymentSessionData, error: paymentSessionError } = useGetPaymentSessionQuery(
     { sessionId },
-    { enabled: !!sessionId }
+    { enabled: false }
   );
 
   const form = useForm<PaymentForm>({
@@ -154,6 +156,8 @@ const PaymentContainer = ({ sessionId }: Props) => {
       invalidAccessPaymentSession();
     }
   }, [paymentSessionData, paymentSessionError]);
+
+  useEffect(() => transitions.show(), []);
 
   const onSubmit = (data: PaymentForm) => {
     console.log('결제 데이터:', data);

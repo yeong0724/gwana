@@ -7,6 +7,7 @@ type TransitionsContextType = {
   className: string;
   setClassName: Dispatch<SetStateAction<string>>;
   animationDuration: number; // Duration of the animation, in miliseconds
+  navigationResolveRef: MutableRefObject<(() => void) | null>;
 };
 
 export type { TransitionsContextType };

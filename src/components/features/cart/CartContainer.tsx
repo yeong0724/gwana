@@ -2,7 +2,6 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 
 import { cloneDeep, filter, first, isEmpty, map, reject, size, some, sumBy } from 'lodash-es';
 import { Info, Minus, Plus, ShoppingCart, X } from 'lucide-react';
@@ -13,13 +12,12 @@ import { usePageTransitions } from '@/hooks/usePageTransitions';
 import { localeFormat } from '@/lib/utils';
 import { useCartService } from '@/service';
 import { useCartStore, useLoginStore } from '@/stores';
-import { Cart } from '@/types';
+import { Cart, FlowType } from '@/types';
 
 const CartContainer = () => {
-  const router = useRouter();
   const transitions = usePageTransitions();
   const { cart: cartStore, setCart: setCartStore, _hasHydrated } = useCartStore();
-  const { isLogin } = useLoginStore();
+  const { isLogin, setFrom } = useLoginStore();
 
   const [purchaseGuideModalOpen, setPurchaseGuideModalOpen] = useState<boolean>(false);
 
@@ -103,22 +101,26 @@ const CartContainer = () => {
   };
 
   const moveToOrderPage = async () => {
-    if (!isLogin) {
-      setPurchaseGuideModalOpen(true);
-      return;
-    }
+    // if (!isLogin) {
+    //   setPurchaseGuideModalOpen(true);
+    //   return;
+    // }
 
-    const payload = filter(cart, { checked: true }).map(({ productId, quantity }) => ({
-      productId,
-      quantity,
-    }));
+    // const payload = filter(cart, { checked: true }).map(({ productId, quantity }) => ({
+    //   productId,
+    //   quantity,
+    // }));
 
-    const { data: sessionId } = await createPaymentSessionAsync(payload);
-    router.push(`/payment?sessionId=${sessionId}`);
+    // const { data: sessionId } = await createPaymentSessionAsync(payload);
+
+    // transitions.navigateWithTransition(`/payment?sessionId=${sessionId}`, FlowType.Next);
+
+    transitions.navigateWithTransition(`/payment?sessionId=${1234}`, FlowType.Next);
   };
 
   const moveToLoginPage = () => {
-    router.push('/login');
+    setFrom('/cart');
+    transitions.navigateWithTransition('/login', FlowType.Next);
   };
 
   useEffect(() => {
@@ -137,13 +139,17 @@ const CartContainer = () => {
         <div className="flex items-center justify-between p-3 sm:p-4 bg-white border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center gap-2">
             <Checkbox
+              id="all-select"
               checked={cart.length > 0 && !some(cart, { checked: false })}
               onCheckedChange={(checked: boolean) => onAllCheckboxHandler(checked)}
               disabled={cart.length === 0}
             />
-            <span className="text-[14px] sm:text-[15px] font-medium text-gray-900">
+            <label
+              htmlFor="all-select"
+              className="text-[14px] sm:text-[15px] font-medium text-gray-900 cursor-pointer select-none"
+            >
               전체선택 ({size(filter(cart, { checked: true }))} / {size(cart)})
-            </span>
+            </label>
           </div>
           <button
             disabled={isNoSelect}

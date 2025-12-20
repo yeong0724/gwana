@@ -30,8 +30,16 @@ export function usePageTransitions() {
         flowType === FlowType.Next ? 'slide-forward' : 'slide-backward'
       );
 
-      const transition = document.startViewTransition(() => {
+      const transition = document.startViewTransition(async () => {
         router.push(url);
+
+        // 새 페이지가 렌더링될 때까지 대기 (최대 100ms만 대기하여 속도 보장)
+        await Promise.race([
+          new Promise<void>((resolve) => {
+            context.navigationResolveRef.current = resolve;
+          }),
+          new Promise<void>((resolve) => setTimeout(resolve, 100)),
+        ]);
       });
 
       transition.finished.then(() => {
@@ -86,8 +94,16 @@ export function usePageTransitions() {
     if (document.startViewTransition) {
       document.documentElement.classList.add('slide-backward');
 
-      const transition = document.startViewTransition(() => {
+      const transition = document.startViewTransition(async () => {
         router.back();
+
+        // 새 페이지가 렌더링될 때까지 대기
+        await Promise.race([
+          new Promise<void>((resolve) => {
+            context.navigationResolveRef.current = resolve;
+          }),
+          new Promise<void>((resolve) => setTimeout(resolve, 100)),
+        ]);
       });
 
       transition.finished.then(() => {

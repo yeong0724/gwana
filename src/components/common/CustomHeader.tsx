@@ -1,21 +1,38 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useMemo } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 
 import { ChevronLeft, Home } from 'lucide-react';
 
+import { usePageTransitions } from '@/hooks/usePageTransitions';
+
 type Props = {
-  title: string;
+  title?: string;
 };
-const CustomHeader = ({ title }: Props) => {
+const CustomHeader = ({ title: propsTitle }: Props) => {
+  const pathname = usePathname();
   const router = useRouter();
+  const transitions = usePageTransitions();
+
+  const title = useMemo(() => {
+    if (propsTitle) return propsTitle;
+    if (pathname.startsWith('/cart')) return '장바구니';
+    if (pathname.startsWith('/payment')) return '주문/결제';
+    if (pathname.startsWith('/login')) return '로그인';
+    return '';
+  }, [propsTitle, pathname]);
 
   const goBack = () => {
-    router.back();
+    if (pathname === '/payment') {
+      transitions.goBackWithTransition();
+    } else {
+      router.back();
+    }
   };
 
   return (
-    <header className="relative flex items-center justify-center p-4 border-b border-gray-200 w-full flex-shrink-0 bg-white">
+    <header className="relative flex items-center justify-center p-4 border-b border-gray-200 w-full flex-shrink-0 bg-white page-header">
       <h1 className="text-[18px] sm:text-[19px] md:text-[20px] lg:text-[22px] font-semibold text-gray-900">
         {title}
       </h1>

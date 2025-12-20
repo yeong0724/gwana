@@ -1,6 +1,7 @@
 export type LoginInfo = {
   isLogin: boolean;
   accessToken: string;
+  from: string;
 };
 
 export type UserStore = {
@@ -8,5 +9,6 @@ export type UserStore = {
   setIsLogin: (isLogin: boolean) => void;
   setAccessToken: (accessToken: string) => void;
   setLoginInfo: (userInfo: LoginInfo) => void;
+  setFrom: (from: string) => void;
   clearLoginInfo: () => void;
 };
