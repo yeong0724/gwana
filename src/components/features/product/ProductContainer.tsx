@@ -12,14 +12,15 @@ import { usePageTransitions } from '@/hooks/usePageTransitions';
 import { useMenuStore } from '@/stores';
 
 // 카테고리 전환용 애니메이션 duration (ms)
-const CATEGORY_ANIMATION_DURATION = 300;
+const CATEGORY_ANIMATION_DURATION = 500;
 
 const ProductContainer = () => {
   const pageTransitions = usePageTransitions(); // 페이지 전환용 (상위 Provider)
 
-  // 카테고리 전환용 로컬 애니메이션 state
-  const [listAnimationClass, setListAnimationClass] = useState('');
-  const pendingCategoryRef = useRef<string | null>(null);
+  // 동시 슬라이드를 위한 상태
+  const [currentCategory, setCurrentCategory] = useState<string | null>(null);
+  const [prevCategory, setPrevCategory] = useState<string | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // 드래그 스크롤 훅들
   const categoryTabScroll = useDragScroll();
@@ -62,28 +63,32 @@ const ProductContainer = () => {
     pageTransitions.show();
   }, []);
 
-  // 카테고리 변경 시 show 애니메이션 (카테고리 전환용)
+  // 초기 카테고리 설정
   useEffect(() => {
-    if (pendingCategoryRef.current === categoryId) {
-      // 카테고리 전환으로 인한 변경 → show 애니메이션
-      setListAnimationClass('animate-slide-left-in');
+    if (currentCategory === null) {
+      setCurrentCategory(categoryId);
+    }
+  }, [categoryId, currentCategory]);
+
+  // URL의 categoryId가 변경되면 동시 슬라이드 애니메이션 시작
+  useEffect(() => {
+    if (currentCategory !== null && categoryId !== currentCategory && !isTransitioning) {
+      // 이전 카테고리 저장하고 전환 시작
+      setPrevCategory(currentCategory);
+      setCurrentCategory(categoryId);
+      setIsTransitioning(true);
+
+      // 애니메이션 완료 후 이전 카테고리 제거
       setTimeout(() => {
-        setListAnimationClass('');
-        pendingCategoryRef.current = null;
+        setPrevCategory(null);
+        setIsTransitioning(false);
       }, CATEGORY_ANIMATION_DURATION);
     }
-  }, [categoryId]);
+  }, [categoryId, currentCategory, isTransitioning]);
 
   const onClickCategory = (menuId: string) => {
-    if (menuId === categoryId) return; // 같은 카테고리면 무시
-
-    // 카테고리 전환용 hide 애니메이션
-    pendingCategoryRef.current = menuId;
-    setListAnimationClass('animate-slide-left-out');
-
-    setTimeout(() => {
-      router.push(`/product?category=${menuId}`);
-    }, CATEGORY_ANIMATION_DURATION);
+    if (menuId === categoryId || isTransitioning) return; // 같은 카테고리거나 전환 중이면 무시
+    router.push(`/product?category=${menuId}`);
   };
 
   return (
@@ -156,11 +161,25 @@ const ProductContainer = () => {
           </div>
         </div>
 
-        {/* ProductList - 카테고리 전환용 로컬 애니메이션 */}
-        <div className={`overflow-hidden ${listAnimationClass}`}>
-          <Suspense fallback={<ProductSkeleton />}>
-            <ProductList key={categoryId} categoryId={categoryId} />
-          </Suspense>
+        {/* ProductList - 동시 슬라이드 애니메이션 */}
+        <div className="relative overflow-hidden">
+          {/* 나가는 리스트 (이전 카테고리) */}
+          {prevCategory && (
+            <div className="absolute inset-0 animate-slide-left-out">
+              <Suspense fallback={<ProductSkeleton />}>
+                <ProductList key={prevCategory} categoryId={prevCategory} />
+              </Suspense>
+            </div>
+          )}
+
+          {/* 들어오는 리스트 (현재 카테고리) */}
+          {currentCategory && (
+            <div className={isTransitioning ? 'animate-slide-left-in' : ''}>
+              <Suspense fallback={<ProductSkeleton />}>
+                <ProductList key={currentCategory} categoryId={currentCategory} />
+              </Suspense>
+            </div>
+          )}
         </div>
       </main>
     </div>

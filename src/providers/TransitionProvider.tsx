@@ -20,7 +20,7 @@ export function TransitionsProvider({ children }: React.PropsWithChildren) {
         className,
         setClassName,
         flowType,
-        animationDuration: 300,
+        animationDuration: 500,
       }}
     >
       {children}
