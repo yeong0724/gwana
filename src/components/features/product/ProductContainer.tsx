@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useMemo } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { concat, filter, find } from 'lodash-es';
@@ -27,6 +27,25 @@ const ProductContainer = () => {
 
     return concat(allCategory, filter(category, { upperMenuId: pathname.replace('/', '') }));
   }, [category, pathname]);
+
+  // 선택된 탭이 보이도록 자동 스크롤
+  useEffect(() => {
+    const scrollContainer = categoryTabScroll.scrollRef.current;
+    if (!scrollContainer) return;
+
+    const selectedTab = scrollContainer.querySelector(
+      `[data-category-id="${categoryId}"]`
+    ) as HTMLElement;
+    if (!selectedTab) return;
+
+    const containerRect = scrollContainer.getBoundingClientRect();
+    const tabRect = selectedTab.getBoundingClientRect();
+
+    // 탭이 컨테이너 밖에 있으면 스크롤
+    if (tabRect.left < containerRect.left || tabRect.right > containerRect.right) {
+      selectedTab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, [categoryId, categoryTabScroll.scrollRef]);
 
   return (
     <div className="flex min-h-screen bg-gray-50 max-w-[1800px] mx-auto">
@@ -71,7 +90,8 @@ const ProductContainer = () => {
               {productCategory.map(({ menuId, menuName }) => (
                 <button
                   key={menuId}
-                  className={`py-4 px-1 cursor-pointer text-lg min-w-[80px] font-medium transition-colors duration-200 relative flex-shrink-0 ${
+                  data-category-id={menuId}
+                  className={`pb-4 px-1 cursor-pointer text-lg min-w-[80px] font-medium transition-colors duration-200 relative flex-shrink-0 ${
                     categoryId === menuId ? 'text-black' : 'text-gray-500 hover:text-gray-700'
                   }`}
                   onClick={() => router.push(`/product?category=${menuId}`)}
