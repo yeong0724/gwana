@@ -14,7 +14,7 @@ import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu
 import { usePageTransitions } from '@/hooks/usePageTransitions';
 import { useCartService } from '@/service';
 import { useCartStore, useLoginStore, useMenuStore } from '@/stores';
-import { FlowType, type Menu, type MenuGroup } from '@/types';
+import { type Menu, type MenuGroup } from '@/types';
 
 type HeaderProps = {
   menuGroup: MenuGroup;
@@ -52,7 +52,7 @@ const Header = ({ menuGroup }: HeaderProps) => {
 
   const moveToLoginPage = () => {
     toggleMenu();
-    transitions.navigateWithTransition(`/login`, FlowType.Next);
+    router.push('/login');
   };
 
   /**
