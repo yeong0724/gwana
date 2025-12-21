@@ -1,17 +1,16 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 import ProductDetailSkeleton from '@components/features/product/detail/ProductDetailSkeleton';
 import { useQueryClient } from '@tanstack/react-query';
-import { clone, find, findIndex } from 'lodash-es';
+import { clone, findIndex } from 'lodash-es';
 import { ChevronDown, Share2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { toast } from 'sonner';
 
-import { productMockData } from '@/api/mock';
 import { PurchaseGuideModal } from '@/components/common/modal';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,35 +23,23 @@ import {
 } from '@/components/ui/carousel';
 import { usePageTransitions } from '@/hooks/usePageTransitions';
 import { localeFormat } from '@/lib/utils';
-import { useCartService, useProductService } from '@/service';
+import { useCartService } from '@/service';
 import { useCartStore, useLoginStore } from '@/stores';
 import { Cart, Product } from '@/types';
 
-const initial: Product = {
-  productId: '',
-  productName: '',
-  categoryId: '',
-  categoryName: '',
-  images: [],
-  infos: [],
-  price: 0,
-  shippingPrice: 0,
-};
-
 type Props = {
-  productId: string;
+  product: Product;
 };
 
-const ProductDetailContainer = ({ productId }: Props) => {
+const ProductDetailContainer = ({ product }: Props) => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const transitions = usePageTransitions();
   const { isLogin } = useLoginStore();
   const { setCart, addCart, cart } = useCartStore();
-  const { useProductDetailQuery } = useProductService();
+  // const { useProductDetailQuery } = useProductService();
   const { useAddToCartMutation } = useCartService();
 
-  const [product, setProduct] = useState<Product>({ ...initial });
   const [quantity, setQuantity] = useState<number>(1);
 
   const [purchaseGuideModalOpen, setPurchaseGuideModalOpen] = useState<boolean>(false);
@@ -67,16 +54,7 @@ const ProductDetailContainer = ({ productId }: Props) => {
   // Portal을 위한 클라이언트 마운트 상태
   const [isMounted, setIsMounted] = useState(false);
 
-  // const { data: productDetailData, isFetching } = useProductDetailQuery(
-  //   { productId },
-  //   { enabled: !!productId }
-  // );
-
   const { mutate: addToCartMutate } = useAddToCartMutation();
-
-  // useEffect(() => {
-  //   if (productDetailData) setProduct(productDetailData.data);
-  // }, [productDetailData]);
 
   const isFetching = false;
 
@@ -85,11 +63,6 @@ const ProductDetailContainer = ({ productId }: Props) => {
     setIsMounted(true);
     transitions.show();
   }, []);
-
-  useEffect(() => {
-    const data = find(productMockData, { productId }) ?? initial;
-    setProduct(data);
-  }, [productId]);
 
   useEffect(() => {
     if (!api) return;
@@ -117,7 +90,7 @@ const ProductDetailContainer = ({ productId }: Props) => {
 
   const handleShare = () => {
     // TODO: 공유하기 로직 구현
-    console.log('공유하기', { productId });
+    console.log('공유하기');
   };
 
   /**
@@ -127,7 +100,7 @@ const ProductDetailContainer = ({ productId }: Props) => {
     const payload: Cart = {
       cartId: '',
       quantity,
-      productId,
+      productId: product.productId,
       productName: product.productName,
       categoryName: product.categoryName,
       price: product.price,
@@ -150,7 +123,7 @@ const ProductDetailContainer = ({ productId }: Props) => {
     }
     // 비로그인 상태인 경우
     else {
-      const index = findIndex(cart, { productId });
+      const index = findIndex(cart, { productId: product.productId });
 
       if (index < 0) {
         addCart(payload);
