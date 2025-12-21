@@ -16,8 +16,8 @@ export default function Layout({ children }: Props) {
   return (
     <div className={cn('flex flex-col', 'min-h-screen')}>
       <Header menuGroup={menuGroup} />
-      <main className={cn('flex-1', 'min-h-[1800px]', 'page-transition-wrapper')}>
-        <TransitionWrapper className="h-full">{children}</TransitionWrapper>
+      <main className={cn('flex-1', 'page-transition-wrapper')}>
+        <TransitionWrapper>{children}</TransitionWrapper>
       </main>
       <Footer />
     </div>

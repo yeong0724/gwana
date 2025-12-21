@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { concat, filter, find } from 'lodash-es';
@@ -12,21 +12,22 @@ import { usePageTransitions } from '@/hooks/usePageTransitions';
 import { useMenuStore } from '@/stores';
 
 // 카테고리 전환용 애니메이션 duration (ms)
-const CATEGORY_ANIMATION_DURATION = 500;
+const CATEGORY_ANIMATION_DURATION = 400;
 
 const ProductContainer = () => {
   const pageTransitions = usePageTransitions(); // 페이지 전환용 (상위 Provider)
 
-  // 동시 슬라이드를 위한 상태
-  const [currentCategory, setCurrentCategory] = useState<string | null>(null);
-  const [prevCategory, setPrevCategory] = useState<string | null>(null);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const searchParams = useSearchParams();
+  const categoryId = searchParams.get('category') ?? 'all';
 
   // 드래그 스크롤 훅들
   const categoryTabScroll = useDragScroll();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const categoryId = searchParams.get('category') ?? 'all';
+
+  // 동시 슬라이드를 위한 상태
+  const [currentCategory, setCurrentCategory] = useState<string>(categoryId);
+  const [prevCategory, setPrevCategory] = useState<string | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const router = useRouter();
 
   const {
@@ -63,12 +64,7 @@ const ProductContainer = () => {
     pageTransitions.show();
   }, []);
 
-  // 초기 카테고리 설정
-  useEffect(() => {
-    if (currentCategory === null) {
-      setCurrentCategory(categoryId);
-    }
-  }, [categoryId, currentCategory]);
+  // 초기 카테고리 설정 제거 (useState에서 직접 수행)
 
   // URL의 categoryId가 변경되면 동시 슬라이드 애니메이션 시작
   useEffect(() => {
@@ -121,7 +117,7 @@ const ProductContainer = () => {
       </nav>
 
       {/* 메인 컨텐츠 영역 - 나머지 공간 차지 */}
-      <main className="flex-1 p-8 pt-5 overflow-y-auto min-w-0 lg:ml-80 bg-white">
+      <div className="flex-1 p-8 pt-5 min-w-0 lg:ml-80 bg-white">
         {/* 모바일/태블릿용 탭 네비게이션 */}
         <div className="lg:hidden mb-6 -mx-8">
           {/* 카테고리 탭들 */}
@@ -181,7 +177,7 @@ const ProductContainer = () => {
             </div>
           )}
         </div>
-      </main>
+      </div>
     </div>
   );
 };

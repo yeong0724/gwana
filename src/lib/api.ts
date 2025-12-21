@@ -69,7 +69,11 @@ instance.interceptors.response.use(
           const newAccessToken = get(data, 'data', '');
 
           if (code === '0000') {
-            loginActions.setLoginInfo({ accessToken: newAccessToken, isLogin: true });
+            loginActions.setLoginInfo({
+              accessToken: newAccessToken,
+              isLogin: true,
+              redirectUrl: '/',
+            });
 
             error.config.headers.Authorization = `Bearer ${newAccessToken}`;
             return instance(error.config);

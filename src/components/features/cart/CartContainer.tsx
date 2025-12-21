@@ -13,13 +13,13 @@ import { usePageTransitions } from '@/hooks/usePageTransitions';
 import { localeFormat } from '@/lib/utils';
 import { useCartService } from '@/service';
 import { useCartStore, useLoginStore } from '@/stores';
-import { Cart } from '@/types';
+import { Cart, FlowType } from '@/types';
 
 const CartContainer = () => {
   const router = useRouter();
   const transitions = usePageTransitions();
   const { cart: cartStore, setCart: setCartStore, _hasHydrated } = useCartStore();
-  const { isLogin } = useLoginStore();
+  const { isLogin, setRedirectUrl } = useLoginStore();
 
   const [purchaseGuideModalOpen, setPurchaseGuideModalOpen] = useState<boolean>(false);
 
@@ -114,11 +114,17 @@ const CartContainer = () => {
     }));
 
     const { data: sessionId } = await createPaymentSessionAsync(payload);
-    router.push(`/payment?sessionId=${sessionId}`);
+
+    transitions.hide(FlowType.Next).then(() => {
+      router.push(`/payment?sessionId=${sessionId}`);
+    });
   };
 
   const moveToLoginPage = () => {
-    router.push('/login');
+    setRedirectUrl('/cart');
+    transitions.hide(FlowType.Next).then(() => {
+      router.push('/login');
+    });
   };
 
   useEffect(() => {
@@ -133,9 +139,9 @@ const CartContainer = () => {
     <>
       {/* 메인 컨텐츠 */}
       <div className="flex flex-col w-full max-w-[500px] mx-auto flex-1 border-x border-gray-100 overflow-hidden">
-        {/* 전체선택 헤더 - 고정 영역 */}
+        {/* 전체선택 헤더 */}
         <div className="flex items-center justify-between p-3 sm:p-4 bg-white border-b border-gray-200 flex-shrink-0">
-          <div className="flex items-center gap-2">
+          <label className="flex items-center gap-2 cursor-pointer select-none">
             <Checkbox
               checked={cart.length > 0 && !some(cart, { checked: false })}
               onCheckedChange={(checked: boolean) => onAllCheckboxHandler(checked)}
@@ -144,7 +150,7 @@ const CartContainer = () => {
             <span className="text-[14px] sm:text-[15px] font-medium text-gray-900">
               전체선택 ({size(filter(cart, { checked: true }))} / {size(cart)})
             </span>
-          </div>
+          </label>
           <button
             disabled={isNoSelect}
             className="text-[13px] sm:text-[14px] text-gray-600 hover:text-gray-900 hover:bg-gray-100 px-2 py-1 rounded-md transition-colors disabled:text-gray-300 disabled:hover:bg-transparent disabled:cursor-not-allowed"
@@ -154,7 +160,7 @@ const CartContainer = () => {
           </button>
         </div>
 
-        {/* 스크롤 영역 - 상품 리스트 + 결제 예상 금액 */}
+        {/* 상품 리스트 + 결제 예상 금액 */}
         <div className="flex-1 overflow-y-auto min-h-0">
           {cart.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full gap-3 bg-gray-100">

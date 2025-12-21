@@ -1,6 +1,7 @@
 export type LoginInfo = {
   isLogin: boolean;
   accessToken: string;
+  redirectUrl: string;
 };
 
 export type UserStore = {
@@ -9,4 +10,5 @@ export type UserStore = {
   setAccessToken: (accessToken: string) => void;
   setLoginInfo: (userInfo: LoginInfo) => void;
   clearLoginInfo: () => void;
+  setRedirectUrl: (redirectUrl: string) => void;
 };

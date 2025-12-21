@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { filter, map } from 'lodash-es';
@@ -19,27 +19,12 @@ const ProductList = ({ categoryId }: Props) => {
   const router = useRouter();
   const transitions = usePageTransitions();
   const { useProductListQuery } = useProductService();
-  const [productList, setProductList] = useState<Array<Product>>([]);
 
-  // const { data: productListData, isFetching } = useProductListQuery(
-  //   { categoryId: categoryId === 'all' ? '' : categoryId },
-  //   { enabled: true, staleTime: 0 }
-  // );
-
-  // useEffect(() => {
-  //   if (productListData) {
-  //     const { data } = productListData;
-  //     setProductList(data);
-  //   }
-  // }, [productListData, categoryId]);
-
-  useEffect(() => transitions.show(), []);
-
-  useEffect(() => {
-    const data = categoryId === 'all' ? productMockData : filter(productMockData, { categoryId });
-
-    setProductList(data);
+  const productList = useMemo(() => {
+    return categoryId === 'all' ? productMockData : filter(productMockData, { categoryId });
   }, [categoryId]);
+
+  // useEffect(() => transitions.show(), []);
 
   const onClickProduct = (productId: string) => {
     transitions.hide(FlowType.Next).then(() => {

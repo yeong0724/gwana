@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { isEmpty } from 'lodash-es';
+import { cloneDeep, isEmpty } from 'lodash-es';
 
 import { useCartService, useLoginService } from '@/service';
 import { useAlertStore, useCartStore, useLoginStore } from '@/stores';
@@ -16,14 +16,14 @@ interface Props {
 const KakaoRedirectContainer = ({ code }: Props) => {
   const router = useRouter();
   const { showConfirmAlert } = useAlertStore();
-  const { setLoginInfo, clearLoginInfo } = useLoginStore();
+  const { setLoginInfo, clearLoginInfo, redirectUrl } = useLoginStore();
   const { cart, _hasHydrated } = useCartStore();
 
   const { useGetAccessTokenByKakaoCode } = useLoginService();
   const { useUpdateCartListMutation } = useCartService();
 
   const { mutate: getAccessTokenByKakaoCode, isPending } = useGetAccessTokenByKakaoCode();
-  const { mutate: updateCartListMutate } = useUpdateCartListMutation();
+  const { mutateAsync: updateCartListAsync } = useUpdateCartListMutation();
 
   const callbackKakaoLogin = () => {
     getAccessTokenByKakaoCode(
@@ -31,11 +31,15 @@ const KakaoRedirectContainer = ({ code }: Props) => {
       {
         onSuccess: async ({ code, data }) => {
           if (code === ResultCode.SUCCESS) {
-            setLoginInfo({ accessToken: data, isLogin: true });
+            const url = cloneDeep(redirectUrl);
 
-            if (!isEmpty(cart)) updateCartListMutate(cart);
+            setLoginInfo({ accessToken: data, isLogin: true, redirectUrl: '/' });
 
-            router.push('/');
+            if (!isEmpty(cart)) {
+              await updateCartListAsync(cart);
+            }
+
+            router.replace(url);
           }
         },
         onError: async () => {
@@ -55,7 +59,9 @@ const KakaoRedirectContainer = ({ code }: Props) => {
   };
 
   useEffect(() => {
-    if (_hasHydrated) callbackKakaoLogin();
+    if (_hasHydrated) {
+      callbackKakaoLogin();
+    }
   }, [_hasHydrated]);
 
   return isPending && <p className="mt-[150px] text-lg">Kakao Login Processing...</p>;

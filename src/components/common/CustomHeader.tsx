@@ -1,17 +1,33 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useMemo } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 
 import { ChevronLeft, Home } from 'lucide-react';
 
-type Props = {
-  title: string;
-};
-const CustomHeader = ({ title }: Props) => {
+import { usePageTransitions } from '@/hooks/usePageTransitions';
+import { FlowType } from '@/types';
+
+const CustomHeader = () => {
+  const pathname = usePathname();
   const router = useRouter();
+  const transitions = usePageTransitions();
+
+  const title = useMemo(() => {
+    if (pathname.startsWith('/cart')) return '장바구니';
+    if (pathname.startsWith('/payment')) return '주문/결제';
+    if (pathname.startsWith('/login')) return '로그인';
+    return '';
+  }, [pathname]);
 
   const goBack = () => {
-    router.back();
+    if (pathname.startsWith('/payment')) {
+      transitions.hide(FlowType.Previous).then(() => {
+        router.back();
+      });
+    } else {
+      router.back();
+    }
   };
 
   return (

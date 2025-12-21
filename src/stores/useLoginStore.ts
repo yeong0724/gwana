@@ -7,6 +7,7 @@ import { LoginInfo, UserStore } from '@/types';
 const initailState: LoginInfo = {
   isLogin: false,
   accessToken: '',
+  redirectUrl: '/',
 };
 
 type ExtendedUserStore = UserStore & {
@@ -26,6 +27,10 @@ export const loginStore = create<ExtendedUserStore>()(
       setAccessToken: (accessToken: string) =>
         set((state) => ({
           loginInfo: { ...state.loginInfo, accessToken },
+        })),
+      setRedirectUrl: (redirectUrl: string) =>
+        set((state) => ({
+          loginInfo: { ...state.loginInfo, redirectUrl },
         })),
       setLoginInfo: (loginInfo: LoginInfo) => set({ loginInfo }),
       clearLoginInfo: () => set({ loginInfo: initailState }),
@@ -52,9 +57,11 @@ const useLoginStore = () =>
       loginInfo: state.loginInfo,
       isLogin: state.loginInfo.isLogin,
       accessToken: state.loginInfo.accessToken,
+      redirectUrl: state.loginInfo.redirectUrl,
       _hasHydrated: state._hasHydrated,
       setIsLogin: state.setIsLogin,
       setAccessToken: state.setAccessToken,
+      setRedirectUrl: state.setRedirectUrl,
       setLoginInfo: state.setLoginInfo,
       clearLoginInfo: state.clearLoginInfo,
     }))
