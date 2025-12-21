@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { concat, filter, find } from 'lodash-es';
@@ -121,7 +121,7 @@ const ProductContainer = () => {
       </nav>
 
       {/* 메인 컨텐츠 영역 - 나머지 공간 차지 */}
-      <main className="flex-1 p-8 pt-5 min-w-0 lg:ml-80 bg-white">
+      <main className="flex-1 p-8 pt-5 overflow-y-auto min-w-0 lg:ml-80 bg-white">
         {/* 모바일/태블릿용 탭 네비게이션 */}
         <div className="lg:hidden mb-6 -mx-8">
           {/* 카테고리 탭들 */}

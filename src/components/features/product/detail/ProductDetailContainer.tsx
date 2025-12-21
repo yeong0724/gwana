@@ -331,13 +331,13 @@ const ProductDetailContainer = ({ productId }: Props) => {
               <div className="hidden lg:flex">
                 <Button
                   onClick={handleAddToCart}
-                  className="flex-[0_0_35%] h-12 bg-black text-white rounded-none"
+                  className="flex-[0_0_35%] h-12 text-base bg-black text-white hover:bg-gray-800 rounded-none rounded-l-none cursor-pointer"
                 >
                   장바구니
                 </Button>
                 <Button
                   onClick={handlePurchase}
-                  className="flex-[0_0_65%] h-12 bg-teal-600 text-white rounded-none"
+                  className="flex-[0_0_65%] h-12 text-base bg-teal-600 text-white hover:bg-teal-700 rounded-none rounded-r-none cursor-pointer"
                 >
                   구매하기
                 </Button>
@@ -349,7 +349,7 @@ const ProductDetailContainer = ({ productId }: Props) => {
 
       {/* 상세정보 섹션 */}
       {!isFetching && (
-        <div className="max-w-[1000px] mx-auto px-4 pt-0 pb-8 lg:py-16 mb-[120px]">
+        <div className="max-w-[1000px] mx-auto px-4 pt-0 pb-8 lg:py-16 mb-[200px]">
           {/* 상세정보 타이틀 */}
           <div className="relative flex items-center justify-center mb-8 lg:mb-12">
             {/* 양쪽 라인 */}
@@ -421,18 +421,18 @@ const ProductDetailContainer = ({ productId }: Props) => {
                         size="icon"
                         onClick={() => setQuantity((prev) => prev - 1)}
                         disabled={quantity <= 1}
-                        className="h-9 w-9 rounded-none border-r-0 bg-white"
+                        className="h-9 w-9 rounded-none border-r-0 cursor-pointer text-base bg-white"
                       >
                         -
                       </Button>
-                      <div className="w-16 text-center h-9 border border-gray-300 text-sm bg-white flex items-center justify-center">
+                      <div className="w-16 text-center h-9 rounded-none border border-gray-300 text-sm bg-white flex items-center justify-center select-none">
                         {quantity}
                       </div>
                       <Button
                         variant="outline"
                         size="icon"
                         onClick={() => setQuantity((prev) => prev + 1)}
-                        className="h-9 w-9 rounded-none border-l-0"
+                        className="h-9 w-9 rounded-none border-l-0 cursor-pointer text-base"
                       >
                         +
                       </Button>
@@ -451,13 +451,13 @@ const ProductDetailContainer = ({ productId }: Props) => {
               <div className="flex">
                 <Button
                   onClick={onCartMobileHandler}
-                  className="flex-[0_0_35%] h-14 bg-black text-white rounded-none"
+                  className="flex-[0_0_35%] h-14 text-base bg-black text-white hover:bg-gray-800 rounded-none cursor-pointer"
                 >
                   장바구니
                 </Button>
                 <Button
                   onClick={onPurchaseMobileHandler}
-                  className="flex-[0_0_65%] h-14 bg-teal-600 text-white rounded-none"
+                  className="flex-[0_0_65%] h-14 text-base bg-teal-600 text-white hover:bg-teal-700 rounded-none cursor-pointer"
                 >
                   구매하기
                 </Button>
@@ -466,7 +466,6 @@ const ProductDetailContainer = ({ productId }: Props) => {
           </div>,
           document.body
         )}
-
       <PurchaseGuideModal
         modalOpen={purchaseGuideModalOpen}
         setModalOpen={setPurchaseGuideModalOpen}

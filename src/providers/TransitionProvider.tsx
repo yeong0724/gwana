@@ -1,7 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import React, { createContext, useContext, useRef, useState } from 'react';
 
 import { FlowType, TransitionsContextType } from '@/types';
 
@@ -14,7 +13,6 @@ export const TransitionsContext = createContext<TransitionsContextType | null>(n
 export function TransitionsProvider({ children }: React.PropsWithChildren) {
   const [className, setClassName] = useState('');
   const flowType = useRef<FlowType | null>(null);
-  const navigationResolveRef = useRef<(() => void) | null>(null);
 
   return (
     <TransitionsContext.Provider
@@ -23,7 +21,6 @@ export function TransitionsProvider({ children }: React.PropsWithChildren) {
         setClassName,
         flowType,
         animationDuration: 300,
-        navigationResolveRef,
       }}
     >
       {children}
