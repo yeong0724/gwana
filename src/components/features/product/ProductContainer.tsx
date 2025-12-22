@@ -11,7 +11,7 @@ import { useDragScroll } from '@/hooks/useDragScroll';
 import { useMenuStore } from '@/stores';
 
 // 카테고리 전환용 애니메이션 duration (ms)
-const CATEGORY_ANIMATION_DURATION = 400;
+const CATEGORY_ANIMATION_DURATION = 600;
 
 const ProductContainer = () => {
   const searchParams = useSearchParams();

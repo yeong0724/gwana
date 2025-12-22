@@ -12,7 +12,7 @@ const useNativeRouter = () => {
         { transform: `translateX(${isForward ? '-100%' : '100%'})` },
       ],
       {
-        duration: 1000,
+        duration: 800,
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
         fill: 'forwards',
         pseudoElement: '::view-transition-old(root)',
@@ -25,7 +25,7 @@ const useNativeRouter = () => {
         { transform: 'translateX(0)' },
       ],
       {
-        duration: 1000,
+        duration: 800,
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
         fill: 'forwards',
         pseudoElement: '::view-transition-new(root)',
