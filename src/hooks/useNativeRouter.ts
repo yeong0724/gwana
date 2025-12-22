@@ -1,7 +1,10 @@
 import { useRouter } from 'next/navigation';
 
+import { getIsMobile } from '@/lib/utils';
+
 const useNativeRouter = () => {
   const router = useRouter();
+  const isMobile = getIsMobile();
 
   const slideAnimation = (direction: 'forward' | 'backward') => {
     const isForward = direction === 'forward';
@@ -34,7 +37,9 @@ const useNativeRouter = () => {
   };
 
   const forward = (path: string) => {
-    if (!document.startViewTransition) {
+    const isMobile = getIsMobile();
+
+    if (!isMobile || !document.startViewTransition) {
       router.push(path);
       return;
     }
@@ -47,7 +52,7 @@ const useNativeRouter = () => {
   };
 
   const backward = () => {
-    if (!document.startViewTransition) {
+    if (!isMobile || !document.startViewTransition) {
       router.back();
       return;
     }

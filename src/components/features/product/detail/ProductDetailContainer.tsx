@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-import ProductDetailSkeleton from '@components/features/product/detail/ProductDetailSkeleton';
 import { useQueryClient } from '@tanstack/react-query';
 import { clone, findIndex } from 'lodash-es';
 import { ChevronDown, Share2 } from 'lucide-react';
@@ -164,157 +163,153 @@ const ProductDetailContainer = ({ product, productId }: Props) => {
     <>
       {/* 모바일에서 하단 버튼 영역 높이만큼 여백 추가 */}
       <div className="max-w-[1000px] mx-auto px-4 py-8 pb-2 lg:pb-10">
-        {isFetching ? (
-          <ProductDetailSkeleton />
-        ) : (
-          <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
-            {/* 좌측: 이미지 캐러셀 */}
-            <div className="flex-1 lg:flex-[0_0_50%] px-6 lg:px-0">
-              {product?.images && product.images.length > 0 ? (
-                <div className="w-full group">
-                  <Carousel
-                    className="w-full"
-                    setApi={setApi}
-                    opts={{
-                      align: 'start',
-                      loop: product.images.length > 1,
-                    }}
-                  >
-                    <CarouselContent>
-                      {product.images.map((image, index) => (
-                        <CarouselItem key={index}>
-                          <div className="relative w-full aspect-square">
-                            <Image
-                              src={image}
-                              alt={`${product.productName} ${index + 1}`}
-                              fill
-                              className="object-cover"
-                              sizes="(max-width: 768px) 100vw, 50vw"
-                              priority
-                            />
-                          </div>
-                        </CarouselItem>
-                      ))}
-                    </CarouselContent>
-                    {product.images.length > 1 && (
-                      <>
-                        <CarouselPrevious className="left-4 opacity-0 group-hover:opacity-100 disabled:opacity-0 transition-opacity" />
-                        <CarouselNext className="right-4 opacity-0 group-hover:opacity-100 disabled:opacity-0 transition-opacity" />
-                      </>
-                    )}
-                  </Carousel>
-                  {/* 페이지 인디케이터 - 프로그레스 바 스타일 */}
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
+          {/* 좌측: 이미지 캐러셀 */}
+          <div className="flex-1 lg:flex-[0_0_50%] px-6 lg:px-0">
+            {product?.images && product.images.length > 0 ? (
+              <div className="w-full group">
+                <Carousel
+                  className="w-full"
+                  setApi={setApi}
+                  opts={{
+                    align: 'start',
+                    loop: product.images.length > 1,
+                  }}
+                >
+                  <CarouselContent>
+                    {product.images.map((image, index) => (
+                      <CarouselItem key={index}>
+                        <div className="relative w-full aspect-square">
+                          <Image
+                            src={image}
+                            alt={`${product.productName} ${index + 1}`}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            priority
+                          />
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
                   {product.images.length > 1 && (
-                    <div className="flex justify-center mt-4">
-                      <div className="w-1/3 relative h-1 bg-gray-200 overflow-hidden">
-                        <div
-                          className="absolute left-0 h-full bg-black/80 transition-all duration-300 ease-out"
-                          style={{
-                            width: `${((current + 1) / product.images.length) * 100}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
+                    <>
+                      <CarouselPrevious className="left-4 opacity-0 group-hover:opacity-100 disabled:opacity-0 transition-opacity" />
+                      <CarouselNext className="right-4 opacity-0 group-hover:opacity-100 disabled:opacity-0 transition-opacity" />
+                    </>
                   )}
-                </div>
-              ) : (
-                <div className="w-full aspect-square bg-gray-200 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
-                </div>
-              )}
+                </Carousel>
+                {/* 페이지 인디케이터 - 프로그레스 바 스타일 */}
+                {product.images.length > 1 && (
+                  <div className="flex justify-center mt-4">
+                    <div className="w-1/3 relative h-1 bg-gray-200 overflow-hidden">
+                      <div
+                        className="absolute left-0 h-full bg-black/80 transition-all duration-300 ease-out"
+                        style={{
+                          width: `${((current + 1) / product.images.length) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="w-full aspect-square bg-gray-200 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+              </div>
+            )}
+          </div>
+
+          {/* 우측: 상품 정보 */}
+          <div className="flex-1 lg:flex-[0_0_50%] flex flex-col">
+            {/* 브레드크럼과 공유 아이콘 */}
+            <div className="flex items-center justify-between text-[18px] font-medium text-gray-400 mb-[24px]">
+              <div>
+                <span>티 제품</span>
+                <span className="mx-2">{'>'}</span>
+                <span>{product.categoryName}</span>
+              </div>
+              <button
+                onClick={handleShare}
+                className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                aria-label="공유하기"
+              >
+                <Share2 size={18} className="text-gray-400" />
+              </button>
             </div>
 
-            {/* 우측: 상품 정보 */}
-            <div className="flex-1 lg:flex-[0_0_50%] flex flex-col">
-              {/* 브레드크럼과 공유 아이콘 */}
-              <div className="flex items-center justify-between text-[18px] font-medium text-gray-400 mb-[24px]">
-                <div>
-                  <span>티 제품</span>
-                  <span className="mx-2">{'>'}</span>
-                  <span>{product.categoryName}</span>
-                </div>
-                <button
-                  onClick={handleShare}
-                  className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
-                  aria-label="공유하기"
-                >
-                  <Share2 size={18} className="text-gray-400" />
-                </button>
-              </div>
+            {/* 상품명 */}
+            <h1 className="text-xl lg:text-[20px] font-bold mb-[30px]">{product.productName}</h1>
 
-              {/* 상품명 */}
-              <h1 className="text-xl lg:text-[20px] font-bold mb-[30px]">{product.productName}</h1>
+            {/* 가격 */}
+            <div className="text-[30px] mb-6">{localeFormat(product.price)}원</div>
 
-              {/* 가격 */}
-              <div className="text-[30px] mb-6">{localeFormat(product.price)}원</div>
-
-              {/* 배송비 정보 */}
-              <div className="mb-6 pb-6">
-                <div className="text-[14px] text-gray-400">
-                  <span>배송비</span>
-                  <span className="ml-2">
-                    <span className="text-gray-900">
-                      {product.shippingPrice ? (
-                        `${localeFormat(product.shippingPrice)}원`
-                      ) : (
-                        <span className="font-medium">무료배송</span>
-                      )}
-                    </span>
+            {/* 배송비 정보 */}
+            <div className="mb-6 pb-6">
+              <div className="text-[14px] text-gray-400">
+                <span>배송비</span>
+                <span className="ml-2">
+                  <span className="text-gray-900">
+                    {product.shippingPrice ? (
+                      `${localeFormat(product.shippingPrice)}원`
+                    ) : (
+                      <span className="font-medium">무료배송</span>
+                    )}
                   </span>
-                </div>
+                </span>
               </div>
+            </div>
 
-              {/* 구매수량 - 데스크톱에서만 표시 (모바일은 하단 패널에서) */}
-              <div className="hidden lg:flex items-center justify-between mb-6 bg-gray-100 p-5">
-                <label className="text-sm font-medium text-gray-700">구매수량</label>
-                <div className="flex items-center">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setQuantity((prev) => prev - 1)}
-                    disabled={quantity <= 1}
-                    className="h-11 w-11 rounded-none border-r-0 cursor-pointer text-lg bg-white"
-                  >
-                    -
-                  </Button>
-                  <div className="w-24 text-center h-11 rounded-none border-x border-y border-gray-300 text-base bg-white flex items-center justify-center select-none">
-                    {quantity}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setQuantity((prev) => prev + 1)}
-                    className="h-11 w-11 rounded-none border-l-0 cursor-pointer text-lg"
-                  >
-                    +
-                  </Button>
-                </div>
-              </div>
-
-              {/* 상품금액 합계 - 데스크톱에서만 표시 */}
-              <div className="hidden lg:flex items-center justify-between py-4 mb-6">
-                <span className="text-base font-medium text-gray-700">상품금액 합계</span>
-                <span className="text-2xl font-bold">{localeFormat(totalPrice)}원</span>
-              </div>
-
-              {/* 버튼 영역 - 데스크톱에서만 표시 */}
-              <div className="hidden lg:flex">
+            {/* 구매수량 - 데스크톱에서만 표시 (모바일은 하단 패널에서) */}
+            <div className="hidden lg:flex items-center justify-between mb-6 bg-gray-100 p-5">
+              <label className="text-sm font-medium text-gray-700">구매수량</label>
+              <div className="flex items-center">
                 <Button
-                  onClick={handleAddToCart}
-                  className="flex-[0_0_35%] h-12 text-base bg-black text-white hover:bg-gray-800 rounded-none rounded-l-none cursor-pointer"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setQuantity((prev) => prev - 1)}
+                  disabled={quantity <= 1}
+                  className="h-11 w-11 rounded-none border-r-0 cursor-pointer text-lg bg-white"
                 >
-                  장바구니
+                  -
                 </Button>
+                <div className="w-24 text-center h-11 rounded-none border-x border-y border-gray-300 text-base bg-white flex items-center justify-center select-none">
+                  {quantity}
+                </div>
                 <Button
-                  onClick={handlePurchase}
-                  className="flex-[0_0_65%] h-12 text-base bg-teal-600 text-white hover:bg-teal-700 rounded-none rounded-r-none cursor-pointer"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setQuantity((prev) => prev + 1)}
+                  className="h-11 w-11 rounded-none border-l-0 cursor-pointer text-lg"
                 >
-                  구매하기
+                  +
                 </Button>
               </div>
+            </div>
+
+            {/* 상품금액 합계 - 데스크톱에서만 표시 */}
+            <div className="hidden lg:flex items-center justify-between py-4 mb-6">
+              <span className="text-base font-medium text-gray-700">상품금액 합계</span>
+              <span className="text-2xl font-bold">{localeFormat(totalPrice)}원</span>
+            </div>
+
+            {/* 버튼 영역 - 데스크톱에서만 표시 */}
+            <div className="hidden lg:flex">
+              <Button
+                onClick={handleAddToCart}
+                className="flex-[0_0_35%] h-12 text-base bg-black text-white hover:bg-gray-800 rounded-none rounded-l-none cursor-pointer"
+              >
+                장바구니
+              </Button>
+              <Button
+                onClick={handlePurchase}
+                className="flex-[0_0_65%] h-12 text-base bg-teal-600 text-white hover:bg-teal-700 rounded-none rounded-r-none cursor-pointer"
+              >
+                구매하기
+              </Button>
             </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* 상세정보 섹션 */}
