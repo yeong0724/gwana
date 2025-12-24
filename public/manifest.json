@@ -9,12 +9,12 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/images/gwana_logo-192x192.webp",
+      "src": "/images/gwana_logo-192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/images/gwana_logo-512x512.webp",
+      "src": "/images/gwana_logo-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
