@@ -18,7 +18,7 @@ const MainLayout = ({ children }: Props) => {
   const isNoMainHeaderPage = noMainHeaderPage(pathname);
 
   return isNoMainHeaderPage ? (
-    <div className="min-h-dvh bg-gray-50 flex flex-col relative overflow-hidden">
+    <div className="h-dvh bg-gray-50 flex flex-col relative overflow-hidden">
       <CustomHeader />
       {children}
     </div>
