@@ -2,11 +2,7 @@
 
 import { ReactNode } from 'react';
 
-type Props = {
-  children: ReactNode;
-};
-
-const MainContainer = ({ children }: Props) => {
+const MainContainer = () => {
   // const { setLoginInfo, loginInfo, _hasHydrated } = useLoginStore();
   // const { useRefreshAccessToken } = useLoginService();
 
@@ -50,7 +46,26 @@ const MainContainer = ({ children }: Props) => {
   //   }
   // }, [_hasHydrated]);
 
-  return <>{children}</>;
+  return (
+    <div>
+      <video
+        src="/videos/tea_drip.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="w-full h-full object-cover"
+      />
+      <video
+        src="/videos/gwana_intro.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="w-full h-full object-cover"
+      />
+    </div>
+  );
 };
 
 export default MainContainer;
