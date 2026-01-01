@@ -133,9 +133,9 @@ const ProductContainer = () => {
       </nav>
 
       {/* 메인 컨텐츠 영역 - 나머지 공간 차지 */}
-      <div className="flex-1 p-8 pt-5 min-w-0 lg:ml-80 bg-white">
+      <div className="flex-1 p-4 md:p-8 pt-5 min-w-0 lg:ml-80 bg-white">
         {/* 모바일/태블릿용 탭 네비게이션 */}
-        <div className="lg:hidden mb-6 -mx-8">
+        <div className="lg:hidden mb-6 -mx-4 md:-mx-8">
           {/* 카테고리 탭들 */}
           <div className="border-b border-gray-200 mb-4">
             <nav
