@@ -179,7 +179,7 @@
       sans-serif;
   }
   button {
-    @apply transition-all active:scale-[0.95];
+    @apply transition-all active:opacity-60;
     cursor: pointer;
   }
   button:disabled {

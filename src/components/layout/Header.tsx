@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 
 import { useQueryClient } from '@tanstack/react-query';
 import { filter, size } from 'lodash-es';
-import { ChevronLeft, Menu as MenuIcon, ShoppingCart, User } from 'lucide-react';
+import { ChevronLeft, Menu as MenuIcon, ShoppingBag, ShoppingCart, User } from 'lucide-react';
 
 import UserDropdownContent from '@/components/layout/UserDropdownContent';
 import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -262,17 +262,17 @@ const Header = ({ menuGroup }: HeaderProps) => {
       </header>
       {/* Side - Header */}
       <header className="h-[70px] lg:hidden top-0 bg-white border-b border-gray-200 z-40">
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="relative flex items-center justify-between px-4 py-3">
+          {/* 왼쪽 - 뒤로가기 */}
           <button
             onClick={goBackWithTransitions}
-            className="hover:bg-gray-100 rounded-md transition-colors z-50 relative"
+            className="hover:bg-gray-100 rounded-md transition-colors z-10"
           >
-            {/* <MenuIcon size={24} className="text-gray-700" /> */}
             <ChevronLeft size={24} className="text-gray-700 sm:w-6 sm:h-6" />
           </button>
 
-          {/* 로고 */}
-          <div>
+          {/* 로고 - 절대 중앙 */}
+          <div className="absolute left-1/2 -translate-x-1/2">
             <Image
               src="/images/gwana_logo.webp"
               alt="gwana_logo"
@@ -283,8 +283,24 @@ const Header = ({ menuGroup }: HeaderProps) => {
           </div>
 
           {/* 우측 아이콘들 */}
-          <div className="flex items-center space-x-2" onClick={toggleMenu}>
-            <button className="relative p-2 hover:bg-gray-100 rounded-md transition-colors">
+          <div className="flex items-center space-x-6 z-10">
+            <button
+              className="relative py-2 hover:bg-gray-100 rounded-md transition-colors"
+              onClick={() => router.push('/cart')}
+            >
+              <ShoppingBag size={24} className="text-gray-700" />
+              {cartCount > 0 && (
+                <span
+                  className={`absolute top-[0px] flex items-center justify-center min-w-[20px] h-[20px] px-1 bg-red-500 text-white text-[12px] font-bold rounded-full ${cartCount > 99 ? 'right-[-5px]' : 'right-[-10px]'}`}
+                >
+                  {cartCount > 99 ? '99+' : cartCount}
+                </span>
+              )}
+            </button>
+            <button
+              className="relative py-1 hover:bg-gray-100 rounded-md transition-colors"
+              onClick={toggleMenu}
+            >
               <MenuIcon size={24} className="text-gray-700" />
             </button>
           </div>

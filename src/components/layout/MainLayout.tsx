@@ -1,13 +1,15 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
 import { CustomHeader } from '@/components/common';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import { menuGroup } from '@/constants';
-import { cn, noMainHeaderPage } from '@/lib/utils';
+import { refreshAccessTokenSingleton } from '@/lib/tokenManager';
+import { allClearPersistStore, cn, noMainHeaderPage, validateToken } from '@/lib/utils';
+import { useLoginStore } from '@/stores';
 
 interface Props {
   children: ReactNode;
@@ -16,6 +18,35 @@ interface Props {
 const MainLayout = ({ children }: Props) => {
   const pathname = usePathname();
   const isNoMainHeaderPage = noMainHeaderPage(pathname);
+
+  const { setLoginInfo, loginInfo, _hasHydrated } = useLoginStore();
+
+  const onCheckLoginStatus = async () => {
+    const { accessToken } = loginInfo;
+
+    if (!accessToken) {
+      setLoginInfo({ isLogin: false, accessToken, redirectUrl: '/' });
+      return;
+    }
+
+    // Access Token이 아직 유효한 경우
+    if (validateToken(accessToken)) {
+      setLoginInfo({ isLogin: true, accessToken, redirectUrl: '/' });
+      return;
+    }
+
+    // Access Token 만료 시 갱신 시도
+    try {
+      await refreshAccessTokenSingleton();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      allClearPersistStore();
+    }
+  };
+
+  useEffect(() => {
+    if (_hasHydrated) onCheckLoginStatus();
+  }, [_hasHydrated]);
 
   return isNoMainHeaderPage ? (
     <div className="h-dvh bg-gray-50 flex flex-col relative overflow-hidden">

@@ -34,9 +34,8 @@ const validateToken = (token: string): boolean => {
     if (!decoded || !decoded.exp) return false;
 
     const currentTime = Date.now() / 1000;
-    if (currentTime > decoded.exp) return false;
 
-    return decoded.exp - currentTime > 0;
+    return currentTime < decoded.exp;
   } catch (error) {
     console.log('[vadiidateToken] error :', error);
     return false;

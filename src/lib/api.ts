@@ -1,14 +1,12 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { get, isEmpty } from 'lodash-es';
-import { toast } from 'sonner';
 
+import { refreshAccessTokenSingleton } from '@/lib/tokenManager';
 import { allClearPersistStore } from '@/lib/utils';
 import { alertStore } from '@/stores/useAlertStore';
 import { loginActions } from '@/stores/useLoginStore';
 import { ResultCode } from '@/types';
 import { HttpMethod } from '@/types/api';
-
-// const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/${process.env.NEXT_PUBLIC_API_PREFIX}/${process.env.NEXT_PUBLIC_API_VERSION}`;
 
 // API 인스턴스 생성
 const axiosOption = {
@@ -20,7 +18,7 @@ const axiosOption = {
   },
 };
 
-const basicInstance: AxiosInstance = axios.create(axiosOption);
+export const basicInstance: AxiosInstance = axios.create(axiosOption);
 
 const instance: AxiosInstance = axios.create(axiosOption);
 
@@ -61,31 +59,13 @@ instance.interceptors.response.use(
 
     if (status === 401) {
       if (data.code === ResultCode.UNAUTHORIZED) {
-        const { accessToken } = loginActions.getLoginInfo();
-
         try {
-          const { data } = await basicInstance.post('/user/refresh/token', { accessToken });
-          const code = get(data, 'code', '');
-          const newAccessToken = get(data, 'data', '');
-
-          if (code === '0000') {
-            loginActions.setLoginInfo({
-              accessToken: newAccessToken,
-              isLogin: true,
-              redirectUrl: '/',
-            });
-
-            error.config.headers.Authorization = `Bearer ${newAccessToken}`;
-            return instance(error.config);
-          } else {
-            allClearPersistStore();
-            toast.error(data.message);
-            window.location.href = '/';
-            throw error;
-          }
-        } catch (refreshTokenError) {
+          const newAccessToken = await refreshAccessTokenSingleton();
+          error.config.headers.Authorization = `Bearer ${newAccessToken}`;
+          return instance(error.config);
+        } catch {
           allClearPersistStore();
-          throw refreshTokenError;
+          window.location.href = '/';
         }
       } else if (data.code === ResultCode.INVALID || data.code === ResultCode.FORBIDDEN) {
         allClearPersistStore();
