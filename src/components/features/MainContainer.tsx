@@ -49,14 +49,7 @@ const MainContainer = () => {
         <CarouselContent className="-ml-0">
           {videos.map(({ src }, index) => (
             <CarouselItem key={index} className="pl-0 basis-full shrink-0 grow-0">
-              <video
-                src={src}
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="w-full h-auto max-h-[78vh]"
-              />
+              <video src={src} autoPlay muted loop playsInline className="w-full h-auto" />
             </CarouselItem>
           ))}
         </CarouselContent>
