@@ -37,24 +37,31 @@ const MainContainer = () => {
   }, [api]);
 
   return (
-    <div className="relative w-full bg-gray-50 overflow-hidden">
+    <div className="relative w-full bg-gray-50 overflow-hidden h-dvh lg:h-auto">
       <Carousel
         setApi={setApi}
         opts={{
           align: 'start',
           loop: videos.length > 1,
         }}
-        className="w-full group"
+        className="w-full h-full group"
       >
         <CarouselContent className="-ml-0">
           {videos.map(({ src }, index) => (
             <CarouselItem key={index} className="pl-0 basis-full shrink-0 grow-0">
-              <video src={src} autoPlay muted loop playsInline className="w-full h-auto" />
+              <video
+                src={src}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full h-full object-cover"
+              />
             </CarouselItem>
           ))}
         </CarouselContent>
         {/* 네비게이션 화살표 */}
-        {videos.length > 0 && (
+        {videos.length > 1 && (
           <>
             <button
               onClick={() => api?.scrollPrev()}
@@ -70,7 +77,7 @@ const MainContainer = () => {
             </button>
           </>
         )}
-        {/* 페이지 인디케이터 - 프로그레스 바 스타일 */}
+        {/* 페이지 인디케이터 */}
         {videos.length > 1 && (
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 w-1/3">
             <div className="h-[5px] bg-white/30 rounded-full overflow-hidden border border-black/20">
