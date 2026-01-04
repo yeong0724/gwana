@@ -56,7 +56,7 @@ const MainLayout = ({ children }: Props) => {
   ) : (
     <div className={cn('flex flex-col', 'min-h-dvh')}>
       <Header menuGroup={menuGroup} />
-      <main className={cn('flex-1', pathname === '/' && 'lg:mt-0 -mt-[70px]')}>{children}</main>
+      <main className={cn('flex-1', pathname === '/' && 'lg:mt-0')}>{children}</main>
       <Footer />
     </div>
   );
