@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { ChevronLeft, ChevronRight, Volume2, VolumeX } from 'lucide-react';
 
@@ -15,6 +15,7 @@ const MainContainer = () => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [isSoundOn, setIsSoundOn] = useState(false);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   const videos = [
     {
@@ -25,7 +26,7 @@ const MainContainer = () => {
     {
       src: '/videos/tea_drip.mp4',
       alt: 'tea_drip',
-      isSound: false,
+      isSound: true,
     },
   ];
 
@@ -38,6 +39,21 @@ const MainContainer = () => {
       setCurrent(api.selectedScrollSnap());
     });
   }, [api]);
+
+  // 사운드 토글 시 현재 비디오만 제어
+  useEffect(() => {
+    videoRefs.current.forEach((video, index) => {
+      if (video) {
+        if (index === current) {
+          video.play();
+          video.muted = videos[index].isSound ? !isSoundOn : true;
+        } else {
+          video.pause();
+          video.muted = true;
+        }
+      }
+    });
+  }, [current, isSoundOn]);
 
   const currentVideoHasSound = videos[current]?.isSound;
 
@@ -55,9 +71,12 @@ const MainContainer = () => {
           {videos.map(({ src }, index) => (
             <CarouselItem key={index} className="pl-0 basis-full shrink-0 grow-0">
               <video
+                ref={(el) => {
+                  videoRefs.current[index] = el;
+                }}
                 src={src}
                 autoPlay
-                muted={!isSoundOn}
+                muted
                 loop
                 playsInline
                 className="w-full h-auto"
