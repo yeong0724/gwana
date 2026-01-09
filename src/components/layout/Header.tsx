@@ -308,7 +308,7 @@ const Header = ({ menuGroup }: HeaderProps) => {
           </div>
 
           {/* 우측 아이콘들 */}
-          <div className="flex items-center space-x-8 z-10">
+          <div className="flex items-center space-x-6 z-10">
             <button
               className="relative py-2 hover:bg-gray-100/20 rounded-md transition-colors"
               onClick={() => router.push('/cart')}

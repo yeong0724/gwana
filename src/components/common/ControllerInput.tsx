@@ -18,7 +18,7 @@ const ControllerInput = <T extends FieldValues>({
   className = '',
   wrapperClassName = '',
   placeholder = '',
-  type = '',
+  type = 'text',
   callbackFn = null,
   readOnly = false,
   disabled = false,
@@ -81,6 +81,7 @@ const ControllerInput = <T extends FieldValues>({
         className={`${className} ${error?.message ? 'border-red-500' : ''}`}
         readOnly={readOnly}
         disabled={disabled}
+        type={type}
       />
       {error?.message && (
         <div className="text-red-500 pt-1 pl-2 text-[12px] sm:text-[8px]">{error.message}</div>
