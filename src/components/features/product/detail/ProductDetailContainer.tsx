@@ -10,7 +10,7 @@ import { ChevronDown, Share2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { toast } from 'sonner';
 
-import { PurchaseGuideModal } from '@/components/common/modal';
+import { PurchaseGuideModal, ShareModal } from '@/components/common/modal';
 import { Button } from '@/components/ui/button';
 import {
   Carousel,
@@ -41,6 +41,7 @@ const ProductDetailContainer = ({ product, productId }: Props) => {
 
   const [quantity, setQuantity] = useState<number>(1);
   const [purchaseGuideModalOpen, setPurchaseGuideModalOpen] = useState<boolean>(false);
+  const [shareModalOpen, setShareModalOpen] = useState<boolean>(false);
 
   // Carousel State
   const [api, setApi] = useState<CarouselApi>();
@@ -87,12 +88,16 @@ const ProductDetailContainer = ({ product, productId }: Props) => {
   };
 
   const handleShare = () => {
+    setShareModalOpen(true);
+  };
+
+  const handleKakaoShare = () => {
     const { Kakao, location } = window;
     Kakao.Share.sendDefault({
       objectType: 'feed',
       content: {
         title: product.productName,
-        description: '차를 마셔보세요 ~ !',
+        description: '차사러 오세요 ! 티를 마셔보세요 !',
         imageUrl: `${process.env.NEXT_PUBLIC_APP_BASE_URL}${product.images[0]}`,
         link: {
           mobileWebUrl: location.href,
@@ -104,7 +109,7 @@ const ProductDetailContainer = ({ product, productId }: Props) => {
           title: '관아수제차 방문하기',
           link: {
             mobileWebUrl: `${process.env.NEXT_PUBLIC_APP_BASE_URL}${pathname}`,
-            webUrl: `${process.env.NEXT_PUBLIC_API_BASE_URL}${pathname}`,
+            webUrl: `${process.env.NEXT_PUBLIC_APP_BASE_URL}${pathname}`,
           },
         },
       ],
@@ -457,6 +462,11 @@ const ProductDetailContainer = ({ product, productId }: Props) => {
         modalOpen={purchaseGuideModalOpen}
         setModalOpen={setPurchaseGuideModalOpen}
         moveToLoginPage={moveToLoginPage}
+      />
+      <ShareModal
+        modalOpen={shareModalOpen}
+        setModalOpen={setShareModalOpen}
+        onKakaoShare={handleKakaoShare}
       />
     </>
   );
