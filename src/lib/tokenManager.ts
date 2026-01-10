@@ -14,14 +14,16 @@ export const refreshAccessTokenSingleton = async (): Promise<string> => {
 };
 
 const refreshAccessToken = async (): Promise<string> => {
-  const { accessToken, loginType, user } = loginActions.getLoginInfo();
-  const { data } = await basicInstance.post('/user/refresh/token', { accessToken });
+  const { accessToken } = loginActions.getLoginInfo();
+  const {
+    data: { data, code },
+  } = await basicInstance.post('/user/refresh/token', { accessToken });
 
-  const { data: newAccessToken, code } = data;
   if (code === '0000') {
+    const { accessToken: newAccessToken, loginType, username, email } = data;
     loginActions.setLoginInfo({
       accessToken: newAccessToken,
-      user,
+      user: { username, email },
       isLogin: true,
       redirectUrl: '/',
       loginType,

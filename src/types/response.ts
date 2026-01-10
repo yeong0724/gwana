@@ -53,5 +53,5 @@ export interface LoginResponse {
   accessToken: string;
   username: string;
   email: string;
-  loginType: 'KAKAO' | 'NAVER' | 'GOOGLE' | '';
+  loginType: 'kakao' | 'naver' | 'google' | '';
 }

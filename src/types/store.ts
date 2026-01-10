@@ -2,7 +2,7 @@ export type LoginInfo = {
   isLogin: boolean;
   accessToken: string;
   redirectUrl: string;
-  loginType: 'KAKAO' | 'NAVER' | 'GOOGLE' | '';
+  loginType: 'kakao' | 'naver' | 'google' | '';
   user: {
     email: string;
     username: string;

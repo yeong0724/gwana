@@ -21,13 +21,6 @@ export interface User {
   profileImage?: string;
 }
 
-// 로그인 응답 타입
-export interface LoginResponse {
-  user: User;
-  accessToken: string;
-  refreshToken: string;
-}
-
 // 소셜 로그인 요청 타입
 export interface SocialLoginRequest {
   provider: 'google' | 'kakao' | 'naver';

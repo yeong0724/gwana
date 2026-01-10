@@ -31,10 +31,10 @@ const MainLayout = ({ children }: Props) => {
     }
 
     // Access Token이 아직 유효한 경우
-    if (validateToken(accessToken)) {
-      setLoginInfo(loginInfo);
-      return;
-    }
+    // if (validateToken(accessToken)) {
+    //   setLoginInfo(loginInfo);
+    //   return;
+    // }
 
     // Access Token 만료 시 갱신 시도
     try {
