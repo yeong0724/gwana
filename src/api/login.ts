@@ -1,8 +1,8 @@
 import { postAxios } from '@/lib/api';
-import type { ApiResponse } from '@/types';
+import type { ApiResponse, LoginResponse } from '@/types';
 
 const getAccessTokenByKakaoCode = async <T>(params: T) => {
-  return postAxios<ApiResponse<string>>({
+  return postAxios<ApiResponse<LoginResponse>>({
     url: '/user/callback',
     params,
   });

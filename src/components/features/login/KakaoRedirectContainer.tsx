@@ -34,7 +34,14 @@ const KakaoRedirectContainer = ({ code }: Props) => {
           if (code === ResultCode.SUCCESS) {
             const url = loginActions.getLoginInfo().redirectUrl || '/';
 
-            setLoginInfo({ accessToken: data, isLogin: true, redirectUrl: '/' });
+            const { accessToken, username, email, loginType } = data;
+            setLoginInfo({
+              accessToken,
+              isLogin: true,
+              redirectUrl: '/',
+              user: { email, username },
+              loginType,
+            });
 
             if (!isEmpty(cart)) {
               await updateCartListAsync(cart);

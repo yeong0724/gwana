@@ -48,3 +48,10 @@ export type PaymentSession = {
   shippingPrice: number;
   images: string[];
 };
+
+export interface LoginResponse {
+  accessToken: string;
+  username: string;
+  email: string;
+  loginType: 'KAKAO' | 'NAVER' | 'GOOGLE' | '';
+}

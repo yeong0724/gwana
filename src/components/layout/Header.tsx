@@ -265,7 +265,7 @@ const Header = ({ menuGroup }: HeaderProps) => {
       </header>
       {/* Side - Header (Mobile) */}
       <header
-        className={`h-[50px] lg:hidden top-0 z-40 ${
+        className={`h-[58px] lg:hidden top-0 z-40 ${
           isHomePage
             ? 'absolute left-0 right-0 bg-transparent'
             : 'relative bg-white border-b border-gray-200'
@@ -285,26 +285,15 @@ const Header = ({ menuGroup }: HeaderProps) => {
           )}
 
           {/* 로고 - 절대 중앙 */}
-          <div className="absolute left-1/2 -translate-x-1/2">
-            {isHomePage ? (
-              <Image
-                src="/images/gwana_logo_2.webp"
-                alt="gwana_logo"
-                width={120}
-                height={120}
-                onClick={() => router.push('/')}
-                className="cursor-pointer"
-              />
-            ) : (
-              <Image
-                src="/images/gwana_logo.webp"
-                alt="gwana_logo"
-                width={80}
-                height={80}
-                onClick={() => router.push('/')}
-                className="cursor-pointer"
-              />
-            )}
+          <div className="absolute left-1/2 -translate-x-1/2 pt-1">
+            <Image
+              src="/images/gwana_logo_4.webp"
+              alt="gwana_logo"
+              width={150}
+              height={150}
+              onClick={() => router.push('/')}
+              className="cursor-pointer"
+            />
           </div>
 
           {/* 우측 아이콘들 */}

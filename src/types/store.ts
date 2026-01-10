@@ -2,6 +2,11 @@ export type LoginInfo = {
   isLogin: boolean;
   accessToken: string;
   redirectUrl: string;
+  loginType: 'KAKAO' | 'NAVER' | 'GOOGLE' | '';
+  user: {
+    email: string;
+    username: string;
+  };
 };
 
 export type UserStore = {

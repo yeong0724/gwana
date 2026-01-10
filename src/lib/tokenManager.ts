@@ -14,17 +14,20 @@ export const refreshAccessTokenSingleton = async (): Promise<string> => {
 };
 
 const refreshAccessToken = async (): Promise<string> => {
-  const { accessToken } = loginActions.getLoginInfo();
-  console.log('refreshAccessTokenSingleton > refreshAccessToken :', accessToken);
+  const { accessToken, loginType, user } = loginActions.getLoginInfo();
   const { data } = await basicInstance.post('/user/refresh/token', { accessToken });
-  console.log('refreshAccessTokenSingleton > data :', data);
-  if (data.code === '0000') {
+
+  const { data: newAccessToken, code } = data;
+  if (code === '0000') {
     loginActions.setLoginInfo({
-      accessToken: data.data,
+      accessToken: newAccessToken,
+      user,
       isLogin: true,
       redirectUrl: '/',
+      loginType,
     });
-    return data.data;
+
+    return newAccessToken;
   }
 
   throw new Error('Refresh failed');

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { concat, filter, isEmpty } from 'lodash-es';
-import { ChevronDown, Home, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, LogOut, User, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
 import { useLoginStore } from '@/stores';
@@ -20,7 +20,7 @@ type Props = {
 const Navigation = ({ isMenuOpen, moveToLoginPage, toggleMenu, menuGroup }: Props) => {
   const router = useRouter();
   const { main, category } = menuGroup;
-  const { isLogin } = useLoginStore();
+  const { isLogin, user } = useLoginStore();
 
   const [currentMenu, setCurrentMenu] = useState<string>('');
 
@@ -58,14 +58,6 @@ const Navigation = ({ isMenuOpen, moveToLoginPage, toggleMenu, menuGroup }: Prop
   };
 
   /**
-   * 주문조회 이동
-   */
-  const moveToOrderHistory = () => {
-    // wrappedPush('/order');
-    closeSidebar();
-  };
-
-  /**
    * 장바구니 이동
    */
   const moveToCart = () => {
@@ -97,13 +89,26 @@ const Navigation = ({ isMenuOpen, moveToLoginPage, toggleMenu, menuGroup }: Prop
       >
         {/* 사이드바 헤더 */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
-          <button
-            onClick={moveToHome}
-            className="p-2 hover:bg-gray-100 rounded-md transition-colors cursor-pointer"
-            aria-label="홈으로 이동"
-          >
-            <Home size={24} className="text-gray-700" />
-          </button>
+          {isLogin ? (
+            <button
+              onClick={moveToHome}
+              className="flex items-center hover:bg-gray-100 rounded-md transition-colors cursor-pointer p-2"
+              aria-label="홈으로 이동"
+            >
+              <User size={26} className="text-gray-900 mr-3" />
+              <span className="text-[18px] font-semibold">{user?.username}</span>
+              <span className="text-[18px] ml-[2px]">님</span>
+            </button>
+          ) : (
+            <button
+              onClick={moveToLoginPage}
+              className="flex items-center hover:bg-gray-100 rounded-md transition-colors cursor-pointer p-2"
+              aria-label="홈으로 이동"
+            >
+              <span className="text-[18px] font-semibold mr-[2px]">로그인</span>
+              <ChevronRight size={22} className="text-gray-800" />
+            </button>
+          )}
 
           <button
             onClick={closeSidebar}
@@ -165,36 +170,28 @@ const Navigation = ({ isMenuOpen, moveToLoginPage, toggleMenu, menuGroup }: Prop
             <div className="flex-1" />
             <div className="py-6 px-4 border-t border-gray-200 flex-shrink-0">
               <div className="flex items-center justify-center gap-0 text-sm tracking-wide">
-                {isLogin ? (
-                  <button
-                    onClick={handleLogout}
-                    className="text-gray-700 hover:text-black transition-colors cursor-pointer font-medium"
-                  >
-                    로그아웃
-                  </button>
-                ) : (
-                  <button
-                    onClick={moveToLoginPage}
-                    className="text-gray-700 hover:text-black transition-colors cursor-pointer font-medium"
-                  >
-                    로그인
-                  </button>
-                )}
+                <button
+                  onClick={moveToHome}
+                  className="text-gray-700 hover:text-black transition-colors cursor-pointer font-medium"
+                >
+                  Home
+                </button>
                 <span className="text-gray-300 mx-5">|</span>
                 <button
                   onClick={moveToCart}
                   className="text-gray-700 hover:text-black transition-colors cursor-pointer font-medium"
                 >
-                  장바구니
+                  오시는길
                 </button>
                 {isLogin && (
                   <>
                     <span className="text-gray-300 mx-5">|</span>
                     <button
-                      onClick={moveToOrderHistory}
-                      className="text-gray-700 hover:text-black transition-colors cursor-pointer font-medium"
+                      onClick={handleLogout}
+                      className="text-gray-700 hover:text-black transition-colors cursor-pointer font-medium flex items-center gap-1"
                     >
-                      마이페이지
+                      <LogOut size={16} />
+                      로그아웃
                     </button>
                   </>
                 )}

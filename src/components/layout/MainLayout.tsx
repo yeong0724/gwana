@@ -10,6 +10,7 @@ import { menuGroup } from '@/constants';
 import { refreshAccessTokenSingleton } from '@/lib/tokenManager';
 import { allClearPersistStore, cn, noMainHeaderPage, validateToken } from '@/lib/utils';
 import { useLoginStore } from '@/stores';
+import { initailState } from '@/stores/useLoginStore';
 
 interface Props {
   children: ReactNode;
@@ -25,13 +26,13 @@ const MainLayout = ({ children }: Props) => {
     const { accessToken } = loginInfo;
 
     if (!accessToken) {
-      setLoginInfo({ isLogin: false, accessToken, redirectUrl: '/' });
+      setLoginInfo(initailState);
       return;
     }
 
     // Access Token이 아직 유효한 경우
     if (validateToken(accessToken)) {
-      setLoginInfo({ isLogin: true, accessToken, redirectUrl: '/' });
+      setLoginInfo(loginInfo);
       return;
     }
 

@@ -4,10 +4,15 @@ import { useShallow } from 'zustand/shallow';
 
 import { LoginInfo, UserStore } from '@/types';
 
-const initailState: LoginInfo = {
+export const initailState: LoginInfo = {
   isLogin: false,
   accessToken: '',
   redirectUrl: '/',
+  loginType: '',
+  user: {
+    email: '',
+    username: '',
+  },
 };
 
 type ExtendedUserStore = UserStore & {
@@ -57,6 +62,7 @@ const useLoginStore = () =>
       loginInfo: state.loginInfo,
       isLogin: state.loginInfo.isLogin,
       accessToken: state.loginInfo.accessToken,
+      user: state.loginInfo.user,
       redirectUrl: state.loginInfo.redirectUrl,
       _hasHydrated: state._hasHydrated,
       setIsLogin: state.setIsLogin,

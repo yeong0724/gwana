@@ -8,7 +8,7 @@ export const menuGroup: MenuGroup = {
       upperMenuId: null,
     },
     {
-      menuName: 'Pension',
+      menuName: 'STAY',
       menuId: 'pension',
       upperMenuId: null,
     },

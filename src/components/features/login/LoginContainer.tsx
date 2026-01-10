@@ -7,15 +7,19 @@ const LoginContainer = () => {
     window.location.replace(`${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/kakao`);
   };
 
+  /**
+   * TODO: 네이버 로그인 구현
+   */
   const onNaverLogin = async () => {
-    // TODO: 네이버 로그인 구현
     console.log('네이버 로그인');
   };
 
-  const onGoogleLogin = async () => {
-    // TODO: 구글 로그인 구현
-    console.log('구글 로그인');
-  };
+  /**
+   * TODO: 구글 로그인 구현
+   */
+  // const onGoogleLogin = async () => {
+  //   console.log('구글 로그인');
+  // };
 
   return (
     <>
@@ -75,7 +79,7 @@ const LoginContainer = () => {
             </button>
 
             {/* 구글 로그인 */}
-            <button
+            {/* <button
               onClick={onGoogleLogin}
               className="w-full h-[50px] sm:h-[56px] px-4 sm:px-6 rounded-xl font-semibold text-sm sm:text-base transition-all flex items-center justify-center gap-2 sm:gap-3 bg-white hover:bg-gray-50 text-gray-900 border border-gray-300"
             >
@@ -87,7 +91,7 @@ const LoginContainer = () => {
                 className="w-4 h-4 sm:w-5 sm:h-5"
               />
               <span>Google로 계속하기</span>
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

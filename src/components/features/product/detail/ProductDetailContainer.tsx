@@ -97,7 +97,7 @@ const ProductDetailContainer = ({ product, productId }: Props) => {
       objectType: 'feed',
       content: {
         title: product.productName,
-        description: '차사러 오세요 ! 티를 마셔보세요 !',
+        description: `출처: 관아수제차 > 티 제품 > ${product.categoryName}`,
         imageUrl: `${process.env.NEXT_PUBLIC_APP_BASE_URL}${product.images[0]}`,
         link: {
           mobileWebUrl: location.href,
