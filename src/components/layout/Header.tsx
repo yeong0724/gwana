@@ -286,14 +286,25 @@ const Header = ({ menuGroup }: HeaderProps) => {
 
           {/* 로고 - 절대 중앙 */}
           <div className="absolute left-1/2 -translate-x-1/2 pt-1">
-            <Image
-              src="/images/gwana_logo_4.webp"
-              alt="gwana_logo"
-              width={150}
-              height={150}
-              onClick={() => router.push('/')}
-              className="cursor-pointer"
-            />
+            {isHomePage ? (
+              <Image
+                src="/images/gwana_logo_4.webp"
+                alt="gwana_logo"
+                width={150}
+                height={150}
+                onClick={() => router.push('/')}
+                className="cursor-pointer"
+              />
+            ) : (
+              <Image
+                src="/images/gwana_logo_3.webp"
+                alt="gwana_logo"
+                width={100}
+                height={100}
+                onClick={() => router.push('/')}
+                className="cursor-pointer"
+              />
+            )}
           </div>
 
           {/* 우측 아이콘들 */}
