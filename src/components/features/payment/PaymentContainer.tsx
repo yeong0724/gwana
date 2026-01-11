@@ -1,41 +1,37 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { first, isEmpty } from 'lodash-es';
+import { TossPaymentsWidgets } from '@tosspayments/tosspayments-sdk';
+import { cloneDeep, first, isEmpty, size } from 'lodash-es';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import DaumPostcode, { Address } from 'react-daum-postcode';
-import { FieldErrors, FormProvider, useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { FieldErrors, FormProvider } from 'react-hook-form';
 
 import ControllerInput from '@/components/common/ControllerInput';
 import ControllerSelect from '@/components/common/ControllerSelect';
 import { SearchPostcodeModal } from '@/components/common/modal';
+import TossPayments from '@/components/features/payment/TossPayments';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { deliveryRequestOptions } from '@/constants';
+import usePaymentForm from '@/hooks/usePaymentForm';
 import { getIsMobile, localeFormat } from '@/lib/utils';
 import { useCartService } from '@/service';
 import { useAlertStore } from '@/stores';
-import { ApiResponse, DeliveryRequestEnum, PaymentSession } from '@/types';
-
-type PaymentForm = {
-  senderName: string;
-  senderPhone: string;
-  recipientName: string;
-  recipientPhone: string;
-  zonecode: string;
-  roadAddress: string;
-  detailAddress: string;
-  deliveryRequest: string;
-  deliveryRequestDetail: string;
-};
+import { PaymentForm, PaymentSessionResponse } from '@/types';
 
 const inputClassName =
   'w-full px-4 py-2 bg-white rounded-lg border border-gray-200 text-[14px] sm:text-[15px] md:text-[16px] lg:text-[17px] placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-500';
+
+const initialPaymentSession: PaymentSessionResponse = {
+  sessionId: '',
+  totalPrice: 0,
+  totalShippingPrice: 0,
+  items: [],
+};
 
 type Props = {
   sessionId: string;
@@ -44,68 +40,30 @@ type Props = {
 const PaymentContainer = ({ sessionId }: Props) => {
   const isMobile = getIsMobile();
   const router = useRouter();
-  const { showConfirmAlert } = useAlertStore();
-
+  const { showConfirmAlert, showAlert } = useAlertStore();
   const { useGetPaymentSessionQuery } = useCartService();
+  const { form, setValue, clearErrors, watch } = usePaymentForm();
 
   // 주문고객 섹션 상태
-  const [customerOpen, setCustomerOpen] = useState(true);
-
-  // 배송지 섹션 상태
-  const [deliveryOpen, setDeliveryOpen] = useState(true);
+  const [sectionOpen, setSectionOpen] = useState({
+    customer: true,
+    delivery: true,
+  });
 
   // 주소 검색 모달 상태
   const [addressOpen, setAddressOpen] = useState(false);
 
-  const [paymentSession, setPaymentSession] = useState<PaymentSession[]>([]);
+  const [ready, setReady] = useState(false);
+  const [widgets, setWidgets] = useState<TossPaymentsWidgets | null>(null);
+
+  const [paymentSession, setPaymentSession] = useState<PaymentSessionResponse>({
+    ...initialPaymentSession,
+  });
 
   const { data: paymentSessionData, error: paymentSessionError } = useGetPaymentSessionQuery(
     { sessionId },
     { enabled: !!sessionId }
   );
-
-  const form = useForm<PaymentForm>({
-    resolver: zodResolver(
-      z
-        .object({
-          senderName: z.string().min(1, { message: '주문고객 이름을 입력해주세요' }),
-          senderPhone: z.string().min(1, { message: '주문고객 휴대폰 번호를 입력해주세요' }),
-          recipientName: z.string().min(1, { message: '받는 사람 이름을 입력해주세요' }),
-          recipientPhone: z.string().min(1, { message: '받는 사람 휴대폰 번호를 입력해주세요' }),
-          zonecode: z.string().min(1, { message: '우편번호를 입력해주세요' }),
-          roadAddress: z.string().min(1, { message: '도로명 주소를 입력해주세요' }),
-          detailAddress: z.string().min(1, { message: '상세 주소를 입력해주세요' }),
-          deliveryRequest: z.string().min(1, { message: '배송요청사항을 선택해주세요' }),
-          deliveryRequestDetail: z.string(),
-        })
-        .superRefine((data, ctx) => {
-          if (
-            data.deliveryRequest === DeliveryRequestEnum.CUSTOM_INPUT &&
-            !data.deliveryRequestDetail
-          ) {
-            ctx.addIssue({
-              code: 'custom',
-              message: '배송요청사항을 입력해주세요',
-              path: ['deliveryRequestDetail'],
-            });
-          }
-        })
-    ),
-    defaultValues: {
-      senderName: '',
-      senderPhone: '',
-      recipientName: '',
-      recipientPhone: '',
-      zonecode: '',
-      roadAddress: '',
-      detailAddress: '',
-      deliveryRequest: '',
-      deliveryRequestDetail: '',
-    },
-    mode: 'onSubmit',
-  });
-
-  const { setValue, clearErrors, watch } = form;
 
   const handleAddressComplete = (addressData: Address) => {
     setValue('zonecode', addressData.zonecode);
@@ -118,20 +76,6 @@ const PaymentContainer = ({ sessionId }: Props) => {
     setAddressOpen((prev) => !prev);
   };
 
-  const getPaymentSession = async (paymentSessionData: ApiResponse<PaymentSession[]>) => {
-    const { data } = paymentSessionData;
-    if (isEmpty(data)) {
-      await showConfirmAlert({
-        title: '에러',
-        description: '결제 세션이 만료되었습니다.',
-        size: 'sm',
-      });
-      router.push('/');
-    } else {
-      setPaymentSession(data);
-    }
-  };
-
   const invalidAccessPaymentSession = async () => {
     await showConfirmAlert({
       title: '에러',
@@ -139,6 +83,69 @@ const PaymentContainer = ({ sessionId }: Props) => {
       size: 'sm',
     });
     router.push('/');
+  };
+
+  const onSubmit = async (data: PaymentForm) => {
+    console.log('결제 데이터:', data);
+
+    const repProductName = first(paymentSession.items)?.productName ?? '';
+    const orderCount = size(paymentSession.items);
+    const orderName = orderCount > 1 ? `${repProductName} 외 ${orderCount - 1}건` : repProductName;
+
+    try {
+      await widgets!.requestPayment({
+        orderId: generateRandomString(),
+        orderName,
+        successUrl: window.location.origin + '/success',
+        failUrl: window.location.origin + '/fail',
+        customerEmail: 'customer123@gmail.com',
+        customerName: data.senderName,
+        customerMobilePhone: data.senderPhone,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '결제 요청 중 오류가 발생했습니다.';
+
+      showAlert({
+        title: '에러',
+        description: message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const sectionOpenHandler = (section: 'customer' | 'delivery') => {
+    setSectionOpen({ ...sectionOpen, [section]: !sectionOpen[section] });
+  };
+
+  const onError = (errors: FieldErrors<PaymentForm>) => {
+    const section = cloneDeep(sectionOpen);
+
+    // 주문고객 필드 에러 체크
+    if (errors.senderName || errors.senderPhone) {
+      section.customer = true;
+    }
+
+    // 배송지 필드 에러 체크
+    if (
+      errors.recipientName ||
+      errors.recipientPhone ||
+      errors.zonecode ||
+      errors.roadAddress ||
+      errors.detailAddress ||
+      errors.deliveryRequest
+    ) {
+      section.delivery = true;
+    }
+
+    setSectionOpen({ ...sectionOpen, ...section });
+  };
+
+  const generateRandomString = () => {
+    if (typeof window !== 'undefined') {
+      return window.btoa(Math.random().toString()).slice(0, 20);
+    }
+
+    return ''; // 서버 환경일 경우 기본값 반환
   };
 
   useEffect(() => {
@@ -149,34 +156,23 @@ const PaymentContainer = ({ sessionId }: Props) => {
 
   useEffect(() => {
     if (paymentSessionData) {
-      getPaymentSession(paymentSessionData);
+      (async () => {
+        const { data } = paymentSessionData;
+        if (isEmpty(data)) {
+          await showConfirmAlert({
+            title: '에러',
+            description: '결제 세션이 만료되었습니다.',
+            size: 'sm',
+          });
+          router.push('/');
+        } else {
+          setPaymentSession(data);
+        }
+      })();
     } else if (paymentSessionError) {
       invalidAccessPaymentSession();
     }
   }, [paymentSessionData, paymentSessionError]);
-
-  const onSubmit = (data: PaymentForm) => {
-    console.log('결제 데이터:', data);
-    // TODO: 결제 처리 로직
-  };
-
-  const onError = (errors: FieldErrors<PaymentForm>) => {
-    // 주문고객 필드 에러 체크
-    if (errors.senderName || errors.senderPhone) {
-      setCustomerOpen(true);
-    }
-    // 배송지 필드 에러 체크
-    if (
-      errors.recipientName ||
-      errors.recipientPhone ||
-      errors.zonecode ||
-      errors.roadAddress ||
-      errors.detailAddress ||
-      errors.deliveryRequest
-    ) {
-      setDeliveryOpen(true);
-    }
-  };
 
   return (
     <div className="flex flex-col w-full max-w-[500px] mx-auto flex-1 border-x border-gray-100 overflow-hidden bg-gray-100">
@@ -190,12 +186,16 @@ const PaymentContainer = ({ sessionId }: Props) => {
             {/* 헤더와 첫 섹션 사이 갭 */}
             <div className="h-2 bg-gray-100" />
             {/* 주문고객 섹션 */}
-            <Collapsible open={customerOpen} onOpenChange={setCustomerOpen} className="bg-white">
+            <Collapsible
+              open={sectionOpen.customer}
+              onOpenChange={() => sectionOpenHandler('customer')}
+              className="bg-white"
+            >
               <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-white">
                 <h2 className="text-[16px] sm:text-[17px] md:text-[18px] lg:text-[19px] font-bold">
                   주문고객
                 </h2>
-                {customerOpen ? (
+                {sectionOpen.customer ? (
                   <ChevronUp className="size-6" />
                 ) : (
                   <ChevronDown className="size-6" />
@@ -220,12 +220,16 @@ const PaymentContainer = ({ sessionId }: Props) => {
             <div className="h-3 bg-gray-100" />
 
             {/* 배송지 섹션 */}
-            <Collapsible open={deliveryOpen} onOpenChange={setDeliveryOpen} className="bg-white">
+            <Collapsible
+              open={sectionOpen.delivery}
+              onOpenChange={() => sectionOpenHandler('delivery')}
+              className="bg-white"
+            >
               <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-5 bg-white">
                 <h2 className="text-[16px] sm:text-[17px] md:text-[18px] lg:text-[19px] font-bold">
                   배송지
                 </h2>
-                {deliveryOpen ? (
+                {sectionOpen.delivery ? (
                   <ChevronUp className="size-6" />
                 ) : (
                   <ChevronDown className="size-6" />
@@ -286,6 +290,9 @@ const PaymentContainer = ({ sessionId }: Props) => {
                     className={inputClassName}
                   />
                 )}
+                <span className="ml-[5px] text-[12px] sm:text-[13px] md:text-[14px] lg:text-[15px] text-gray-500">
+                  ※ 제주도 지역은 배송비 4,000원이 추가됩니다.
+                </span>
               </CollapsibleContent>
             </Collapsible>
 
@@ -300,7 +307,7 @@ const PaymentContainer = ({ sessionId }: Props) => {
               </div>
               {/* 상품 목록 박스 */}
               <div className="mb-4 bg-white">
-                {paymentSession.map((item, index) => (
+                {paymentSession.items.map((item, index) => (
                   <div key={item.productId}>
                     <div className="flex items-start gap-4 px-4 py-3">
                       {/* 상품 이미지 */}
@@ -331,7 +338,7 @@ const PaymentContainer = ({ sessionId }: Props) => {
                       </div>
                     </div>
                     {/* 구분선 */}
-                    {index !== paymentSession.length - 1 && (
+                    {index !== paymentSession.items.length - 1 && (
                       <div className="mx-4 border-b border-gray-200" />
                     )}
                   </div>
@@ -339,8 +346,47 @@ const PaymentContainer = ({ sessionId }: Props) => {
               </div>
             </div>
 
-            {/* 하단 결제 버튼 영역 여백 */}
-            <div className="h-10" />
+            <div className="h-3 bg-gray-100" />
+
+            {/* 결제 정보 섹션 */}
+            <div className="bg-white px-4 py-5">
+              <h2 className="text-[16px] sm:text-[17px] md:text-[18px] lg:text-[19px] font-bold mb-4">
+                결제 정보
+              </h2>
+              <div className="space-y-3">
+                {/* 상품 합계 */}
+                <div className="flex items-center justify-between text-[14px] sm:text-[15px] md:text-[16px] lg:text-[17px]">
+                  <span className="text-gray-700">상품 합계</span>
+                  <span className="font-medium">{localeFormat(paymentSession.totalPrice)}원</span>
+                </div>
+                {/* 배송비 */}
+                <div className="flex items-center justify-between text-[14px] sm:text-[15px] md:text-[16px] lg:text-[17px]">
+                  <span className="text-gray-700 flex items-center gap-2">
+                    배송비{' '}
+                    <span className="text-gray-400 text-[11px] sm:text-[13px] md:text-[14px] lg:text-[15px]">
+                      50,000원 이상 구매시 배송비 무료
+                    </span>
+                  </span>
+                  <span className="font-medium">
+                    {localeFormat(paymentSession.totalShippingPrice)}원
+                  </span>
+                </div>
+                {/* 구분선 */}
+                <div className="border-t border-gray-200 pt-3 mt-3">
+                  {/* 결제 금액 */}
+                  <div className="flex items-center justify-between text-[16px] sm:text-[17px] md:text-[18px] lg:text-[19px]">
+                    <span className="font-bold">결제 금액</span>
+                    <span className="font-bold text-blue-600">
+                      {localeFormat(paymentSession.totalPrice + paymentSession.totalShippingPrice)}
+                      원
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 토스 결제 UI */}
+            <TossPayments widgets={widgets} setWidgets={setWidgets} setReady={setReady} />
           </div>
 
           {/* 하단 고정 결제 버튼 */}
@@ -348,8 +394,9 @@ const PaymentContainer = ({ sessionId }: Props) => {
             <button
               type="submit"
               className="w-full py-4 bg-black text-white text-[16px] sm:text-[17px] md:text-[18px] lg:text-[19px] font-bold rounded-lg hover:bg-gray-800 transition-colors"
+              disabled={!ready}
             >
-              결제하기
+              {`${localeFormat(paymentSession.totalPrice + paymentSession.totalShippingPrice)}원 결제하기`}
             </button>
           </div>
         </form>

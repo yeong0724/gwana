@@ -4,6 +4,7 @@ export interface UserResponse {
   email: string;
   phone: string;
   role: 'ADMIN' | 'GENERAL';
+  customerKey: string;
 }
 
 export type Menu = {
@@ -49,9 +50,19 @@ export type PaymentSession = {
   images: string[];
 };
 
+export type PaymentSessionResponse = {
+  sessionId: string;
+  totalPrice: number;
+  totalShippingPrice: number;
+  items: PaymentSession[];
+};
+
 export interface LoginResponse {
   accessToken: string;
+  userId: string;
   username: string;
   email: string;
+  customerKey: string;
+  phone: string;
   loginType: 'kakao' | 'naver' | 'google' | '';
 }

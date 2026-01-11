@@ -22,7 +22,6 @@ const GlobalAlert = () => {
     description,
     confirmText,
     cancelText,
-    variant,
     size,
     confirmAlert,
     cancelAlert,
@@ -62,16 +61,11 @@ const GlobalAlert = () => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           {type === 'CONFIRM' && cancelText && (
-            <AlertDialogCancel onClick={cancelAlert}>{cancelText || '취소'}</AlertDialogCancel>
+            <AlertDialogCancel onClick={cancelAlert} className="rounded-[10px]">
+              {cancelText || '취소'}
+            </AlertDialogCancel>
           )}
-          <AlertDialogAction
-            onClick={handleConfirm}
-            className={
-              variant === 'destructive'
-                ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
-                : ''
-            }
-          >
+          <AlertDialogAction onClick={handleConfirm} className="rounded-[10px]">
             {confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>

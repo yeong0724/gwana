@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: false,
   images: {
     remotePatterns: [],
+    domains: ['static.toss.im'],
   },
   async rewrites() {
     return [];

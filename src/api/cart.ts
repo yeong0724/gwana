@@ -5,7 +5,7 @@ import {
   Cart,
   CreatePaymentSessionRequest,
   GetPaymentSessionRequest,
-  PaymentSession,
+  PaymentSessionResponse,
 } from '@/types';
 
 const addToCart = async (params: AddToCartRequest) => {
@@ -50,7 +50,7 @@ const createPaymentSession = async (params: CreatePaymentSessionRequest[]) => {
 };
 
 const getPaymentSession = async (params: GetPaymentSessionRequest) => {
-  return postAxios<ApiResponse<PaymentSession[]>>({
+  return postAxios<ApiResponse<PaymentSessionResponse>>({
     url: '/cart/search/payment/session',
     params,
   });
@@ -58,10 +58,10 @@ const getPaymentSession = async (params: GetPaymentSessionRequest) => {
 
 export {
   addToCart,
-  getCartList,
-  updateCartList,
-  deleteCartList,
-  updateCartQuantity,
   createPaymentSession,
+  deleteCartList,
+  getCartList,
   getPaymentSession,
+  updateCartList,
+  updateCartQuantity,
 };

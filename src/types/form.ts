@@ -25,3 +25,15 @@ export type UserAccountInfo = z.infer<typeof userAccountSchema>;
 export type FormFieldsEnum<T> = {
   [K in keyof T as Uppercase<string & K>]: K;
 };
+
+export type PaymentForm = {
+  senderName: string;
+  senderPhone: string;
+  recipientName: string;
+  recipientPhone: string;
+  zonecode: string;
+  roadAddress: string;
+  detailAddress: string;
+  deliveryRequest: string;
+  deliveryRequestDetail: string;
+};

@@ -12,6 +12,9 @@ export const initailState: LoginInfo = {
   user: {
     email: '',
     username: '',
+    userId: '',
+    customerKey: '',
+    phone: '',
   },
 };
 

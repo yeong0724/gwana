@@ -20,10 +20,19 @@ const refreshAccessToken = async (): Promise<string> => {
   } = await basicInstance.post('/user/refresh/token', { accessToken });
 
   if (code === '0000') {
-    const { accessToken: newAccessToken, loginType, username, email } = data;
+    const {
+      accessToken: newAccessToken,
+      loginType,
+      username,
+      email,
+      userId,
+      customerKey,
+      phone,
+    } = data;
+
     loginActions.setLoginInfo({
       accessToken: newAccessToken,
-      user: { username, email },
+      user: { username, email, userId, customerKey, phone },
       isLogin: true,
       redirectUrl: '/',
       loginType,

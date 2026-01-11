@@ -6,6 +6,9 @@ export type LoginInfo = {
   user: {
     email: string;
     username: string;
+    userId: string;
+    customerKey: string;
+    phone: string;
   };
 };
 

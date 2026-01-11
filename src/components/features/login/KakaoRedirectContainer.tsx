@@ -34,12 +34,12 @@ const KakaoRedirectContainer = ({ code }: Props) => {
           if (code === ResultCode.SUCCESS) {
             const url = loginActions.getLoginInfo().redirectUrl || '/';
 
-            const { accessToken, username, email, loginType } = data;
+            const { accessToken, userId, username, email, loginType, customerKey, phone } = data;
             setLoginInfo({
               accessToken,
               isLogin: true,
               redirectUrl: '/',
-              user: { email, username },
+              user: { email, username, userId, customerKey, phone },
               loginType,
             });
 
