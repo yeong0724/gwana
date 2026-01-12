@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 import { TossPaymentsWidgets } from '@tosspayments/tosspayments-sdk';
-import { cloneDeep, first, isEmpty, size } from 'lodash-es';
+import { cloneDeep, first, isEmpty, pick, size } from 'lodash-es';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import DaumPostcode, { Address } from 'react-daum-postcode';
 import { FieldErrors, FormProvider } from 'react-hook-form';
@@ -19,9 +19,9 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { deliveryRequestOptions } from '@/constants';
 import usePaymentForm from '@/hooks/usePaymentForm';
 import { getIsMobile, localeFormat } from '@/lib/utils';
-import { useCartService } from '@/service';
-import { useAlertStore } from '@/stores';
-import { PaymentForm, PaymentSessionResponse } from '@/types';
+import { usePaymentService } from '@/service';
+import { useAlertStore, useLoginStore } from '@/stores';
+import { PaymentForm, PaymentSessionResponse, SavePaymentInfoRequest } from '@/types';
 
 const inputClassName =
   'w-full px-4 py-2 bg-white rounded-lg border border-gray-200 text-[14px] sm:text-[15px] md:text-[16px] lg:text-[17px] placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-500';
@@ -41,8 +41,12 @@ const PaymentContainer = ({ sessionId }: Props) => {
   const isMobile = getIsMobile();
   const router = useRouter();
   const { showConfirmAlert, showAlert } = useAlertStore();
-  const { useGetPaymentSessionQuery } = useCartService();
   const { form, setValue, clearErrors, watch } = usePaymentForm();
+  const {
+    user: { email },
+  } = useLoginStore();
+
+  const { useGetPaymentSessionQuery, useSavePaymentInfoMutation } = usePaymentService();
 
   // 주문고객 섹션 상태
   const [sectionOpen, setSectionOpen] = useState({
@@ -65,6 +69,8 @@ const PaymentContainer = ({ sessionId }: Props) => {
     { enabled: !!sessionId }
   );
 
+  const { mutateAsync: savePaymentInfoAsync } = useSavePaymentInfoMutation();
+
   const handleAddressComplete = (addressData: Address) => {
     setValue('zonecode', addressData.zonecode);
     setValue('roadAddress', addressData.roadAddress);
@@ -86,17 +92,30 @@ const PaymentContainer = ({ sessionId }: Props) => {
   };
 
   const onSubmit = async (data: PaymentForm) => {
+    const orderId = crypto.randomUUID();
+
+    const request: SavePaymentInfoRequest = {
+      ...data,
+      ...pick(paymentSession, ['totalPrice', 'totalShippingPrice']),
+      sessionId,
+      orderId,
+    };
+
+    await savePaymentInfoAsync(request);
+    /**
+     * Toss 결제 요청
+     */
     const repProductName = first(paymentSession.items)?.productName ?? '';
     const orderCount = size(paymentSession.items);
     const orderName = orderCount > 1 ? `${repProductName} 외 ${orderCount - 1}건` : repProductName;
 
     try {
       await widgets!.requestPayment({
-        orderId: generateRandomString(),
+        orderId,
         orderName,
         successUrl: window.location.origin + '/success',
         failUrl: window.location.origin + '/fail',
-        customerEmail: 'customer123@gmail.com',
+        customerEmail: email,
         customerName: data.senderName,
         customerMobilePhone: data.senderPhone,
       });
@@ -138,14 +157,6 @@ const PaymentContainer = ({ sessionId }: Props) => {
     setSectionOpen({ ...sectionOpen, ...section });
   };
 
-  const generateRandomString = () => {
-    if (typeof window !== 'undefined') {
-      return window.btoa(Math.random().toString()).slice(0, 20);
-    }
-
-    return ''; // 서버 환경일 경우 기본값 반환
-  };
-
   useEffect(() => {
     if (!sessionId) {
       invalidAccessPaymentSession();
@@ -156,7 +167,7 @@ const PaymentContainer = ({ sessionId }: Props) => {
     if (paymentSessionData) {
       (async () => {
         const { data } = paymentSessionData;
-        if (isEmpty(data)) {
+        if (isEmpty(data.items)) {
           await showConfirmAlert({
             title: '에러',
             description: '결제 세션이 만료되었습니다.',

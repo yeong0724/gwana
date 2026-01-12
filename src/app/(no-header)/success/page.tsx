@@ -1,0 +1,19 @@
+import React from 'react';
+
+import SuccessContainer from '@/components/features/success/SuccessContainer';
+
+type PageProps = {
+  searchParams: Promise<{
+    paymentKey?: string;
+    orderId?: string;
+    amount?: string;
+  }>;
+};
+
+const Page = async ({ searchParams }: PageProps) => {
+  const { paymentKey = '', orderId = '', amount = '' } = await searchParams;
+
+  return <SuccessContainer paymentKey={paymentKey} orderId={orderId} amount={amount} />;
+};
+
+export default Page;

@@ -11,7 +11,7 @@ import { PurchaseGuideModal } from '@/components/common/modal';
 import { Checkbox } from '@/components/ui/checkbox';
 import useNativeRouter from '@/hooks/useNativeRouter';
 import { localeFormat } from '@/lib/utils';
-import { useCartService } from '@/service';
+import { useCartService, usePaymentService } from '@/service';
 import { useCartStore, useLoginStore } from '@/stores';
 import { Cart } from '@/types';
 
@@ -23,12 +23,10 @@ const CartContainer = () => {
 
   const [purchaseGuideModalOpen, setPurchaseGuideModalOpen] = useState<boolean>(false);
 
-  const {
-    useDeleteCartListMutation,
-    useGetCartListQuery,
-    useUpdateCartQuantityMutation,
-    useCreatePaymentSessionMutation,
-  } = useCartService();
+  const { useDeleteCartListMutation, useGetCartListQuery, useUpdateCartQuantityMutation } =
+    useCartService();
+
+  const { useCreatePaymentSessionMutation } = usePaymentService();
 
   const { data: cartListData } = useGetCartListQuery({
     enabled: isLogin,

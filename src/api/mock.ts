@@ -1,7 +1,7 @@
 export const productMockData = [
   {
     productId: '1',
-    productName: '관아수제차 세작(녹차) 유기농 하동녹차(80g)',
+    productName: '세작(녹차) 유기농 하동녹차(80g)',
     categoryId: 'greenTea',
     categoryName: '녹차',
     images: [
@@ -31,7 +31,7 @@ export const productMockData = [
   },
   {
     productId: '2',
-    productName: '관아수제차 우전 유기농 하동녹차(80g)',
+    productName: '우전 유기농 하동녹차(80g)',
     categoryId: 'greenTea',
     categoryName: '녹차',
     images: [
@@ -65,10 +65,7 @@ export const productMockData = [
     productName: '관아수제차 녹차 드립백',
     categoryId: 'greenTea',
     categoryName: '녹차',
-    images: [
-      '/images/product/greenTea/thumbnail/greenTeaDripBag_1.webp',
-      '/images/product/greenTea/thumbnail/greenTeaDripBag_2.webp',
-    ],
+    images: ['/images/product/greenTea/thumbnail/greenTeaDripBag_1.webp'],
     infos: [
       '/images/product/greenTea/info/greenTeaDripBag_1.webp',
       '/images/product/greenTea/info/greenTeaDripBag_2.webp',
@@ -86,7 +83,7 @@ export const productMockData = [
   },
   {
     productId: '4',
-    productName: '관아수제차 발효차(홍차) 유기농 하동홍차(80g)',
+    productName: '발효차(홍차) 유기농 하동홍차(80g)',
     categoryId: 'blackTea',
     categoryName: '발효차',
     images: [
@@ -132,7 +129,7 @@ export const productMockData = [
   },
   {
     productId: '6',
-    productName: '하동 가을무우차 무카페인 자연차 전통차 관아수제차',
+    productName: '하동 가을무우차 무카페인 자연차 전통차',
     categoryId: 'substituteTea',
     categoryName: '대용차',
     images: [
@@ -159,7 +156,7 @@ export const productMockData = [
   },
   {
     productId: '7',
-    productName: '하동 야생 쑥차 관아수제차 무카페인 건강차',
+    productName: '하동 야생 쑥차 무카페인 건강차',
     categoryId: 'substituteTea',
     categoryName: '대용차',
     images: ['/images/product/substituteTea/thumbnail/wildMugwortTea_1.webp'],
@@ -183,7 +180,7 @@ export const productMockData = [
   },
   {
     productId: '8',
-    productName: '구기자차 무카페인 유기농 전통차 관아수제차',
+    productName: '구기자차 무카페인 유기농 전통차',
     categoryId: 'substituteTea',
     categoryName: '대용차',
     images: ['/images/product/substituteTea/thumbnail/gugijaTea_1.webp'],
@@ -207,7 +204,7 @@ export const productMockData = [
   },
   {
     productId: '9',
-    productName: '하동 목련꽃차 무카페인 꽃차 관아수제차 지리산 전통차',
+    productName: '하동 목련꽃차 무카페인 꽃차 지리산 전통차',
     categoryId: 'substituteTea',
     categoryName: '대용차',
     images: [

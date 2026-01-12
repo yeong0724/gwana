@@ -38,3 +38,25 @@ export interface CreatePaymentSessionRequest {
 export interface GetPaymentSessionRequest {
   sessionId: string;
 }
+
+export interface SavePaymentInfoRequest {
+  sessionId: string;
+  orderId: string;
+  totalPrice: number;
+  totalShippingPrice: number;
+  senderName: string;
+  senderPhone: string;
+  recipientName: string;
+  recipientPhone: string;
+  zonecode: string;
+  roadAddress: string;
+  detailAddress: string;
+  deliveryRequest: string;
+  deliveryRequestDetail: string;
+}
+
+export interface RequestPaymentApproveRequest {
+  orderId: string;
+  paymentKey: string;
+  amount: number;
+}

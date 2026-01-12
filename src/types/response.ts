@@ -66,3 +66,15 @@ export interface LoginResponse {
   phone: string;
   loginType: 'kakao' | 'naver' | 'google' | '';
 }
+
+export interface RequestPaymentApproveResponse {
+  paymentKey: string;
+  orderId: string;
+  status: string;
+  totalAmount: number;
+  method: string;
+  approvedAt: string;
+  receipt: {
+    url: string;
+  };
+}
