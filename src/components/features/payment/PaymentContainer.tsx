@@ -184,7 +184,7 @@ const PaymentContainer = ({ sessionId }: Props) => {
   }, [paymentSessionData, paymentSessionError]);
 
   return (
-    <div className="flex flex-col w-full max-w-[500px] mx-auto flex-1 border-x border-gray-100 overflow-hidden bg-gray-100">
+    <div className="flex flex-col w-full max-w-[600px] mx-auto flex-1 border-x border-gray-100 overflow-hidden bg-gray-100">
       <FormProvider {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit, onError)}

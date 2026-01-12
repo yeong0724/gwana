@@ -24,6 +24,7 @@ export interface ValidateTokenRequest {
 export interface AddToCartRequest {
   productId: string;
   quantity: number;
+  optionId: string | null;
 }
 
 export interface KakaoLogoutRequest {

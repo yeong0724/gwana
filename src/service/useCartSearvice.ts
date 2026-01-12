@@ -12,7 +12,7 @@ import { AddToCartRequest, Cart, UseQueryOptionsType } from '@/types';
 const useCartService = () => {
   const useAddToCartMutation = () =>
     useMutation({
-      mutationFn: (param: AddToCartRequest) => addToCart(param),
+      mutationFn: (param: AddToCartRequest[]) => addToCart(param),
     });
 
   const useUpdateCartListMutation = () =>

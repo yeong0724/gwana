@@ -31,13 +31,15 @@ export type Product = {
 
 export type Cart = {
   cartId: string;
-  quantity: number;
   productId: string;
   productName: string;
+  quantity: number;
   categoryName: string;
   price: number;
   shippingPrice: number;
   images: string[];
+  optionId: string | null;
+  optionName: string;
 };
 
 export type PaymentSession = {
@@ -77,4 +79,23 @@ export interface RequestPaymentApproveResponse {
   receipt: {
     url: string;
   };
+}
+
+export interface ProductOption {
+  optionId: string;
+  optionName: string;
+  productId: string;
+  additionalPrice: number;
+}
+
+export interface ProductDetailResponse {
+  productId: string;
+  productName: string;
+  categoryId: string;
+  categoryName: string;
+  images: string[];
+  infos: string[];
+  price: number;
+  shippingPrice: number;
+  options: ProductOption[];
 }

@@ -139,9 +139,9 @@ const CartContainer = () => {
   return (
     <>
       {/* lg 이상의 웹뷰 */}
-      <div className="hidden lg:flex flex-col w-full mx-auto flex-1 px-16 py-8">
+      <div className="hidden lg:flex flex-col w-full mx-auto flex-1 min-h-0 overflow-y-auto px-16 py-8 bg-white">
         {/* 장바구니 타이틀 */}
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">장바구니 ({size(cart)})</h1>
+        <h1 className="text-2xl font-medium text-gray-900 mb-6">장바구니 ({size(cart)})</h1>
 
         {cart.length === 0 ? (
           <div className="flex flex-col items-center justify-center flex-1 gap-4 bg-gray-50 rounded-lg py-20">
@@ -263,22 +263,22 @@ const CartContainer = () => {
               </button>
 
               {/* 우측: 무료배송 안내 */}
-              <p className="text-[13px] text-gray-600">* 50,000원 이상 구매 시 무료배송</p>
+              <p className="text-[14px] text-gray-600">※ 50,000원 이상 구매 시 무료배송</p>
             </div>
 
             {/* 비용 섹션 */}
             <div className="flex justify-end mt-6">
               <div className="flex flex-col gap-2 min-w-[350px]">
-                <div className="flex justify-between items-center text-[14px]">
+                <div className="flex justify-between items-center text-[16px]">
                   <span className="text-gray-700">상품 합계</span>
                   <span className="text-gray-900">{localeFormat(totalProductPrice)}원</span>
                 </div>
-                <div className="flex justify-between items-center text-[14px]">
+                <div className="flex justify-between items-center text-[16px]">
                   <span className="text-gray-700">배송비</span>
                   <span className="text-gray-900">{localeFormat(totalShippingPrice)}원</span>
                 </div>
                 <div className="h-px bg-gray-300 my-2" />
-                <div className="flex justify-between items-center text-[16px] font-bold">
+                <div className="flex justify-between items-center text-[18px] font-bold">
                   <span className="text-gray-900">합계</span>
                   <span className="text-gray-900">
                     {localeFormat(totalProductPrice + totalShippingPrice)}원
@@ -302,7 +302,7 @@ const CartContainer = () => {
       </div>
 
       {/* lg 미만의 모바일뷰 */}
-      <div className="flex flex-col w-full max-w-[500px] mx-auto flex-1 border-x border-gray-100 overflow-hidden lg:hidden">
+      <div className="flex flex-col w-full mx-auto flex-1 border-x border-gray-100 overflow-hidden lg:hidden">
         {/* 전체선택 헤더 */}
         <div className="flex items-center justify-between p-3 bg-white border-b border-gray-200 flex-shrink-0">
           <label className="flex items-center gap-2 cursor-pointer select-none">

@@ -5,11 +5,12 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { clone, findIndex } from 'lodash-es';
-import { ChevronDown, Share2 } from 'lucide-react';
+import { clone, findIndex, forEach, isEmpty, map, pick, sumBy } from 'lodash-es';
+import { ChevronDown, Share2, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { toast } from 'sonner';
 
+import { CustomDropdown } from '@/components/common';
 import { PurchaseGuideModal, ShareModal } from '@/components/common/modal';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,25 +22,28 @@ import {
   type CarouselApi,
 } from '@/components/ui/carousel';
 import { getIsMobile, localeFormat } from '@/lib/utils';
-import { useCartService } from '@/service';
-import { useCartStore, useLoginStore } from '@/stores';
-import { Cart, Product } from '@/types';
+import { useCartService, useProductService } from '@/service';
+import { useAlertStore, useCartStore, useLoginStore } from '@/stores';
+import { Cart, ProductDetailResponse } from '@/types';
+
+const cartPick = ['productId', 'productName', 'categoryName', 'price', 'shippingPrice', 'images'];
 
 type Props = {
-  product: Product;
   productId: string;
 };
 
-const ProductDetailContainer = ({ product, productId }: Props) => {
+const ProductDetailContainer = ({ productId }: Props) => {
   const queryClient = useQueryClient();
   const pathname = usePathname();
   const router = useRouter();
   const { isLogin } = useLoginStore();
   const isMobile = getIsMobile();
+  const { showAlert } = useAlertStore();
   const { setCart, addCart, cart } = useCartStore();
-  const { useAddToCartMutation } = useCartService();
 
-  const [quantity, setQuantity] = useState<number>(1);
+  const { useUpdateCartListMutation } = useCartService();
+  const { mutate: updateCartListMutate } = useUpdateCartListMutation();
+
   const [purchaseGuideModalOpen, setPurchaseGuideModalOpen] = useState<boolean>(false);
   const [shareModalOpen, setShareModalOpen] = useState<boolean>(false);
 
@@ -52,10 +56,29 @@ const ProductDetailContainer = ({ product, productId }: Props) => {
 
   // Portal을 위한 클라이언트 마운트 상태
   const [isMounted, setIsMounted] = useState(false);
+  const [product, setProduct] = useState<ProductDetailResponse>({
+    productId: '',
+    productName: '',
+    categoryId: '',
+    categoryName: '',
+    images: [],
+    infos: [],
+    price: 0,
+    shippingPrice: 0,
+    options: [],
+  });
 
-  const { mutate: addToCartMutate } = useAddToCartMutation();
+  // 상품 선택 옵션
+  const [purchaseList, setPurchaseOption] = useState<Cart[]>([]);
 
-  const isFetching = false;
+  const { useProductDetailQuery } = useProductService();
+  const {
+    data: productDetailData,
+    error: productDetailError,
+    isFetching,
+  } = useProductDetailQuery({ productId }, { enabled: true });
+
+  const hasOption = useMemo(() => !isEmpty(product.options), [product.options]);
 
   // 클라이언트 마운트 감지 + 스크롤 최상단 이동
   useEffect(() => {
@@ -70,9 +93,30 @@ const ProductDetailContainer = ({ product, productId }: Props) => {
     api.on('select', () => setCurrent(api.selectedScrollSnap()));
   }, [api]);
 
+  useEffect(() => {
+    if (productDetailData) {
+      const { data } = productDetailData;
+      if (isEmpty(data.options)) {
+        setPurchaseOption([
+          {
+            ...(pick(data, cartPick) as Cart),
+            cartId: '',
+            quantity: 1,
+            optionId: null,
+            optionName: '',
+          },
+        ]);
+      }
+
+      setProduct(data);
+    } else if (productDetailError) {
+      toast.error('상품 상세 정보를 불러오는데 실패하였습니다.');
+    }
+  }, [productDetailData, productDetailError]);
+
   const totalPrice = useMemo(
-    () => product.price * quantity + product.shippingPrice,
-    [product.price, quantity, product.shippingPrice]
+    () => sumBy(purchaseList, ({ price, quantity }) => price * quantity) + product.shippingPrice,
+    [purchaseList, product.shippingPrice]
   );
 
   const moveToLoginPage = () => {
@@ -120,20 +164,14 @@ const ProductDetailContainer = ({ product, productId }: Props) => {
    * 장바구니 상품 추가
    */
   const handleAddToCart = () => {
-    const payload: Cart = {
-      cartId: '',
-      quantity,
-      productId,
-      productName: product.productName,
-      categoryName: product.categoryName,
-      price: product.price,
-      shippingPrice: product?.shippingPrice ?? 0,
-      images: product.images,
-    };
+    if (isEmpty(purchaseList)) {
+      showAlert({ title: '안내', description: '옵션을 선택해주세요.' });
+      return;
+    }
 
     // 로그인 상태인 경우
     if (isLogin) {
-      addToCartMutate(payload, {
+      updateCartListMutate(purchaseList, {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ['cartList'], refetchType: 'all' });
           handleSuccessToast();
@@ -146,15 +184,20 @@ const ProductDetailContainer = ({ product, productId }: Props) => {
     }
     // 비로그인 상태인 경우
     else {
-      const index = findIndex(cart, { productId });
+      forEach(purchaseList, (item) => {
+        const { productId, optionId, quantity } = item;
+        const searchParam = optionId ? { productId, optionId } : { productId };
 
-      if (index < 0) {
-        addCart(payload);
-      } else {
-        const updatedCart = clone(cart);
-        updatedCart[index].quantity += quantity;
-        setCart(updatedCart);
-      }
+        const index = findIndex(cart, searchParam);
+
+        if (index < 0) {
+          addCart(item);
+        } else {
+          const updatedCart = clone(cart);
+          updatedCart[index].quantity += quantity;
+          setCart(updatedCart);
+        }
+      });
 
       handleSuccessToast();
     }
@@ -184,6 +227,32 @@ const ProductDetailContainer = ({ product, productId }: Props) => {
     toast.success('상품이 장바구니에 추가되었습니다', {
       description: '장바구니 페이지에서 확인하세요',
     });
+  };
+
+  const handleQuantityChange = (index: number, quantity: number) => {
+    const updatedCart = clone(purchaseList);
+    updatedCart[index].quantity = quantity;
+    setPurchaseOption(updatedCart);
+  };
+
+  const onOptionSelect = (optionId: string, optionName: string) => {
+    const index = findIndex(purchaseList, { optionId });
+    if (index < 0) {
+      setPurchaseOption((prev) => {
+        return [
+          ...prev,
+          {
+            ...(pick(product, cartPick) as Cart),
+            cartId: '',
+            quantity: 1,
+            optionId,
+            optionName,
+          },
+        ];
+      });
+    } else {
+      showAlert({ title: '안내', description: '이미 선택한 옵션입니다.' });
+    }
   };
 
   return (
@@ -294,19 +363,19 @@ const ProductDetailContainer = ({ product, productId }: Props) => {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => setQuantity((prev) => prev - 1)}
-                  disabled={quantity <= 1}
+                  onClick={() => null}
+                  disabled={false}
                   className="h-11 w-11 rounded-none border-r-0 cursor-pointer text-lg bg-white"
                 >
                   -
                 </Button>
                 <div className="w-24 text-center h-11 rounded-none border-x border-y border-gray-300 text-base bg-white flex items-center justify-center select-none">
-                  {quantity}
+                  {1}
                 </div>
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => setQuantity((prev) => prev + 1)}
+                  onClick={() => null}
                   className="h-11 w-11 rounded-none border-l-0 cursor-pointer text-lg"
                 >
                   +
@@ -383,61 +452,143 @@ const ProductDetailContainer = ({ product, productId }: Props) => {
       {!isFetching &&
         isMounted &&
         createPortal(
-          <div className="fixed bottom-0 left-0 right-0 z-[100] lg:hidden">
+          <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden">
             {/* 메인 패널 */}
             <div
-              className={`bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)] ${isBottomPanelOpen ? 'rounded-t-2xl' : ''}`}
+              className={`bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)] transition-all duration-300 ease-in-out ${isBottomPanelOpen ? 'rounded-t-2xl' : ''}`}
             >
-              {/* 닫기 버튼 - 열린 상태에서만 표시 */}
-              {isBottomPanelOpen && (
-                <button
-                  onClick={() => setIsBottomPanelOpen(false)}
-                  className="w-full flex items-center justify-center"
+              {/* 확장 패널: 구매수량 + 상품금액 합계 (옵션 없는 경우) */}
+              {hasOption ? (
+                <div
+                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                    isBottomPanelOpen ? 'max-h-[500px]' : 'max-h-0'
+                  }`}
                 >
-                  <ChevronDown size={24} className="text-gray-400" />
-                </button>
-              )}
-              {/* 확장 패널: 구매수량 + 상품금액 합계 */}
-              <div
-                className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                  isBottomPanelOpen ? 'max-h-60' : 'max-h-0'
-                }`}
-              >
-                <div className="px-4 py-4 space-y-4 bg-white">
-                  {/* 구매수량 */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">구매수량</span>
-                    <div className="flex items-center">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setQuantity((prev) => prev - 1)}
-                        disabled={quantity <= 1}
-                        className="h-9 w-9 rounded-none border-r-0 cursor-pointer text-base bg-white"
-                      >
-                        -
-                      </Button>
-                      <div className="w-16 text-center h-9 rounded-none border border-gray-300 text-sm bg-white flex items-center justify-center select-none">
-                        {quantity}
+                  {/* 닫기 버튼 */}
+                  <button
+                    onClick={() => setIsBottomPanelOpen(false)}
+                    className="w-full flex items-center justify-center py-2"
+                  >
+                    <ChevronDown size={24} className="text-gray-400" />
+                  </button>
+                  <div className="px-4 pb-4 space-y-4 bg-white">
+                    {/* 옵션 선택 - 커스텀 드롭다운 */}
+                    <CustomDropdown options={product.options} onOptionSelect={onOptionSelect} />
+
+                    {/* 선택된 옵션 목록 */}
+                    {!isEmpty(purchaseList) && (
+                      <div className="space-y-3">
+                        {map(purchaseList, ({ optionName, quantity, price }, index) => (
+                          <div
+                            key={index}
+                            className="border border-gray-200 rounded-md p-4 space-y-3"
+                          >
+                            <div className="flex items-start justify-between">
+                              <span className="text-sm font-medium text-gray-800">
+                                {optionName}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updatedCart = clone(purchaseList);
+                                  updatedCart.splice(index, 1);
+                                  setPurchaseOption(updatedCart);
+                                }}
+                                className="text-gray-400 hover:text-gray-600"
+                              >
+                                <X size={20} strokeWidth={1.5} />
+                              </button>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center border border-gray-300 rounded">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleQuantityChange(index, quantity - 1)}
+                                  disabled={quantity <= 1}
+                                  className="h-9 w-9 rounded-none border-r cursor-pointer text-base"
+                                >
+                                  -
+                                </Button>
+                                <div className="w-12 text-center h-9 text-sm flex items-center justify-center select-none">
+                                  {quantity}
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleQuantityChange(index, quantity + 1)}
+                                  className="h-9 w-9 rounded-none border-l cursor-pointer text-base"
+                                >
+                                  +
+                                </Button>
+                              </div>
+                              <span className="text-base font-semibold">
+                                {localeFormat(price * quantity)}원
+                              </span>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setQuantity((prev) => prev + 1)}
-                        className="h-9 w-9 rounded-none border-l-0 cursor-pointer text-base"
-                      >
-                        +
-                      </Button>
+                    )}
+
+                    {/* 상품금액 합계 */}
+                    <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                      <span className="text-sm font-medium text-gray-700">상품 금액 합계</span>
+                      <span className="text-xl font-bold">{localeFormat(totalPrice)}원</span>
                     </div>
                   </div>
+                </div>
+              ) : (
+                <div
+                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                    isBottomPanelOpen ? 'max-h-60' : 'max-h-0'
+                  }`}
+                >
+                  {/* 닫기 버튼 */}
+                  <button
+                    onClick={() => setIsBottomPanelOpen(false)}
+                    className="w-full flex items-center justify-center py-2"
+                  >
+                    <ChevronDown size={24} className="text-gray-400" />
+                  </button>
+                  <div className="px-4 pb-4 space-y-4 bg-white">
+                    {/* 구매수량 */}
+                    {map(purchaseList, ({ quantity }, index) => (
+                      <div className="flex items-center justify-between" key={index}>
+                        <span className="text-sm font-medium text-gray-700">구매수량</span>
+                        <div className="flex items-center">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleQuantityChange(index, quantity - 1)}
+                            disabled={quantity <= 1}
+                            className="h-9 w-9 rounded-none border-r-0 cursor-pointer text-base bg-white"
+                          >
+                            -
+                          </Button>
+                          <div className="w-16 text-center h-9 rounded-none border border-gray-300 text-sm bg-white flex items-center justify-center select-none">
+                            {quantity}
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleQuantityChange(index, quantity + 1)}
+                            className="h-9 w-9 rounded-none border-l-0 cursor-pointer text-base"
+                          >
+                            +
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
 
-                  {/* 상품금액 합계 */}
-                  <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                    <span className="text-sm font-medium text-gray-700">상품 금액 합계</span>
-                    <span className="text-xl font-bold">{localeFormat(totalPrice)}원</span>
+                    {/* 상품금액 합계 */}
+                    <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                      <span className="text-sm font-medium text-gray-700">상품 금액 합계</span>
+                      <span className="text-xl font-bold">{localeFormat(totalPrice)}원</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* 버튼 */}
               <div className="flex">
