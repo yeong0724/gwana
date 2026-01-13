@@ -352,209 +352,217 @@ const CartContainer = () => {
         {/* 상품 리스트 + 결제 예상 금액 */}
         <div className="flex-1 overflow-y-auto min-h-0">
           {cart.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full gap-3 bg-gray-100">
+            <div className="flex flex-col items-center justify-center h-full gap-3 bg-white">
               <ShoppingCart size={64} className="text-gray-300" strokeWidth={1.5} />
               <span className="text-gray-500 text-[14px]">장바구니가 비어있습니다</span>
             </div>
           ) : (
             <div className="flex flex-col min-h-full">
               {/* 장바구니 아이템 리스트 */}
-              <div className="flex flex-col gap-6 p-3 bg-gray-100">
+              <div className="flex flex-col bg-white">
                 {map(cart, (item, index) => (
-                  <div
-                    key={`${item.cartId}-${index}`}
-                    className="bg-white border border-gray-100 rounded-lg overflow-hidden shadow-[3px_3px_10px_rgba(0,0,0,0.15)]"
-                  >
-                    {/* 상단 영역: 체크박스 + 상품 정보 */}
-                    <div className="flex gap-2 px-3 py-[16px]">
-                      {/* 체크박스 */}
-                      <div className="flex items-start justify-center pt-1 px-2">
-                        <Checkbox
-                          checked={item.checked}
-                          onCheckedChange={(checked: boolean) => onCheckboxHandler(checked, index)}
-                        />
-                      </div>
-
-                      {/* 나머지 콘텐츠 */}
-                      <div className="flex-1 flex flex-col gap-2">
-                        {/* 상단 영역: 이미지 + 상품정보 */}
-                        <div className="flex gap-2">
-                          {/* 상품 이미지 */}
-                          <div className="relative w-14 h-14 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
-                            {item.images && !isEmpty(item.images) ? (
-                              <Image
-                                src={first(item.images)!}
-                                alt={item.productName}
-                                fill
-                                className="object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-gray-200" />
-                            )}
-                          </div>
-
-                          {/* 상품명 */}
-                          <div className="flex-1">
-                            <p className="text-[13px] font-semibold text-gray-900">
-                              {item.categoryName}
-                            </p>
-                            <p className="text-[11px] text-gray-700 mt-1 line-clamp-2">
-                              {item.productName}
-                            </p>
-                          </div>
+                  <>
+                    <div key={`${item.cartId}-${index}`} className="bg-white px-2">
+                      {/* 상단 영역: 체크박스 + 상품 정보 */}
+                      <div className="flex gap-2 px-1 pt-[24px]">
+                        {/* 체크박스 */}
+                        <div className="flex items-start justify-center pt-1 px-2">
+                          <Checkbox
+                            checked={item.checked}
+                            onCheckedChange={(checked: boolean) =>
+                              onCheckboxHandler(checked, index)
+                            }
+                          />
                         </div>
 
-                        {/* 메인 상품 영역 - optionRequired가 false일 때만 표시 */}
-                        {!item.optionRequired && (
-                          <div className="flex flex-col gap-2 mt-3 py-2 border-t border-gray-100">
-                            <div className="flex items-center gap-1">
-                              <span className="text-[11px] text-teal-600 font-medium">
-                                메인 상품
-                              </span>
-                              <span className="text-[11px] text-gray-400">|</span>
-                              <span className="text-[12px] text-gray-700">{item.productName}</span>
+                        {/* 나머지 콘텐츠 */}
+                        <div className="flex-1 flex flex-col gap-2">
+                          {/* 상단 영역: 이미지 + 상품정보 */}
+                          <div className="flex gap-2">
+                            {/* 상품 이미지 */}
+                            <div className="relative w-14 h-14 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
+                              {item.images && !isEmpty(item.images) ? (
+                                <Image
+                                  src={first(item.images)!}
+                                  alt={item.productName}
+                                  fill
+                                  className="object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-gray-200" />
+                              )}
                             </div>
-                            <div className="flex items-center justify-between">
-                              {/* 수량 조절 */}
-                              <div className="flex items-center border border-gray-300 rounded overflow-hidden">
-                                <button
-                                  className="w-7 h-6 hover:bg-gray-50 border-r border-gray-300 flex items-center justify-center disabled:opacity-50"
-                                  disabled={item.quantity <= 1}
-                                  onClick={() =>
-                                    onUpdateCartQuantity(
-                                      item.productId,
-                                      '',
-                                      item.quantity - 1,
-                                      index,
-                                      item.optionRequired
-                                    )
-                                  }
-                                >
-                                  <Minus size={12} className="text-gray-600" />
-                                </button>
-                                <span className="w-8 h-6 text-[12px] text-gray-900 flex items-center justify-center">
-                                  {item.quantity}
+
+                            {/* 상품명 */}
+                            <div className="flex-1">
+                              <p className="text-[13px] font-semibold text-gray-900">
+                                {item.categoryName}
+                              </p>
+                              <p className="text-[11px] text-gray-700 mt-1 line-clamp-2">
+                                {item.productName}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* 메인 상품 영역 - optionRequired가 false일 때만 표시 */}
+                          {!item.optionRequired && (
+                            <div className="flex flex-col gap-2 mt-3 py-2">
+                              <div className="flex items-center gap-1">
+                                <span className="text-[11px] text-teal-600 font-medium">
+                                  메인 상품
                                 </span>
-                                <button className="w-7 h-6 hover:bg-gray-50 border-l border-gray-300 flex items-center justify-center">
-                                  <Plus
-                                    size={12}
-                                    className="text-gray-600"
+                                <span className="text-[11px] text-gray-400">|</span>
+                                <span className="text-[12px] text-gray-700">
+                                  {item.productName}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                {/* 수량 조절 */}
+                                <div className="flex items-center border border-gray-300 rounded overflow-hidden">
+                                  <button
+                                    className="w-7 h-6 hover:bg-gray-50 border-r border-gray-300 flex items-center justify-center disabled:opacity-50"
+                                    disabled={item.quantity <= 1}
                                     onClick={() =>
                                       onUpdateCartQuantity(
                                         item.productId,
                                         '',
-                                        item.quantity + 1,
+                                        item.quantity - 1,
                                         index,
                                         item.optionRequired
                                       )
                                     }
-                                  />
-                                </button>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                {/* 금액 */}
-                                <span className="text-[13px] font-semibold text-gray-900">
-                                  {localeFormat(item.price * item.quantity)}원
-                                </span>
-                                {/* 삭제 버튼 */}
-                                <button className="p-1 hover:bg-gray-100 rounded active:scale-90 transition-transform">
-                                  <X size={14} className="text-gray-400" />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* 옵션 상품 영역 */}
-                        {item.options && item.options.length > 0 && (
-                          <div className="flex flex-col">
-                            {map(item.options, (option, optionIndex) => (
-                              <div
-                                key={`${item.cartId}-option-${optionIndex}`}
-                                className="flex flex-col gap-2 py-2 border-t border-gray-100"
-                              >
-                                <div className="flex items-center gap-1">
-                                  <span className="text-[11px] text-teal-600 font-medium">
-                                    옵션
+                                  >
+                                    <Minus size={12} className="text-gray-600" />
+                                  </button>
+                                  <span className="w-8 h-6 text-[12px] text-gray-900 flex items-center justify-center">
+                                    {item.quantity}
                                   </span>
-                                  <span className="text-[11px] text-gray-400">|</span>
-                                  <span className="text-[12px] text-gray-700">
-                                    {option.optionName}
-                                  </span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                  {/* 수량 조절 */}
-                                  <div className="flex items-center border border-gray-300 rounded overflow-hidden">
-                                    <button
-                                      className="w-7 h-6 hover:bg-gray-50 border-r border-gray-300 flex items-center justify-center disabled:opacity-50"
-                                      disabled={option.quantity <= 1}
+                                  <button className="w-7 h-6 hover:bg-gray-50 border-l border-gray-300 flex items-center justify-center">
+                                    <Plus
+                                      size={12}
+                                      className="text-gray-600"
                                       onClick={() =>
                                         onUpdateCartQuantity(
                                           item.productId,
-                                          option.optionId,
-                                          option.quantity - 1,
+                                          '',
+                                          item.quantity + 1,
                                           index,
                                           item.optionRequired
                                         )
                                       }
-                                    >
-                                      <Minus size={12} className="text-gray-600" />
-                                    </button>
-                                    <span className="w-8 h-6 text-[12px] text-gray-900 flex items-center justify-center">
-                                      {option.quantity}
+                                    />
+                                  </button>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  {/* 금액 */}
+                                  <span className="text-[13px] font-semibold text-gray-900">
+                                    {localeFormat(item.price * item.quantity)}원
+                                  </span>
+                                  {/* 삭제 버튼 */}
+                                  <button className="p-1 hover:bg-gray-100 rounded active:scale-90 transition-transform">
+                                    <X size={14} className="text-gray-400" />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* 옵션 상품 영역 */}
+                          {item.options && item.options.length > 0 && (
+                            <div className="flex flex-col">
+                              {map(item.options, (option, optionIndex) => (
+                                <div
+                                  key={`${item.cartId}-option-${optionIndex}`}
+                                  className="flex flex-col gap-2 py-2"
+                                >
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-[11px] text-teal-600 font-medium">
+                                      옵션
                                     </span>
-                                    <button className="w-7 h-6 hover:bg-gray-50 border-l border-gray-300 flex items-center justify-center">
-                                      <Plus
-                                        size={12}
-                                        className="text-gray-600"
+                                    <span className="text-[11px] text-gray-400">|</span>
+                                    <span className="text-[12px] text-gray-700">
+                                      {option.optionName}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    {/* 수량 조절 */}
+                                    <div className="flex items-center border border-gray-300 rounded overflow-hidden">
+                                      <button
+                                        className="w-7 h-6 hover:bg-gray-50 border-r border-gray-300 flex items-center justify-center disabled:opacity-50"
+                                        disabled={option.quantity <= 1}
                                         onClick={() =>
                                           onUpdateCartQuantity(
                                             item.productId,
                                             option.optionId,
-                                            option.quantity + 1,
+                                            option.quantity - 1,
                                             index,
                                             item.optionRequired
                                           )
                                         }
-                                      />
-                                    </button>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    {/* 금액 */}
-                                    <span className="text-[13px] font-semibold text-gray-900">
-                                      {localeFormat(option.optionPrice * option.quantity)}원
-                                    </span>
-                                    {/* 삭제 버튼 */}
-                                    <button className="p-1 hover:bg-gray-100 rounded active:scale-90 transition-transform">
-                                      <X size={14} className="text-gray-400" />
-                                    </button>
+                                      >
+                                        <Minus size={12} className="text-gray-600" />
+                                      </button>
+                                      <span className="w-8 h-6 text-[12px] text-gray-900 flex items-center justify-center">
+                                        {option.quantity}
+                                      </span>
+                                      <button className="w-7 h-6 hover:bg-gray-50 border-l border-gray-300 flex items-center justify-center">
+                                        <Plus
+                                          size={12}
+                                          className="text-gray-600"
+                                          onClick={() =>
+                                            onUpdateCartQuantity(
+                                              item.productId,
+                                              option.optionId,
+                                              option.quantity + 1,
+                                              index,
+                                              item.optionRequired
+                                            )
+                                          }
+                                        />
+                                      </button>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      {/* 금액 */}
+                                      <span className="text-[13px] font-semibold text-gray-900">
+                                        {localeFormat(option.optionPrice * option.quantity)}원
+                                      </span>
+                                      {/* 삭제 버튼 */}
+                                      <button className="p-1 hover:bg-gray-100 rounded active:scale-90 transition-transform">
+                                        <X size={14} className="text-gray-400" />
+                                      </button>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* 하단 가격 산정 영역 */}
+                      <div className="text-center text-[11px] text-gray-600 pt-3 pb-5 bg-white">
+                        {/* 구분선 */}
+
+                        {`상품 ${localeFormat(item.price * item.quantity + sumBy(item.options, (opt) => opt.optionPrice * opt.quantity))}원 + 배송비 ${localeFormat(item.shippingPrice)}원 = `}
+                        <span className="font-semibold text-gray-900">
+                          {localeFormat(
+                            item.price * item.quantity +
+                              sumBy(item.options, (opt) => opt.optionPrice * opt.quantity) +
+                              item.shippingPrice
+                          )}
+                          원
+                        </span>
                       </div>
                     </div>
-
-                    {/* 하단 가격 산정 영역 */}
-                    <div className="text-center text-[11px] text-gray-600 py-3 border-t border-gray-200 bg-white">
-                      {`상품 ${localeFormat(item.price * item.quantity + sumBy(item.options, (opt) => opt.optionPrice * opt.quantity))}원 + 배송비 ${localeFormat(item.shippingPrice)}원 = `}
-                      <span className="font-semibold text-gray-900">
-                        {localeFormat(
-                          item.price * item.quantity +
-                            sumBy(item.options, (opt) => opt.optionPrice * opt.quantity) +
-                            item.shippingPrice
-                        )}
-                        원
-                      </span>
-                    </div>
-                  </div>
+                    {cart.length - 1 !== index && (
+                      <div className="border-b border-gray-300 mx-5 mb-3" />
+                    )}
+                  </>
                 ))}
               </div>
 
               {/* 남은 공간 채우기 - 상품 적을 때 결제 예상 금액을 하단으로 밀어냄 */}
-              <div className="flex-1 bg-gray-100" />
+              <div className="flex-1 bg-white" />
 
               {/* 결제 예상 금액 - 스크롤 영역 내 */}
               <div className="bg-white px-3 pt-4 pb-3 border-t border-gray-200">
