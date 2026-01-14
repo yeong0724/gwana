@@ -20,7 +20,6 @@ export default function AboutPage() {
   const phase1Text1Ref = useRef<HTMLParagraphElement>(null);
   const phase1LogoRef = useRef<HTMLDivElement>(null);
   const phase1Text2Ref = useRef<HTMLParagraphElement>(null);
-  const phase1Text3Ref = useRef<HTMLParagraphElement>(null);
 
   // Phase 2 개별 요소들
   const phase2TitleRef = useRef<HTMLHeadingElement>(null);
@@ -68,7 +67,7 @@ export default function AboutPage() {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: heroRef.current,
-          start: 'top top',
+          start: window.innerWidth >= 1024 ? 'top 94px' : 'top 58px',
           end: '+=400%', // 더 길게 (순차 등장 시간 확보)
           pin: true,
           scrub: 1,
@@ -178,9 +177,12 @@ export default function AboutPage() {
   }, []);
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} className="">
       {/* ===== 히어로 섹션 ===== */}
-      <div ref={heroRef} className="relative h-screen w-full overflow-hidden">
+      <div
+        ref={heroRef}
+        className="relative h-[calc(100dvh-58px)] lg:h-[calc(100dvh-94px)] w-full overflow-hidden"
+      >
         {/* 배경 이미지 */}
         <div
           className="absolute inset-0 bg-cover bg-center"
@@ -259,14 +261,14 @@ export default function AboutPage() {
             ref={phase2ButtonRef}
             className="px-6 py-3 border border-white/50 rounded-full text-sm hover:bg-white/10 transition-colors"
           >
-            View More →
+            Go to Shop
           </button>
         </div>
 
         {/* 스크롤 인디케이터 */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
           {/* <span className="text-white/50 text-xs font-light tracking-widest uppercase">Scroll</span> */}
-          <ChevronDown className="w-8 h-8 text-white/70 animate-bounce" strokeWidth={1} />
+          <ChevronDown className="w-8 h-8 text-white/70 animate-bounce" strokeWidth={3} />
         </div>
       </div>
 

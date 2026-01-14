@@ -145,9 +145,7 @@ const Header = ({ menuGroup }: HeaderProps) => {
     <div className="sticky top-0 z-50" style={{ viewTransitionName: 'header' }}>
       {/* Main Bar Header */}
       <header
-        className={`hidden lg:block sticky top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled ? 'bg-white shadow-lg' : 'bg-white/30'
-        } hover:bg-white hover:shadow-lg`}
+        className={`hidden lg:block sticky h-[94px] top-0 left-0 right-0 z-50 transition-all duration-300 bg-white shadow-lg hover:bg-white hover:shadow-lg`}
         onMouseEnter={() => setIsHeaderHovered(true)}
         onMouseLeave={() => {
           setIsHeaderHovered(false);
