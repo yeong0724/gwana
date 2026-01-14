@@ -3,7 +3,12 @@ import { MenuGroup } from '@/types';
 export const menuGroup: MenuGroup = {
   main: [
     {
-      menuName: '티 제품',
+      menuName: 'ABOUT',
+      menuId: 'about',
+      upperMenuId: null,
+    },
+    {
+      menuName: 'TEA',
       menuId: 'product',
       upperMenuId: null,
     },

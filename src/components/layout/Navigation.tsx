@@ -35,6 +35,9 @@ const Navigation = ({ isMenuOpen, moveToLoginPage, toggleMenu, menuGroup }: Prop
   const onClickMain = (menuId: string, hasCategory: boolean) => {
     if (hasCategory) {
       setCurrentMenu((prev) => (prev === menuId ? '' : menuId));
+    } else {
+      router.push(`/${menuId}`);
+      closeSidebar();
     }
   };
 

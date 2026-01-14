@@ -28,7 +28,7 @@ type HeaderProps = {
 
 const Header = ({ menuGroup }: HeaderProps) => {
   const pathname = usePathname();
-  const isHomePage = pathname === '/';
+  const isHomePage = pathname === '/' || pathname === '/about';
 
   const { main, category } = menuGroup;
   const queryClient = useQueryClient();
@@ -93,6 +93,8 @@ const Header = ({ menuGroup }: HeaderProps) => {
 
     if (menuId === 'product') {
       moveToProductPage('all');
+    } else if (menuId === 'about') {
+      router.push('/about');
     }
   };
 
