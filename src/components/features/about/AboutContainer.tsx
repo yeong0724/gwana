@@ -201,17 +201,33 @@ const AboutContainer = () => {
           ref={content1Ref}
           className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-6"
         >
-          <h1 ref={phase1TitleRef} className="text-5xl md:text-7xl font-bold text-emerald-400 mb-6">
+          <h1
+            ref={phase1TitleRef}
+            className="text-5xl md:text-7xl font-bold text-emerald-500 mb-12"
+            style={{ opacity: 0 }}
+          >
             관아수제차
           </h1>
-          <p ref={phase1Text1Ref} className="text-lg md:text-xl max-w-xl leading-relaxed mb-8">
+          <p
+            ref={phase1Text1Ref}
+            className="text-[22px] md:text-xl max-w-xl leading-relaxed mb-16 font-semibold"
+            style={{ opacity: 0 }}
+          >
             Tea from Hadong, calmly brewed
           </p>
-          <p ref={phase1Text2Ref} className="text-lg md:text-xl max-w-xl leading-relaxed mb-8">
+          <p
+            ref={phase1Text2Ref}
+            className="text-[20px] md:text-xl max-w-xl leading-relaxed mb-14"
+            style={{ opacity: 0 }}
+          >
             하동의 자연과 계절의 흐름을
             <br />차 한 잔에 담았습니다.
           </p>
-          <div ref={phase1LogoRef} className="flex items-center justify-center mb-8">
+          <div
+            ref={phase1LogoRef}
+            className="flex items-center justify-center mb-8"
+            style={{ opacity: 0 }}
+          >
             <span className="text-emerald-400 text-3xl">🦚</span>
           </div>
         </div>
@@ -221,27 +237,39 @@ const AboutContainer = () => {
           ref={content2Ref}
           className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-6"
         >
-          <h2 ref={phase2TitleRef} className="text-3xl md:text-5xl font-bold mb-4">
+          <h2
+            ref={phase2TitleRef}
+            className="text-3xl md:text-5xl font-bold mb-4"
+            style={{ opacity: 0 }}
+          >
             지리산 깊은 골짜기에
             <br />
             시작된 관아수제차
           </h2>
 
-          <p ref={phase2SubtitleRef} className="text-xl italic mb-8 opacity-70">
+          <p
+            ref={phase2SubtitleRef}
+            className="text-xl italic mb-8 opacity-70"
+            style={{ opacity: 0 }}
+          >
             What we can do
           </p>
 
-          <div ref={phase2IconsRef} className="flex gap-4 mb-6">
+          <div ref={phase2IconsRef} className="flex gap-4 mb-6" style={{ opacity: 0 }}>
             <div className="flex items-center justify-center">
               <span className="text-2xl">🦚</span>
             </div>
           </div>
 
-          <h3 ref={phase2HeadingRef} className="text-xl font-semibold mb-8">
+          <h3 ref={phase2HeadingRef} className="text-xl font-semibold mb-8" style={{ opacity: 0 }}>
             농약이나 화학비료에 의존하지 않고 <br /> 오직 자연 그대로 기른 찻잎
           </h3>
 
-          <p ref={phase2TextRef} className="text-sm max-w-md leading-relaxed opacity-80 mb-8">
+          <p
+            ref={phase2TextRef}
+            className="text-sm max-w-md leading-relaxed opacity-80 mb-8"
+            style={{ opacity: 0 }}
+          >
             세대를 거쳐 이어온 기준으로
             <br />
             자연과 전통을 지켜온 차를 만듭니다.
@@ -256,6 +284,7 @@ const AboutContainer = () => {
           <button
             ref={phase2ButtonRef}
             className="flex items-center gap-3 group"
+            style={{ opacity: 0 }}
             onClick={(e) => {
               const button = e.currentTarget;
               gsap.to(button, {
