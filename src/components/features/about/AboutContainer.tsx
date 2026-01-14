@@ -199,25 +199,25 @@ const AboutContainer = () => {
         {/* 첫 번째 컨텐츠 */}
         <div
           ref={content1Ref}
-          className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-6"
+          className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-6 mt-12"
         >
           <h1
             ref={phase1TitleRef}
-            className="text-5xl md:text-7xl font-bold text-emerald-500 mb-12"
+            className="text-5xl md:text-7xl font-bold text-emerald-500"
             style={{ opacity: 0 }}
           >
             관아수제차
           </h1>
           <p
             ref={phase1Text1Ref}
-            className="text-[22px] md:text-xl max-w-xl leading-relaxed mb-16 font-semibold"
+            className="text-[22px] md:text-xl max-w-xl leading-relaxed mt-56 mb-8 font-semibold"
             style={{ opacity: 0 }}
           >
             Tea from Hadong, calmly brewed
           </p>
           <p
             ref={phase1Text2Ref}
-            className="text-[20px] md:text-xl max-w-xl leading-relaxed mb-14"
+            className="text-[20px] md:text-xl max-w-xl leading-relaxed mb-4"
             style={{ opacity: 0 }}
           >
             하동의 자연과 계절의 흐름을
@@ -228,7 +228,7 @@ const AboutContainer = () => {
             className="flex items-center justify-center mb-8"
             style={{ opacity: 0 }}
           >
-            <span className="text-emerald-400 text-3xl">🦚</span>
+            <span className="text-emerald-400 text-3xl">🍵</span>
           </div>
         </div>
 
@@ -257,7 +257,7 @@ const AboutContainer = () => {
 
           <div ref={phase2IconsRef} className="flex gap-4 mb-6" style={{ opacity: 0 }}>
             <div className="flex items-center justify-center">
-              <span className="text-2xl">🦚</span>
+              <span className="text-2xl">🌿</span>
             </div>
           </div>
 
