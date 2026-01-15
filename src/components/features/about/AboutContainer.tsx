@@ -1,13 +1,19 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-
+import {
+  aboutCarousel1Img,
+  aboutCarousel2Img,
+  aboutCarousel3Img,
+  aboutCarousel4Img,
+  aboutCarousel5Img,
+  aboutGwanaImg,
+} from '@/static/images';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
-import { aboutCarousel1Img, aboutCarousel2Img, aboutCarousel3Img, aboutCarousel4Img, aboutCarousel5Img, aboutGwanaImg } from '@/static/images';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -18,7 +24,6 @@ const brandImages = [
   aboutCarousel4Img, // 로고 스타일 4
   aboutCarousel5Img, // 로고 스타일 5
 ];
-
 
 const AboutContainer = () => {
   const router = useRouter();
@@ -93,7 +98,7 @@ const AboutContainer = () => {
           {
             x: -totalWidth,
             duration: 45,
-            ease: "none",
+            ease: 'none',
             repeat: -1,
           }
         );
@@ -217,21 +222,17 @@ const AboutContainer = () => {
     }
 
     window.scrollTo(0, 0);
-  }, [])
+  }, []);
 
-  const carouselImages = [
-    ...brandImages,
-    ...brandImages,
-    ...brandImages,
-    ...brandImages,
-  ];
+  const carouselImages = [...brandImages, ...brandImages, ...brandImages, ...brandImages];
 
   return (
     <div ref={containerRef} className="">
       {/* ===== 히어로 섹션 ===== */}
       <div
         ref={heroRef}
-        className="relative h-screen lg:h-[calc(100dvh-94px)] w-full overflow-hidden"
+        className="relative lg:h-[calc(100dvh-94px)] w-full overflow-hidden"
+        style={{ height: '100dvh' }}
       >
         {/* 배경 이미지 */}
         <div
@@ -256,7 +257,7 @@ const AboutContainer = () => {
               className="w-[280px] lg:w-[350px] mb-[80px]"
               style={{
                 filter:
-                  "drop-shadow(1px 0 0 white) drop-shadow(0 1px 0 white) drop-shadow(0 0 1px white)",
+                  'drop-shadow(1px 0 0 white) drop-shadow(0 1px 0 white) drop-shadow(0 0 1px white)',
               }}
               width={100}
               height={100}
@@ -279,7 +280,7 @@ const AboutContainer = () => {
             <div
               ref={carouselTrackRef}
               className="flex gap-8 lg:gap-12 xl:gap-20 items-center"
-              style={{ width: "fit-content" }}
+              style={{ width: 'fit-content' }}
             >
               {carouselImages.map((src, index) => (
                 <div
@@ -346,6 +347,7 @@ const AboutContainer = () => {
             style={{ opacity: 0 }}
             onClick={(e) => {
               const button = e.currentTarget;
+
               gsap.to(button, {
                 scale: 0.8,
                 duration: 0.1,
