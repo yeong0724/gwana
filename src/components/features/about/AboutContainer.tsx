@@ -1,29 +1,14 @@
 'use client';
 
-import {
-  aboutCarousel1Img,
-  aboutCarousel2Img,
-  aboutCarousel3Img,
-  aboutCarousel4Img,
-  aboutCarousel5Img,
-  aboutGwanaImg,
-} from '@/static/images';
+import { aboutGwanaImg } from '@/static/images';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 gsap.registerPlugin(ScrollTrigger);
-
-const brandImages = [
-  aboutCarousel1Img, // 로고 스타일 1
-  aboutCarousel2Img, // 로고 스타일 2
-  aboutCarousel3Img, // 로고 스타일 3
-  aboutCarousel4Img, // 로고 스타일 4
-  aboutCarousel5Img, // 로고 스타일 5
-];
 
 const AboutContainer = () => {
   const router = useRouter();
@@ -33,22 +18,64 @@ const AboutContainer = () => {
   const content1Ref = useRef<HTMLDivElement>(null);
   const content2Ref = useRef<HTMLDivElement>(null);
 
+  // 모바일 브라우저 UI 숨김/표시에 따른 동적 높이 추적
+  const [viewportHeight, setViewportHeight] = useState<number | null>(null);
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
+  const [isHeroPinned, setIsHeroPinned] = useState(true); // 히어로 섹션이 핀된 상태인지
+
+  const updateViewport = useCallback(() => {
+    // 히어로 섹션 핀이 끝났으면 더 이상 업데이트하지 않음
+    if (!isHeroPinned) return;
+
+    // visualViewport가 있으면 사용 (더 정확함), 없으면 innerHeight
+    const height = window.visualViewport?.height ?? window.innerHeight;
+    setViewportHeight(height);
+    setIsLargeScreen(window.innerWidth >= 1024);
+  }, [isHeroPinned]);
+
+  useEffect(() => {
+    // 히어로 섹션 핀이 끝났으면 리스너 등록하지 않음
+    if (!isHeroPinned) return;
+
+    // 초기 높이 설정
+    updateViewport();
+
+    // resize 이벤트 리스너
+    window.addEventListener('resize', updateViewport);
+
+    // visualViewport API 지원 시 추가 (모바일 브라우저 UI 변화 감지)
+    const visualViewport = window.visualViewport;
+    if (visualViewport) {
+      visualViewport.addEventListener('resize', updateViewport);
+    }
+
+    return () => {
+      window.removeEventListener('resize', updateViewport);
+      if (visualViewport) {
+        visualViewport.removeEventListener('resize', updateViewport);
+      }
+    };
+  }, [updateViewport, isHeroPinned]);
+
   // Phase 1 개별 요소들
+  const phase1BgRef = useRef<HTMLDivElement>(null);
   const phase1TitleRef = useRef<HTMLHeadingElement>(null);
   const phase1Text1Ref = useRef<HTMLParagraphElement>(null);
   const phase1LogoRef = useRef<HTMLDivElement>(null);
   const phase1Text2Ref = useRef<HTMLParagraphElement>(null);
-  const phase1CarouselRef = useRef(null); // 캐러셀 컨테이너
 
   // Phase 2 개별 요소들
+  const phase2BgRef = useRef<HTMLDivElement>(null);
   const phase2TitleRef = useRef<HTMLHeadingElement>(null);
-  const phase2SubtitleRef = useRef<HTMLParagraphElement>(null);
-  const phase2IconsRef = useRef<HTMLDivElement>(null);
   const phase2HeadingRef = useRef<HTMLHeadingElement>(null);
   const phase2TextRef = useRef<HTMLParagraphElement>(null);
   const phase2ButtonRef = useRef<HTMLButtonElement>(null);
+  const arrowRef = useRef<HTMLDivElement>(null);
+  const chevronDownRef = useRef<HTMLDivElement>(null);
 
   const carouselTrackRef = useRef<HTMLDivElement>(null);
+  const whiteSectionRef = useRef<HTMLDivElement>(null);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -60,7 +87,6 @@ const AboutContainer = () => {
           phase1Text1Ref.current,
           phase1LogoRef.current,
           phase1Text2Ref.current,
-          phase1CarouselRef.current,
         ],
         {
           opacity: 0,
@@ -75,7 +101,6 @@ const AboutContainer = () => {
           phase1Text1Ref.current,
           phase1LogoRef.current,
           phase1Text2Ref.current,
-          phase1CarouselRef.current,
         ],
         {
           opacity: 1,
@@ -112,6 +137,8 @@ const AboutContainer = () => {
           pin: true,
           scrub: 0.5,
           // markers: true,
+          onLeave: () => setIsHeroPinned(false), // 핀 종료 시 동적 높이 추적 중단
+          onEnterBack: () => setIsHeroPinned(true), // 다시 돌아오면 추적 재개
         },
       });
 
@@ -121,22 +148,41 @@ const AboutContainer = () => {
 
       tl.to(content1Ref.current, {
         opacity: 0,
-        duration: 0.5,
-      }).to(
-        overlayRef.current,
-        {
-          opacity: 0.75,
-          duration: 0.5,
-        },
-        '<'
-      );
+        duration: 0.8,
+        ease: 'power2.inOut',
+      })
+        .to(
+          phase1BgRef.current,
+          {
+            opacity: 0,
+            duration: 2,
+            ease: 'power1.inOut',
+          },
+          '<'
+        )
+        .to(
+          overlayRef.current,
+          {
+            opacity: 0.4,
+            duration: 2,
+            ease: 'power1.inOut',
+          },
+          '<'
+        )
+        .to(
+          phase2BgRef.current,
+          {
+            opacity: 1,
+            duration: 2,
+            ease: 'power1.inOut',
+          },
+          '<'
+        );
 
       // ===== Phase 2: 두 번째 컨텐츠 순차 등장 =====
       gsap.set(
         [
           phase2TitleRef.current,
-          phase2SubtitleRef.current,
-          phase2IconsRef.current,
           phase2HeadingRef.current,
           phase2TextRef.current,
           phase2ButtonRef.current,
@@ -152,16 +198,6 @@ const AboutContainer = () => {
         y: 0,
         duration: 0.5,
       })
-        .to(phase2SubtitleRef.current, {
-          opacity: 1,
-          y: 0,
-          duration: 0.5,
-        })
-        .to(phase2IconsRef.current, {
-          opacity: 1,
-          y: 0,
-          duration: 0.5,
-        })
         .to(phase2HeadingRef.current, {
           opacity: 1,
           y: 0,
@@ -178,6 +214,24 @@ const AboutContainer = () => {
           duration: 0.5,
         });
 
+      // ArrowRight 미세 바운스 애니메이션
+      gsap.to(arrowRef.current, {
+        x: 1.5,
+        duration: 1,
+        ease: 'power1.inOut',
+        repeat: -1,
+        yoyo: true,
+      });
+
+      // ChevronDown 미세 바운스 애니메이션
+      gsap.to(chevronDownRef.current, {
+        y: 2.5,
+        duration: 0.8,
+        ease: 'power1.inOut',
+        repeat: -1,
+        yoyo: true,
+      });
+
       // 페이즈 2 유지 시간 (내용을 보고 버튼을 클릭할 시간 확보)
       tl.to({}, { duration: 1 });
 
@@ -188,7 +242,7 @@ const AboutContainer = () => {
       }).to(
         overlayRef.current,
         {
-          opacity: 0.9,
+          opacity: 0.95,
           duration: 0.5,
         },
         '<'
@@ -211,10 +265,24 @@ const AboutContainer = () => {
           },
         });
       });
+
+      // GSAP 초기화 완료 후 흰 배경 섹션 표시
+      setIsReady(true);
     }, containerRef);
 
     return () => ctx.revert();
   }, []);
+
+  // viewport 높이 변경 시 ScrollTrigger 업데이트 (히어로 핀 중일 때만)
+  useEffect(() => {
+    if (viewportHeight && isHeroPinned) {
+      // 약간의 딜레이 후 ScrollTrigger refresh (레이아웃 업데이트 대기)
+      const timeoutId = setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 100);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [viewportHeight, isHeroPinned]);
 
   useEffect(() => {
     if ('scrollRestoration' in history) {
@@ -224,26 +292,41 @@ const AboutContainer = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  const carouselImages = [...brandImages, ...brandImages, ...brandImages, ...brandImages];
-
   return (
     <div ref={containerRef} className="">
       {/* ===== 히어로 섹션 ===== */}
       <div
         ref={heroRef}
-        className="relative lg:h-[calc(100dvh-94px)] w-full overflow-hidden"
-        style={{ height: '100dvh' }}
+        className="relative w-full overflow-hidden"
+        style={{
+          height: viewportHeight
+            ? isLargeScreen
+              ? `${viewportHeight - 94}px`
+              : `${viewportHeight}px`
+            : '100dvh',
+        }}
       >
-        {/* 배경 이미지 */}
+        {/* 배경 이미지 - Phase 1 */}
         <div
+          ref={phase1BgRef}
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: `url('/images/about/gwana_about_01.webp')`,
           }}
         />
 
+        {/* 배경 이미지 - Phase 2 (페이드인) */}
+        <div
+          ref={phase2BgRef}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url('/images/about/gwana_about_02.webp')`,
+            opacity: 0,
+          }}
+        />
+
         {/* 어두운 오버레이 */}
-        <div ref={overlayRef} className="absolute inset-0 bg-black" style={{ opacity: 0.5 }} />
+        <div ref={overlayRef} className="absolute inset-0 bg-black" style={{ opacity: 0.3 }} />
 
         {/* 첫 번째 컨텐츠 */}
         <div
@@ -254,50 +337,32 @@ const AboutContainer = () => {
             <Image
               src={aboutGwanaImg}
               alt="관아수제차"
-              className="w-[280px] lg:w-[350px] mb-[80px]"
+              className="w-[280px] lg:w-[350px] mb-[150px]"
               style={{
                 filter:
-                  'drop-shadow(1px 0 0 white) drop-shadow(0 1px 0 white) drop-shadow(0 0 1px white)',
+                  'drop-shadow(1px 0 0 white) drop-shadow(-1px 0 0 white) drop-shadow(0 1px 0 white) drop-shadow(0 0 1px white)',
               }}
               width={100}
               height={100}
             />
           </div>
           <p
-            ref={phase1Text2Ref}
-            className="text-[20px] md:text-xl max-w-xl leading-relaxed mb-10"
+            ref={phase1Text1Ref}
+            className="text-3xl md:text-5xl font-bold m-10"
             style={{ opacity: 0 }}
           >
-            하동의 자연과 계절의 흐름을
-            <br />차 한 잔에 담았습니다.
+            지리산 깊은 골짜기에
+            <br />
+            시작된 관아수제차
           </p>
-          {/* 무한 루프 이미지 캐러셀 */}
-          <div
-            ref={phase1CarouselRef}
-            className="w-full overflow-hidden mb-8 min-h-[100px] mt-10"
+          <p
+            ref={phase1Text2Ref}
+            className="text-[18px] md:text-xl max-w-xl leading-relaxed text-center"
             style={{ opacity: 0 }}
           >
-            <div
-              ref={carouselTrackRef}
-              className="flex gap-8 lg:gap-12 xl:gap-20 items-center"
-              style={{ width: 'fit-content' }}
-            >
-              {carouselImages.map((src, index) => (
-                <div
-                  key={index}
-                  className="flex-shrink-0 rounded-lg flex items-center justify-center backdrop-blur-sm border-[1px] border-gray-600"
-                >
-                  <Image
-                    src={src}
-                    alt={`Brand ${(index % brandImages.length) + 1}`}
-                    className={`w-[240px] md:w-[300px] lg:w-[380px] xl:w-[480px] aspect-[5/3] object-cover rounded hover:opacity-100 transition-opacity`}
-                    width={100}
-                    height={100}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+            관아의 차는 지리산 화개동천의 깊은 골짜기 <br /> 무제갓 1만여평 야생 차밭에서
+            자라납니다.
+          </p>
         </div>
 
         {/* 두 번째 컨텐츠 */}
@@ -305,45 +370,27 @@ const AboutContainer = () => {
           ref={content2Ref}
           className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-6"
         >
-          <h2
-            ref={phase2TitleRef}
-            className="text-3xl md:text-5xl font-bold mb-4"
-            style={{ opacity: 0 }}
-          >
-            지리산 깊은 골짜기에
-            <br />
-            시작된 관아수제차
-          </h2>
-
-          <div ref={phase2IconsRef} className="flex gap-4 mb-6" style={{ opacity: 0 }}>
-            <div className="flex items-center justify-center">
-              <span className="text-2xl">🌿</span>
-            </div>
-          </div>
-
-          <h3 ref={phase2HeadingRef} className="text-xl font-semibold mb-8" style={{ opacity: 0 }}>
+          <h3 ref={phase2TitleRef} className="text-[20px] md:text-5xl mb-10" style={{ opacity: 0 }}>
             농약이나 화학비료에 의존하지 않고 <br /> 오직 자연 그대로 기른 찻잎
           </h3>
 
-          <p
-            ref={phase2TextRef}
-            className="text-sm max-w-md leading-relaxed opacity-80 mb-8"
-            style={{ opacity: 0 }}
-          >
+          <h4 ref={phase2HeadingRef} className="text-[20px] mb-10" style={{ opacity: 0 }}>
             세대를 거쳐 이어온 기준으로
             <br />
-            자연과 전통을 지켜온 차를 만듭니다.
-            <br />
-            설명보다 여운이 남고,
-            <br />
-            속도보다 호흡이 먼저인 차
-            <br />
-            이것이 관아가 차를 바라보는 가장 맑은 방식입니다.
+            자연과 전통을 지켜온 차.
+          </h4>
+
+          <p
+            ref={phase2TextRef}
+            className="text-[20px] max-w-md leading-relaxed opacity-80 mb-20"
+            style={{ opacity: 0 }}
+          >
+            하동의 자연과 계절의 흐름을 <br />차 한 잔에 담았습니다.
           </p>
 
           <button
             ref={phase2ButtonRef}
-            className="flex items-center gap-3 group"
+            className="flex items-center gap-3 group text-center"
             style={{ opacity: 0 }}
             onClick={(e) => {
               const button = e.currentTarget;
@@ -361,24 +408,29 @@ const AboutContainer = () => {
             }}
           >
             <span className="text-[18px] relative">
-              <div className="absolute -z-10 top-1/2 left-[-18px] -translate-y-1/2 w-10 h-10 rounded-full bg-zinc-700/80" />
+              <div className="absolute -z-10 top-1/2 left-[-18px] -translate-y-1/2 w-10 h-10 rounded-full bg-gray-700/100" />
               Go to Shop
             </span>
-            <div className="">
+            <div ref={arrowRef} className="">
               <ArrowRight className="w-5 h-5 text-white" />
             </div>
           </button>
         </div>
 
         {/* 스크롤 인디케이터 */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-          {/* <span className="text-white/50 text-xs font-light tracking-widest uppercase">Scroll</span> */}
-          <ChevronDown className="w-8 h-8 text-white/70 animate-bounce" strokeWidth={3} />
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+          <div ref={chevronDownRef}>
+            <ChevronDown className="w-8 h-8 text-white/70" strokeWidth={3} />
+          </div>
         </div>
       </div>
 
       {/* ===== 흰 배경 섹션 ===== */}
-      <div className="bg-white min-h-screen">
+      <div
+        ref={whiteSectionRef}
+        className="bg-white min-h-screen transition-opacity duration-300"
+        style={{ opacity: isReady ? 1 : 0 }}
+      >
         <div className="max-w-4xl mx-auto px-6 py-20">
           <section className="fade-section mb-20">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">Section 1 Title</h2>

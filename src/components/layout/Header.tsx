@@ -1,21 +1,20 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
-// Header.tsx
-import dynamic from 'next/dynamic';
-import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
-
-import { useQueryClient } from '@tanstack/react-query';
-import { filter, size } from 'lodash-es';
-import { ChevronLeft, Menu as MenuIcon, ShoppingBag, ShoppingCart, User } from 'lucide-react';
-
 import UserDropdownContent from '@/components/layout/UserDropdownContent';
 import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import useNativeRouter from '@/hooks/useNativeRouter';
 import { useCartService } from '@/service';
+import { mainLogoImg } from '@/static/images';
 import { useCartStore, useLoginStore, useMenuStore } from '@/stores';
 import type { Menu, MenuGroup } from '@/types';
+import { useQueryClient } from '@tanstack/react-query';
+import { filter, size } from 'lodash-es';
+import { ChevronLeft, Menu as MenuIcon, ShoppingBag, ShoppingCart, User } from 'lucide-react';
+// Header.tsx
+import dynamic from 'next/dynamic';
+import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
+import React, { useEffect, useMemo, useState } from 'react';
 
 // SSR 비활성화로 import
 const Navigation = dynamic(() => import('@/components/layout/Navigation'), {
@@ -288,7 +287,7 @@ const Header = ({ menuGroup }: HeaderProps) => {
           <div className="absolute left-1/2 -translate-x-1/2 pt-1">
             {isHomePage ? (
               <Image
-                src="/images/gwana_logo_4.webp"
+                src={mainLogoImg}
                 alt="gwana_logo"
                 width={150}
                 height={150}
