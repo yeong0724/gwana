@@ -22,6 +22,8 @@ const AboutContainer = () => {
   const [viewportHeight, setViewportHeight] = useState<number | null>(null);
   const [isLargeScreen, setIsLargeScreen] = useState(false);
   const [isHeroPinned, setIsHeroPinned] = useState(true); // 히어로 섹션이 핀된 상태인지
+  const isKakaoRef = useRef(false); // 카카오 인앱 브라우저 여부
+  const isReturningRef = useRef(false); // onEnterBack으로 돌아오는 중인지
 
   const updateViewport = useCallback(() => {
     // 히어로 섹션 핀이 끝났으면 더 이상 업데이트하지 않음
@@ -34,6 +36,9 @@ const AboutContainer = () => {
   }, [isHeroPinned]);
 
   useEffect(() => {
+    // 카카오 인앱 브라우저 감지 (클라이언트에서만)
+    isKakaoRef.current = /KAKAOTALK/i.test(navigator.userAgent);
+
     // 히어로 섹션 핀이 끝났으면 리스너 등록하지 않음
     if (!isHeroPinned) return;
 
@@ -49,10 +54,30 @@ const AboutContainer = () => {
       visualViewport.addEventListener('resize', updateViewport);
     }
 
+    // 카카오 인앱에서는 scroll 이벤트에서도 높이 체크 (빠른 스크롤 시 visualViewport 이벤트 누락 대응)
+    let scrollThrottleTimer: NodeJS.Timeout | null = null;
+    const handleScroll = () => {
+      if (!isKakaoRef.current || scrollThrottleTimer) return;
+      scrollThrottleTimer = setTimeout(() => {
+        scrollThrottleTimer = null;
+        updateViewport();
+      }, 1000);
+    };
+
+    if (isKakaoRef.current) {
+      window.addEventListener('scroll', handleScroll, { passive: true });
+    }
+
     return () => {
       window.removeEventListener('resize', updateViewport);
       if (visualViewport) {
         visualViewport.removeEventListener('resize', updateViewport);
+      }
+      if (isKakaoRef.current) {
+        window.removeEventListener('scroll', handleScroll);
+        if (scrollThrottleTimer) {
+          clearTimeout(scrollThrottleTimer);
+        }
       }
     };
   }, [updateViewport, isHeroPinned]);
@@ -138,7 +163,16 @@ const AboutContainer = () => {
           scrub: 0.5,
           // markers: true,
           onLeave: () => setIsHeroPinned(false), // 핀 종료 시 동적 높이 추적 중단
-          onEnterBack: () => setIsHeroPinned(true), // 다시 돌아오면 추적 재개
+          onEnterBack: () => {
+            // 카카오 인앱에서 돌아올 때 잠시 refresh 차단
+            if (isKakaoRef.current) {
+              isReturningRef.current = true;
+              setTimeout(() => {
+                isReturningRef.current = false;
+              }, 500);
+            }
+            setIsHeroPinned(true);
+          },
         },
       });
 
@@ -274,13 +308,18 @@ const AboutContainer = () => {
   }, []);
 
   // viewport 높이 변경 시 ScrollTrigger 업데이트 (히어로 핀 중일 때만)
+  // 카카오 인앱에서 onEnterBack 직후에는 refresh 생략 (스크롤 튀김 방지)
   useEffect(() => {
-    if (viewportHeight && isHeroPinned) {
-      // 약간의 딜레이 후 ScrollTrigger refresh (레이아웃 업데이트 대기)
-      const timeoutId = setTimeout(() => {
+    if (viewportHeight && isHeroPinned && !isReturningRef.current) {
+      if (!isReturningRef.current) {
+        const timeoutId = setTimeout(() => {
+          ScrollTrigger.refresh();
+        }, 100);
+
+        return () => clearTimeout(timeoutId);
+      } else {
         ScrollTrigger.refresh();
-      }, 100);
-      return () => clearTimeout(timeoutId);
+      }
     }
   }, [viewportHeight, isHeroPinned]);
 
