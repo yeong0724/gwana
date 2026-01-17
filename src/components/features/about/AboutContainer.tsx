@@ -250,8 +250,8 @@ const AboutContainer = () => {
 
       // ArrowRight 미세 바운스 애니메이션
       gsap.to(arrowRef.current, {
-        x: 1.5,
-        duration: 1,
+        x: 3,
+        duration: 0.5,
         ease: 'power1.inOut',
         repeat: -1,
         yoyo: true,

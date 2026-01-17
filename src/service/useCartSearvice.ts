@@ -1,13 +1,18 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-
 import {
   addToCart,
+  deleteCart,
   deleteCartList,
   getCartList,
   updateCartList,
   updateCartQuantity,
 } from '@/api/cart';
-import { AddToCartRequest, UpdateCartRequest, UseQueryOptionsType } from '@/types';
+import {
+  AddToCartRequest,
+  DeleteCartRequest,
+  UpdateCartRequest,
+  UseQueryOptionsType,
+} from '@/types';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 const useCartService = () => {
   const useAddToCartMutation = () =>
@@ -23,6 +28,11 @@ const useCartService = () => {
   const useDeleteCartListMutation = () =>
     useMutation({
       mutationFn: (param: string[]) => deleteCartList(param),
+    });
+
+  const useDeleteCartMutation = () =>
+    useMutation({
+      mutationFn: (param: DeleteCartRequest) => deleteCart(param),
     });
 
   const useUpdateCartQuantityMutation = () =>
@@ -42,6 +52,7 @@ const useCartService = () => {
     useGetCartListQuery,
     useUpdateCartListMutation,
     useDeleteCartListMutation,
+    useDeleteCartMutation,
     useUpdateCartQuantityMutation,
   };
 };

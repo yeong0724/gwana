@@ -103,6 +103,7 @@ export type PurchaseList = {
 };
 
 export type CartOption = {
+  cartId: string;
   optionId: string;
   optionName: string;
   quantity: number;
@@ -121,3 +122,5 @@ export type Cart = {
   optionRequired: boolean;
   options: CartOption[];
 };
+
+export type CartState = Cart & { checked: boolean };

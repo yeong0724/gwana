@@ -27,6 +27,11 @@ export interface AddToCartRequest {
   optionId: string;
 }
 
+export interface DeleteCartRequest {
+  cartId: string;
+  optionId: string;
+}
+
 export interface KakaoLogoutRequest {
   accessToken: string;
 }

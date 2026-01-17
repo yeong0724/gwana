@@ -1,8 +1,5 @@
 'use client';
 
-import { ReactNode, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
-
 import { CustomHeader } from '@/components/common';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
@@ -11,6 +8,8 @@ import { refreshAccessTokenSingleton } from '@/lib/tokenManager';
 import { allClearPersistStore, cn, noMainHeaderPage, validateToken } from '@/lib/utils';
 import { useLoginStore } from '@/stores';
 import { initailState } from '@/stores/useLoginStore';
+import { usePathname } from 'next/navigation';
+import { ReactNode, useEffect } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -49,7 +48,7 @@ const MainLayout = ({ children }: Props) => {
   }, [_hasHydrated]);
 
   return isNoMainHeaderPage ? (
-    <div className="h-dvh bg-gray-50 flex flex-col relative overflow-hidden">
+    <div className="h-dvh  flex flex-col relative overflow-hidden bg-white">
       <CustomHeader />
       {children}
     </div>

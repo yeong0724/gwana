@@ -1,8 +1,6 @@
 // src/components/common/GlobalAlertDialog.tsx
 'use client';
 
-import { useMemo } from 'react';
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,6 +12,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { alertStore } from '@/stores/useAlertStore';
+import { useMemo } from 'react';
 
 const GlobalAlert = () => {
   const {
@@ -60,14 +59,14 @@ const GlobalAlert = () => {
           <AlertDialogDescription className="min-h-[30px]">{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
+          <AlertDialogAction onClick={handleConfirm} className="rounded-[10px]">
+            {confirmText}
+          </AlertDialogAction>
           {type === 'CONFIRM' && cancelText && (
             <AlertDialogCancel onClick={cancelAlert} className="rounded-[10px]">
               {cancelText || '취소'}
             </AlertDialogCancel>
           )}
-          <AlertDialogAction onClick={handleConfirm} className="rounded-[10px]">
-            {confirmText}
-          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-
+import { localeFormat } from '@/lib/utils';
+import { ProductOption } from '@/types';
 import { map } from 'lodash-es';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-
-import { ProductOption } from '@/types';
+import { useState } from 'react';
 
 interface Props {
   options: ProductOption[];
@@ -26,7 +25,7 @@ const CustomDropdown = ({
   };
 
   return (
-    <div className="border border-gray-500 rounded-md overflow-hidden">
+    <div className="border border-gray-300 rounded-md overflow-hidden">
       {/* 드롭다운 트리거 */}
       <button
         type="button"
@@ -47,7 +46,7 @@ const CustomDropdown = ({
           isOptionOpen ? 'max-h-60' : 'max-h-0'
         }`}
       >
-        <div className="border-t border-gray-200">
+        <div className="border-t border-gray-300">
           {map(options, (option) => (
             <button
               key={option.optionId}
@@ -55,7 +54,7 @@ const CustomDropdown = ({
               onClick={() => handleSelect(option)}
               className="w-full px-3 py-3 text-left text-sm hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
             >
-              {option.optionName}
+              {option.optionName} (+ {localeFormat(option.optionPrice)})
             </button>
           ))}
         </div>
