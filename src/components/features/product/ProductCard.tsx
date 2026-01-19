@@ -30,7 +30,7 @@ const ProductCard = ({ product, onClickProduct }: ProductCardProps) => {
       />
       {/* 상품 정보 */}
       <div className="flex flex-col pt-4 space-y-2 justify-center items-center">
-        <h3 className="text-[15px] lg:text-[17px] font-semibold text-gray-900 leading-snug text-center break-keep">
+        <h3 className="text-[15px] lg:text-[17px] font-semibold text-gray-800 leading-snug text-center break-keep">
           {product.productName}
         </h3>
         <div className="space-y-1">

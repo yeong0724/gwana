@@ -13,7 +13,7 @@ import UserDropdownContent from '@/components/layout/UserDropdownContent';
 import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import useNativeRouter from '@/hooks/useNativeRouter';
 import { useCartService } from '@/service';
-import { headerLogoImg, mainLogoImg } from '@/static/images';
+import { gwanaLogoCutoutImg, headerLogoImg, mainLogoImg } from '@/static/images';
 import { useCartStore, useLoginStore, useMenuStore } from '@/stores';
 import type { Menu, MenuGroup } from '@/types';
 
@@ -177,7 +177,7 @@ const Header = ({ menuGroup }: HeaderProps) => {
               // drop-shadow(0 0 0.5px black)
               >
                 <Image
-                  src={'/images/gwana_logo_1-cutout.webp'}
+                  src={gwanaLogoCutoutImg}
                   alt="gwana_logo"
                   width={120}
                   height={80}
@@ -304,8 +304,8 @@ const Header = ({ menuGroup }: HeaderProps) => {
               <Image
                 src={mainLogoImg}
                 alt="gwana_logo"
-                width={150}
-                height={150}
+                width={120}
+                height={120}
                 onClick={() => router.push('/')}
                 className="cursor-pointer"
               />
@@ -313,8 +313,8 @@ const Header = ({ menuGroup }: HeaderProps) => {
               <Image
                 src={headerLogoImg}
                 alt="gwana_logo"
-                width={95}
-                height={95}
+                width={100}
+                height={100}
                 onClick={() => router.push('/')}
                 className="cursor-pointer"
               />

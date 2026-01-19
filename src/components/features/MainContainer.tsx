@@ -172,9 +172,11 @@ const MainContainer = () => {
         </Carousel>
 
         {/* 인기상품 섹션 */}
-        <div className="bg-white px-4 pt-15">
+        <div className="bg-white px-4 pt-25">
           {/* 타이틀 */}
-          <h2 className="text-[21px] font-medium text-gray-900 mb-8">관아수제차 인기상품</h2>
+          <h2 className="text-[25px] font-bold text-gray-700 mb-12 tracking-wider flex items-center justify-center">
+            <span>관아수제차 인기 상품</span>
+          </h2>
 
           {/* 탭 & 전체보기 */}
           <div className="flex justify-between items-center mb-5">
@@ -217,7 +219,9 @@ const MainContainer = () => {
         </div>
 
         <div className="bg-white px-4 pt-20 pb-30">
-          <h2 className="text-[21px] font-medium text-gray-900 mb-8">대용차 (논카페인)</h2>
+          <h2 className="text-[25px] font-bold text-gray-700 mb-12 tracking-wider flex items-center justify-center">
+            <span>대용차 (논카페인)</span>
+          </h2>
           <div className="grid grid-cols-2 gap-x-[25px] gap-y-10">
             {filter(productMockData, { categoryId: 'substituteTea' }).map((product) => (
               <ProductCard

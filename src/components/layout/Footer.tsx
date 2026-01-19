@@ -37,17 +37,20 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        <div className="md:hidden flex flex-col space-y-4 text-sm text-gray-700">
+        <div className="md:hidden flex flex-col space-y-4 text-gray-700">
           {/* 첫 번째 줄: 사업자 정보 */}
-          <div className="flex flex-wrap flex-col items-start gap-2 leading-relaxed text-[15px]">
-            <div className="flex flex-col items-start">
-              <span className="font-bold mr-[5px]">상호명: 관아수제차</span>
-              <span className="font-bold mr-[5px]">대표자: 김정옥</span>
+          <div className="flex flex-wrap flex-col items-center gap-2 leading-relaxed text-[13px]">
+            <div className="flex items-center">
+              <span className="font-bold">상호명: 관아수제차</span>
+              <span className="mx-[5px]">|</span>
+              <span className="font-bold">대표자: 김정옥</span>
+              <span className="mx-[5px]">|</span>
+              <span className="font-bold">mobile: 010-5334-7785</span>
             </div>
-            <div className="flex flex-col items-start">
-              <span>mobile: 010-5334-7785</span>
-              <span>E-mail: rud0243@naver.com</span>
-              <span>TEL: 0507-1462-8041</span>
+            <div className="flex items-center">
+              <span className="font-bold">E-mail: rud0243@naver.com</span>
+              <span className="mx-[5px]">|</span>
+              <span className="font-bold">TEL: 0507-1462-8041</span>
             </div>
             <div>
               <span className="font-bold">
@@ -57,7 +60,7 @@ const Footer = () => {
             <div>
               <span className="font-bold">사업자등록번호: 613-19-89889</span>
             </div>
-            <div className="flex flex-col items-start">
+            <div className="flex flex-col items-center">
               <span className="text-gray-500">Copyright © Gwana Tea House.</span>
               <span className="text-gray-500">All rights reserved.</span>
             </div>

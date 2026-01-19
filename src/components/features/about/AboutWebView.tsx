@@ -16,8 +16,7 @@ import {
   aboutWebImg4_2,
   aboutWebImg4_3,
   aboutWebImg5_1,
-  aboutWebImg5_2,
-  aboutWebImg6,
+  aboutWebImg5_2, aboutWebImg6,
 } from '@/static/images';
 
 // GSAP 플러그인 등록
