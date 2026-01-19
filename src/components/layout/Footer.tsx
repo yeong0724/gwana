@@ -39,13 +39,11 @@ const Footer = () => {
         </div>
         <div className="md:hidden flex flex-col space-y-4 text-gray-700">
           {/* 첫 번째 줄: 사업자 정보 */}
-          <div className="flex flex-wrap flex-col items-center gap-2 leading-relaxed text-[13px]">
+          <div className="flex flex-wrap flex-col items-center gap-2 leading-relaxed text-[12px]">
             <div className="flex items-center">
               <span className="font-bold">상호명: 관아수제차</span>
               <span className="mx-[5px]">|</span>
-              <span className="font-bold">대표자: 김정옥</span>
-              <span className="mx-[5px]">|</span>
-              <span className="font-bold">mobile: 010-5334-7785</span>
+              <span className="font-bold">대표자: 김정옥 (010-5334-7785)</span>
             </div>
             <div className="flex items-center">
               <span className="font-bold">E-mail: rud0243@naver.com</span>
