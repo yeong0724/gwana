@@ -330,18 +330,20 @@ const AboutWebView = () => {
             className="object-cover"
             priority
           />
+          {/* 이미지 위 음영 오버레이 */}
+          <div className="absolute inset-0 bg-black/25" />
         </div>
-        <div className="absolute inset-0 flex flex-col items-center pt-[25vh] text-white text-center font-sans font-semibold tracking-widest ">
+        <div className="absolute inset-0 flex flex-col items-center pt-[25vh] text-white text-center">
           <div
             ref={heroTitleRef}
-            className="text-[56px] mb-16 tracking-widest "
+            className="text-[56px] mb-16 font-family-cormorant"
             style={{ opacity: 0 }}
           >
             From Hadong
           </div>
           <div
             ref={heroText1Ref}
-            className="space-y-1 text-[28px] mb-[10px]"
+            className="space-y-1 text-[28px] mb-[10px] tracking-widest"
             style={{ opacity: 0 }}
           >
             <p>관아수제차는 1994년부터</p>
@@ -349,7 +351,7 @@ const AboutWebView = () => {
           </div>
           <div
             ref={heroText2Ref}
-            className="mt-12 space-y-1 text-[28px] mb-[10px]"
+            className="mt-12 space-y-1 text-[28px] mb-[10px] tracking-widest"
             style={{ opacity: 0 }}
           >
             <p>빠르게 변화하는 흐름보다</p>
@@ -536,27 +538,30 @@ const AboutWebView = () => {
       </section>
 
       {/* ===== 섹션 6: 마무리 히어로 ===== */}
-      <section className="relative z-10 min-h-screen flex flex-col items-center justify-center bg-white">
-        <Image
-          src={aboutWebImg6}
-          alt="From Hadong, with Care"
-          width={3000}
-          height={1080}
-          quality={100}
-          sizes="100vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center font-sans tracking-widest">
-          <h1 className="text-[50px] font-light tracking-wide mb-16">From Hadong, with Care</h1>
-          <div className="space-y-1 text-[22px] leading-relaxed">
-            <p>관아수제차는</p>
-            <p>화려함보다 편안함을,</p>
-            <p>강한 인상보다 오래 남는 여운을 생각합니다.</p>
-          </div>
-          <div className="mt-12 space-y-1 text-[22px] leading-relaxed">
-            <p>손이 자주 가는 이유가 있는 차,</p>
-            <p>사람과 사람을 이어주는 차를</p>
-            <p>오늘도 하동에서 만들고 있습니다.</p>
+      <section className="relative z-10 flex flex-col items-center justify-center bg-white">
+        <div className="relative">
+          <Image
+            src={aboutWebImg6}
+            alt="From Hadong, with Care"
+            width={1000}
+            height={1080}
+            quality={100}
+            sizes="100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-black/20" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center font-sans tracking-widest">
+            <h1 className="text-[45px] font-light tracking-wide mb-16">From Hadong, with Care</h1>
+            <div className="space-y-1 text-[20px] leading-relaxed">
+              <p>관아수제차는</p>
+              <p>화려함보다 편안함을,</p>
+              <p>강한 인상보다 오래 남는 여운을 생각합니다.</p>
+            </div>
+            <div className="mt-12 space-y-1 text-[22px] leading-relaxed">
+              <p>손이 자주 가는 이유가 있는 차,</p>
+              <p>사람과 사람을 이어주는 차를</p>
+              <p>오늘도 하동에서 만들고 있습니다.</p>
+            </div>
           </div>
         </div>
       </section>

@@ -1,4 +1,4 @@
-import aboutWebImg1 from '@images/about/web/about_web_1.webp';
+import aboutWebImg1 from '@images/about/web/about_web_1.png';
 import aboutWebImg2_1 from '@images/about/web/about_web_2_1.webp';
 import aboutWebImg2_2 from '@images/about/web/about_web_2_2.webp';
 import aboutWebImg3_1 from '@images/about/web/about_web_3_1.webp';

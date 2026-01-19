@@ -52,6 +52,12 @@
   --font-family-pretendard:
     var(--font-pretendard), -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+
+  /* Serif 폰트들 */
+  --font-family-cormorant: var(--font-cormorant), 'Georgia', serif;
+  --font-family-playfair: var(--font-playfair), 'Georgia', serif;
+  --font-family-eb-garamond: var(--font-eb-garamond), 'Georgia', serif;
+  --font-family-libre-baskerville: var(--font-libre-baskerville), 'Georgia', serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
