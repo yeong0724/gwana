@@ -362,7 +362,10 @@ const AboutWebView = () => {
       </section>
 
       {/* ===== 섹션 2: 계절을 기준으로 한 차 (일자형으로 덮어나감) ===== */}
-      <section ref={section2Ref} className="relative w-full min-h-[48vw] bg-[#f5f5f5] z-10 flex items-center">
+      <section
+        ref={section2Ref}
+        className="relative w-full min-h-[48vw] bg-[#f5f5f5] z-10 flex items-center"
+      >
         <div className="relative w-full min-h-[500px]">
           {/* 이미지 영역 - 좌측에서 35% 위치 */}
           <div
@@ -397,14 +400,16 @@ const AboutWebView = () => {
           {/* 텍스트 영역 - 우측에서 30% 위치 (좌측에서 70%) */}
           <div
             ref={section2TextRef}
-            className="absolute font-sans tracking-widest"
+            className="absolute tracking-widest"
             style={{
               left: '70%',
               top: '50%',
               transform: 'translate(-50%, -50%)',
             }}
           >
-            <div className="font-bold text-gray-900 mb-7 text-[18px] lg:text-[26px] xl:text-[30px] 2xl:text-[34px] ">계절을 기준으로 한 차</div>
+            <div className="font-bold text-gray-900 mb-7 text-[18px] lg:text-[26px] xl:text-[30px] 2xl:text-[34px] ">
+              계절을 기준으로 한 차
+            </div>
             <div className="space-y-1 text-gray-700 leading-loose text-[16px] lg:text-[16px] xl:text-[18px] 2xl:text-[24px]">
               <p>차는 계절에 따라 달라집니다.</p>
               <p>봄에는 녹차를 만들고,</p>
@@ -419,7 +424,10 @@ const AboutWebView = () => {
       </section>
 
       {/* ===== 섹션 3: 사람과 사람을 잇는 마음 ===== */}
-      <section ref={section3Ref} className="relative w-full min-h-screen bg-white z-10 overflow-hidden flex flex-col justify-center">
+      <section
+        ref={section3Ref}
+        className="relative w-full min-h-screen bg-white z-10 overflow-hidden flex flex-col justify-center"
+      >
         {/* 이미지 영역 */}
         <div className="flex justify-center gap-20 py-20 px-12">
           <div ref={section3Img1Ref}>
@@ -443,7 +451,7 @@ const AboutWebView = () => {
         </div>
 
         {/* 텍스트 영역 - 회색 배경 */}
-        <div ref={section3TextRef} className="w-full bg-[#f5f5f5] py-20 font-sans tracking-wider">
+        <div ref={section3TextRef} className="w-full bg-[#f5f5f5] py-20 tracking-wider">
           <div className="text-center">
             <h2 className="text-[32px] font-bold text-gray-900 mb-8">사람과 사람을 잇는 마음</h2>
             <div className="space-y-1 text-[18px] text-gray-700 leading-loose">
@@ -458,7 +466,10 @@ const AboutWebView = () => {
       </section>
 
       {/* ===== 섹션 4: 찻집에서 경험하는 티코스 ===== */}
-      <section ref={section4Ref} className="relative w-full min-h-screen bg-white z-10 flex flex-col justify-center">
+      <section
+        ref={section4Ref}
+        className="relative w-full min-h-screen bg-white z-10 flex flex-col justify-center"
+      >
         {/* 이미지 3개 */}
         <div ref={section4ImgRef} className="flex justify-center gap-12 px-12 mb-16">
           <Image
@@ -485,7 +496,7 @@ const AboutWebView = () => {
         </div>
 
         {/* 텍스트 영역 */}
-        <div ref={section4TextRef} className="text-center bg-[#f5f5f5] py-20 font-sans tracking-wider">
+        <div ref={section4TextRef} className="text-center bg-[#f5f5f5] py-20 tracking-wider">
           <h2 className="text-[32px] font-bold text-gray-900 mb-8">찻집에서 경험하는 티코스</h2>
           <div className="space-y-1 text-[18px] text-gray-700 leading-loose">
             <p>한국차를 천천히 경험할 수 있는 티코스를 운영하고 있습니다.</p>
@@ -499,7 +510,10 @@ const AboutWebView = () => {
       </section>
 
       {/* ===== 섹션 5: 차밭에서 보내는 소풍 ===== */}
-      <section ref={section5Ref} className="relative w-full min-h-screen bg-white z-10 overflow-hidden flex flex-col justify-center">
+      <section
+        ref={section5Ref}
+        className="relative w-full min-h-screen bg-white z-10 overflow-hidden flex flex-col justify-center"
+      >
         {/* 이미지 영역 */}
         <div className="flex justify-center gap-20 pb-10 px-12">
           <div ref={section5Img1Ref}>
@@ -523,7 +537,7 @@ const AboutWebView = () => {
         </div>
 
         {/* 텍스트 영역 - 회색 배경 */}
-        <div ref={section5TextRef} className="w-full bg-[#f5f5f5] py-20 font-sans tracking-wider">
+        <div ref={section5TextRef} className="w-full bg-[#f5f5f5] py-20 tracking-wider">
           <div className="text-center">
             <h2 className="text-[32px] font-bold text-gray-900 mb-8">차밭에서 보내는 소풍</h2>
             <div className="space-y-1 text-[18px] text-gray-700 leading-loose">
@@ -550,8 +564,10 @@ const AboutWebView = () => {
             className="object-cover"
           />
           <div className="absolute inset-0 bg-black/20" />
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center font-sans tracking-widest">
-            <h1 className="text-[45px] font-light tracking-wide mb-16">From Hadong, with Care</h1>
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center tracking-widest">
+            <h1 className="text-[45px] tracking-wider mb-16 font-family-cormorant">
+              From Hadong, with Care
+            </h1>
             <div className="space-y-1 text-[20px] leading-relaxed">
               <p>관아수제차는</p>
               <p>화려함보다 편안함을,</p>
