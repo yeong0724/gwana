@@ -1,5 +1,11 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+import Image from 'next/image';
+
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
 import {
   aboutWebImg1,
   aboutWebImg2_1,
@@ -11,12 +17,8 @@ import {
   aboutWebImg4_3,
   aboutWebImg5_1,
   aboutWebImg5_2,
-  aboutWebImg6
+  aboutWebImg6,
 } from '@/static/images';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Image from 'next/image';
-import { useEffect, useRef } from 'react';
 
 // GSAP 플러그인 등록
 gsap.registerPlugin(ScrollTrigger);
@@ -124,7 +126,7 @@ const AboutWebView = () => {
             scrollTrigger: {
               trigger: section2Ref.current,
               start: 'top 60%', // 더 아래에서 시작
-              end: 'top 5%', // 더 위에서 끝 → 스크롤 구간이 길어짐
+              end: 'top 20%', // 더 위에서 끝 → 스크롤 구간이 길어짐
               scrub: 2, // 값을 높이면 더 부드럽게
             },
           }
@@ -142,7 +144,7 @@ const AboutWebView = () => {
             scrollTrigger: {
               trigger: section2Ref.current,
               start: 'top 60%', // 이미지1보다 약간 늦게 시작
-              end: 'top 5%',
+              end: 'top 20%',
               scrub: 2,
             },
           }
@@ -317,7 +319,7 @@ const AboutWebView = () => {
   }, []);
 
   return (
-    <div className="hidden lg:block w-full -mt-[70px]">
+    <div className="hidden lg:block w-full -mt-[60px]">
       {/* ===== 섹션 1: 히어로 (sticky로 고정) =====  */}
       <section ref={heroSectionRef} className="sticky top-0 w-full h-screen min-h-[600px] z-0">
         <div ref={heroImageRef} className="absolute inset-0" style={{ opacity: 0 }}>
@@ -329,17 +331,17 @@ const AboutWebView = () => {
             priority
           />
         </div>
-        <div className="absolute inset-0 flex flex-col items-center pt-[20vh] text-white text-center font-mono">
-          <h1
+        <div className="absolute inset-0 flex flex-col items-center pt-[25vh] text-white text-center font-sans font-semibold tracking-widest ">
+          <div
             ref={heroTitleRef}
-            className="text-[56px] font-serif font-semibold tracking-widest mb-16"
+            className="text-[56px] mb-16 tracking-widest "
             style={{ opacity: 0 }}
           >
             From Hadong
-          </h1>
+          </div>
           <div
             ref={heroText1Ref}
-            className="space-y-1 text-[28px] leading-relaxed font-medium tracking-widest mb-[10px]"
+            className="space-y-1 text-[28px] mb-[10px]"
             style={{ opacity: 0 }}
           >
             <p>관아수제차는 1994년부터</p>
@@ -347,7 +349,7 @@ const AboutWebView = () => {
           </div>
           <div
             ref={heroText2Ref}
-            className="mt-12 space-y-1 text-[28px] leading-relaxed font-medium tracking-widest mb-[10px]"
+            className="mt-12 space-y-1 text-[28px] mb-[10px]"
             style={{ opacity: 0 }}
           >
             <p>빠르게 변화하는 흐름보다</p>
@@ -358,8 +360,8 @@ const AboutWebView = () => {
       </section>
 
       {/* ===== 섹션 2: 계절을 기준으로 한 차 (일자형으로 덮어나감) ===== */}
-      <section ref={section2Ref} className="relative w-full bg-[#f5f5f5] py-24 z-10">
-        <div className="relative w-full min-h-[600px]">
+      <section ref={section2Ref} className="relative w-full min-h-[48vw] bg-[#f5f5f5] z-10 flex items-center">
+        <div className="relative w-full min-h-[500px]">
           {/* 이미지 영역 - 좌측에서 35% 위치 */}
           <div
             className="absolute"
@@ -378,10 +380,7 @@ const AboutWebView = () => {
                 className="w-full h-auto object-cover rounded-md shadow-lg"
               />
               {/* 원형 이미지 - 이미지1의 오른쪽 하단 꼭지점에 원의 정중앙 배치 */}
-              <div
-                ref={section2Img2Ref}
-                className="absolute w-[12vw] -bottom-[6vw] -right-[6vw]"
-              >
+              <div ref={section2Img2Ref} className="absolute w-[12vw] -bottom-[6vw] -right-[6vw]">
                 <Image
                   src={aboutWebImg2_2}
                   alt="찻잎 클로즈업"
@@ -396,18 +395,18 @@ const AboutWebView = () => {
           {/* 텍스트 영역 - 우측에서 30% 위치 (좌측에서 70%) */}
           <div
             ref={section2TextRef}
-            className="absolute font-mono"
+            className="absolute font-sans tracking-widest"
             style={{
               left: '70%',
               top: '50%',
               transform: 'translate(-50%, -50%)',
             }}
           >
-            <h2 className="text-[32px] font-bold text-gray-900 mb-10">계절을 기준으로 한 차</h2>
-            <div className="space-y-1 text-[18px] text-gray-700 leading-loose">
+            <div className="font-bold text-gray-900 mb-7 text-[18px] lg:text-[26px] xl:text-[30px] 2xl:text-[34px] ">계절을 기준으로 한 차</div>
+            <div className="space-y-1 text-gray-700 leading-loose text-[16px] lg:text-[16px] xl:text-[18px] 2xl:text-[24px]">
               <p>차는 계절에 따라 달라집니다.</p>
               <p>봄에는 녹차를 만들고,</p>
-              <p>여름·가을·겨울에는</p>
+              <p>여름 · 가을 · 겨울에는</p>
               <p>계절에 어울리는 대용차를 준비합니다.</p>
               <p>자연의 흐름에 맞춰</p>
               <p>지금 만들 수 있는 차를 만들며</p>
@@ -418,7 +417,7 @@ const AboutWebView = () => {
       </section>
 
       {/* ===== 섹션 3: 사람과 사람을 잇는 마음 ===== */}
-      <section ref={section3Ref} className="relative w-full bg-white z-10 overflow-hidden">
+      <section ref={section3Ref} className="relative w-full min-h-screen bg-white z-10 overflow-hidden flex flex-col justify-center">
         {/* 이미지 영역 */}
         <div className="flex justify-center gap-20 py-20 px-12">
           <div ref={section3Img1Ref}>
@@ -442,7 +441,7 @@ const AboutWebView = () => {
         </div>
 
         {/* 텍스트 영역 - 회색 배경 */}
-        <div ref={section3TextRef} className="w-full bg-[#f5f5f5] py-20 font-mono">
+        <div ref={section3TextRef} className="w-full bg-[#f5f5f5] py-20 font-sans tracking-wider">
           <div className="text-center">
             <h2 className="text-[32px] font-bold text-gray-900 mb-8">사람과 사람을 잇는 마음</h2>
             <div className="space-y-1 text-[18px] text-gray-700 leading-loose">
@@ -457,7 +456,7 @@ const AboutWebView = () => {
       </section>
 
       {/* ===== 섹션 4: 찻집에서 경험하는 티코스 ===== */}
-      <section ref={section4Ref} className="relative w-full py-20 bg-white z-10">
+      <section ref={section4Ref} className="relative w-full min-h-screen bg-white z-10 flex flex-col justify-center">
         {/* 이미지 3개 */}
         <div ref={section4ImgRef} className="flex justify-center gap-12 px-12 mb-16">
           <Image
@@ -484,7 +483,7 @@ const AboutWebView = () => {
         </div>
 
         {/* 텍스트 영역 */}
-        <div ref={section4TextRef} className="text-center bg-[#f5f5f5] py-20 font-mono">
+        <div ref={section4TextRef} className="text-center bg-[#f5f5f5] py-20 font-sans tracking-wider">
           <h2 className="text-[32px] font-bold text-gray-900 mb-8">찻집에서 경험하는 티코스</h2>
           <div className="space-y-1 text-[18px] text-gray-700 leading-loose">
             <p>한국차를 천천히 경험할 수 있는 티코스를 운영하고 있습니다.</p>
@@ -498,9 +497,9 @@ const AboutWebView = () => {
       </section>
 
       {/* ===== 섹션 5: 차밭에서 보내는 소풍 ===== */}
-      <section ref={section5Ref} className="relative w-full bg-white z-10 overflow-hidden">
+      <section ref={section5Ref} className="relative w-full min-h-screen bg-white z-10 overflow-hidden flex flex-col justify-center">
         {/* 이미지 영역 */}
-        <div className="flex justify-center gap-20 py-20 px-12">
+        <div className="flex justify-center gap-20 pb-10 px-12">
           <div ref={section5Img1Ref}>
             <Image
               src={aboutWebImg5_1}
@@ -522,7 +521,7 @@ const AboutWebView = () => {
         </div>
 
         {/* 텍스트 영역 - 회색 배경 */}
-        <div ref={section5TextRef} className="w-full bg-[#f5f5f5] py-20 font-mono">
+        <div ref={section5TextRef} className="w-full bg-[#f5f5f5] py-20 font-sans tracking-wider">
           <div className="text-center">
             <h2 className="text-[32px] font-bold text-gray-900 mb-8">차밭에서 보내는 소풍</h2>
             <div className="space-y-1 text-[18px] text-gray-700 leading-loose">
@@ -537,16 +536,17 @@ const AboutWebView = () => {
       </section>
 
       {/* ===== 섹션 6: 마무리 히어로 ===== */}
-      <section className="relative z-10 flex flex-col items-center justify-center bg-white">
+      <section className="relative z-10 min-h-screen flex flex-col items-center justify-center bg-white">
         <Image
-          src={aboutWebImg6} alt="From Hadong, with Care"
+          src={aboutWebImg6}
+          alt="From Hadong, with Care"
           width={3000}
           height={1080}
           quality={100}
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center font-mono">
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center font-sans tracking-widest">
           <h1 className="text-[50px] font-light tracking-wide mb-16">From Hadong, with Care</h1>
           <div className="space-y-1 text-[22px] leading-relaxed">
             <p>관아수제차는</p>
@@ -559,7 +559,6 @@ const AboutWebView = () => {
             <p>오늘도 하동에서 만들고 있습니다.</p>
           </div>
         </div>
-
       </section>
       <section className="relative z-10 flex flex-col items-center justify-center h-[300px] bg-white">
         {/* <Image

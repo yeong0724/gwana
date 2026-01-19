@@ -1,12 +1,14 @@
 'use client';
 
-import { aboutGwanaImg } from '@/static/images';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, ChevronDown } from 'lucide-react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
+
+import { aboutGwanaImg } from '@/static/images';
 
 gsap.registerPlugin(ScrollTrigger);
 

@@ -1,5 +1,14 @@
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
+import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
+
+import { useQueryClient } from '@tanstack/react-query';
+import { filter, isEmpty, size } from 'lodash-es';
+import { ChevronLeft, Menu as MenuIcon, ShoppingBag, ShoppingCart, User } from 'lucide-react';
+
 import UserDropdownContent from '@/components/layout/UserDropdownContent';
 import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import useNativeRouter from '@/hooks/useNativeRouter';
@@ -7,13 +16,6 @@ import { useCartService } from '@/service';
 import { headerLogoImg, mainLogoImg } from '@/static/images';
 import { useCartStore, useLoginStore, useMenuStore } from '@/stores';
 import type { Menu, MenuGroup } from '@/types';
-import { useQueryClient } from '@tanstack/react-query';
-import { filter, size } from 'lodash-es';
-import { ChevronLeft, Menu as MenuIcon, ShoppingBag, ShoppingCart, User } from 'lucide-react';
-import dynamic from 'next/dynamic';
-import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
 
 // SSR 비활성화로 import
 const Navigation = dynamic(() => import('@/components/layout/Navigation'), {
@@ -143,12 +145,12 @@ const Header = ({ menuGroup }: HeaderProps) => {
     <div className="sticky top-0 z-50" style={{ viewTransitionName: 'header' }}>
       {/* Main Bar Header */}
       <header
-        className="hidden md:block sticky h-[70px] top-0 left-0 right-0 z-50 transition-all duration-300"
+        className="hidden md:block sticky h-[60px] top-0 left-0 right-0 z-50 transition-all duration-300"
         style={{
           background:
             isScrolled || isHeaderHovered
               ? 'white'
-              : 'linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%)',
+              : 'linear-gradient(to bottom, rgba(255,255,255,0.60) 0%, rgba(255,255,255,0) 100%)',
           boxShadow: isScrolled || isHeaderHovered ? '0 10px 15px -3px rgb(0 0 0 / 0.1)' : 'none',
         }}
         onMouseEnter={() => setIsHeaderHovered(true)}
@@ -169,13 +171,15 @@ const Header = ({ menuGroup }: HeaderProps) => {
         <div className="mx-auto px-6 relative z-20 h-full">
           <div className="flex items-center justify-between h-full">
             <div className="flex flex-1 min-w-0">
-              <div className="flex items-center flex-shrink-0 cursor-pointer pl-8"
-                style={{ filter: 'drop-shadow(1px 0 0 white) drop-shadow(0 0 1px white)' }}
+              <div
+                className="flex items-center flex-shrink-0 cursor-pointer pl-8"
+                style={{ filter: 'drop-shadow(0.5px 0 0 black) ' }}
+              // drop-shadow(0 0 0.5px black)
               >
                 <Image
                   src={'/images/gwana_logo_1-cutout.webp'}
                   alt="gwana_logo"
-                  width={140}
+                  width={120}
                   height={80}
                   onClick={() => router.push('/')}
                   priority
@@ -197,14 +201,19 @@ const Header = ({ menuGroup }: HeaderProps) => {
                     <div
                       key={menuId}
                       className="relative group flex flex-col items-center justify-start"
-                      onMouseEnter={() => setIsMainHovered(true)}
                     >
                       {/* 메인 메뉴 버튼 */}
                       <button
-                        className={`cursor-pointer flex items-center justify-center text-[21px] font-semibold text-black space-x-1 py-6 font-mediu hover:text-green-600 transition-all duration-500 w-full`}
+                        className={`cursor-pointer flex items-center justify-center text-[18px] text-black space-x-1 py-6 font-sans font-semibold tracking-wider hover:text-gray-500 transition-all duration-500 w-full`}
                         onClick={() => onClickMain(menuId)}
+                        onMouseEnter={() => {
+                          if (!isEmpty(categories)) setIsMainHovered(true);
+                        }}
+                        onMouseLeave={() => setIsMainHovered(false)}
                       >
-                        <span className="[text-shadow:_-0.4px_0_white,_0.4px_0_white,_0_-0.4px_white,_0_0.4px_white]">
+                        <span
+                        // className="[text-shadow:_-0.4px_0_white,_0.4px_0_white,_0_-0.4px_white,_0_0.4px_white]"
+                        >
                           {menuName}
                         </span>
                       </button>
@@ -220,7 +229,7 @@ const Header = ({ menuGroup }: HeaderProps) => {
                         {categories.map((category) => (
                           <button
                             key={category.menuId}
-                            className="cursor-pointer mb-[20px] text-[18px] text-gray-600 hover:text-green-600 transition-colors whitespace-nowrap text-center"
+                            className="cursor-pointer mb-[20px] text-[18px] text-gray-600 hover:text-gray-400 transition-colors whitespace-nowrap text-center"
                             onClick={() => onClickCategory(menuId, category.menuId)}
                           >
                             {category.menuName}
@@ -232,9 +241,9 @@ const Header = ({ menuGroup }: HeaderProps) => {
                 })}
               </div>
             </div>
-            <div className="flex items-center flex-shrink-0 space-x-1 lg:space-x-2">
+            <div className="flex items-center flex-shrink-0 space-x-1 lg:space-x-8">
               <button
-                className="relative text-black cursor-pointer hover:text-green-600 transition-all p-3 lg:p-4 xl:p-5 duration-500 mr-[30px]"
+                className="relative text-black cursor-pointer hover:text-gray-400 transition-all p-3 lg:p-4 xl:p-5 duration-500 mr-[30px]"
                 onClick={moveToCartPage}
               >
                 <ShoppingCart className="w-4 h-4 lg:w-5 lg:h-5 scale-[1.2]" />
@@ -247,7 +256,7 @@ const Header = ({ menuGroup }: HeaderProps) => {
               {isLogin ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="text-black cursor-pointer hover:text-green-600 transition-all p-3 lg:p-4 xl:p-5 duration-500">
+                    <button className="text-black cursor-pointer hover:text-gray-400 transition-all p-3 lg:p-4 xl:p-5 duration-500">
                       <User className="w-4 h-4 lg:w-5 lg:h-5 scale-[1.2]" />
                     </button>
                   </DropdownMenuTrigger>
@@ -268,7 +277,7 @@ const Header = ({ menuGroup }: HeaderProps) => {
             </div>
           </div>
         </div>
-      </header >
+      </header>
       {/* Side - Header (Mobile) */}
       <header
         className={`h-[58px] md:hidden top-0 z-40 ${isHomePage
@@ -341,14 +350,14 @@ const Header = ({ menuGroup }: HeaderProps) => {
             </button>
           </div>
         </div>
-      </header >
+      </header>
       <Navigation
         isMenuOpen={isMenuOpen}
         moveToLoginPage={moveToLoginPage}
         toggleMenu={toggleMenu}
         menuGroup={menuGroup}
       />
-    </div >
+    </div>
   );
 };
 

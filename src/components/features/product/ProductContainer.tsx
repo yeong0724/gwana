@@ -105,7 +105,7 @@ const ProductContainer = ({ categoryId }: Props) => {
     <div className="flex min-h-screen bg-gray-50 max-w-[1800px] mx-auto">
       {/* 사이드 네비게이션 - 데스크톱용 */}
       <nav
-        className="w-80 bg-white fixed top-[70px] overflow-y-auto flex-shrink-0 hidden lg:block"
+        className="w-80 bg-white fixed top-[60px] overflow-y-auto flex-shrink-0 hidden lg:block"
         style={{ height: 'calc(100vh - 80px)' }}
       >
         {/* 네비 헤더 - 스티키 */}
