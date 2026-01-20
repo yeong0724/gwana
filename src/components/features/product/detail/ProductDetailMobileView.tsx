@@ -15,7 +15,8 @@ import Image from 'next/image';
 import { createPortal } from 'react-dom';
 
 const ProductDetailMobileView = () => {
-  const { product, current, isMounted, isBottomPanelOpen, purchaseList, totalPrice } = useStateContext();
+  const { product, current, isMounted, isBottomPanelOpen, purchaseList, totalPrice } =
+    useStateContext();
 
   const {
     setApi,
@@ -107,7 +108,7 @@ const ProductDetailMobileView = () => {
             </div>
 
             {/* 상품명 */}
-            <h1 className="text-[20px] font-sans mb-[10px]">{product.productName}</h1>
+            <h1 className="text-[20px] font-sans mb-[10px] break-keep">{product.productName}</h1>
 
             {/* 가격 */}
             <div className="text-[15px] text-gray-600 font-normal mb-6">
@@ -182,8 +183,9 @@ const ProductDetailMobileView = () => {
             >
               {/* 확장 패널: 구매수량 + 상품금액 합계 (옵션 없는 경우) */}
               <div
-                className={`overflow-hidden transition-all duration-300 ease-in-out ${isBottomPanelOpen ? 'max-h-[500px]' : 'max-h-0'
-                  }`}
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  isBottomPanelOpen ? 'max-h-[500px]' : 'max-h-0'
+                }`}
               >
                 {/* 닫기 버튼 */}
                 <button

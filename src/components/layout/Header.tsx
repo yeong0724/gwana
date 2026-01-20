@@ -308,7 +308,7 @@ const Header = ({ menuGroup }: HeaderProps) => {
               onClick={goBackWithTransitions}
               className="hover:bg-gray-100 rounded-md transition-colors z-10"
             >
-              <ChevronLeft size={24} className="text-gray-700" />
+              <ChevronLeft size={24} className="text-black" />
             </button>
           ) : (
             <div className="w-6 h-6" />
@@ -327,10 +327,10 @@ const Header = ({ menuGroup }: HeaderProps) => {
               />
             ) : (
               <Image
-                src={mainLogoImg}
+                src={headerLogoImg}
                 alt="gwana_logo"
-                width={100}
-                height={100}
+                width={80}
+                height={80}
                 onClick={() => router.push('/')}
                 className="cursor-pointer"
               />
