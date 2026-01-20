@@ -1,6 +1,6 @@
 'use client';
 
-import { gwanaLogoCutoutImg } from '@/static/images';
+import { gwana_logo_1_webp } from '@/static/images';
 import Image from 'next/image';
 
 const LoginContainer = () => {
@@ -29,7 +29,7 @@ const LoginContainer = () => {
         {/* 로고 */}
         <div className="mt-8 sm:mt-12 md:mt-16 flex-shrink-0">
           <Image
-            src={gwanaLogoCutoutImg}
+            src={gwana_logo_1_webp}
             width={300}
             height={130}
             alt="관아수제차"

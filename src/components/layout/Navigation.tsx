@@ -74,8 +74,8 @@ const Navigation = ({ isMenuOpen, moveToLoginPage, toggleMenu, menuGroup }: Prop
   /**
    * 장바구니 이동
    */
-  const moveToCart = () => {
-    router.push('/cart');
+  const moveToMyPage = () => {
+    router.push('/mypage');
     closeSidebar();
   };
 
@@ -89,17 +89,15 @@ const Navigation = ({ isMenuOpen, moveToLoginPage, toggleMenu, menuGroup }: Prop
       {/* 오버레이 */}
       <div
         style={{ viewTransitionName: 'navigation-overlay' }}
-        className={`fixed inset-0 bg-gray-800 bg-opacity-5 z-[70] transition-opacity duration-600 ${
-          isMenuOpen ? 'opacity-30 visible' : 'opacity-0 invisible'
-        }`}
+        className={`fixed inset-0 bg-gray-800 bg-opacity-5 z-[70] transition-opacity duration-600 ${isMenuOpen ? 'opacity-30 visible' : 'opacity-0 invisible'
+          }`}
       />
 
       {/* 사이드바 메뉴 */}
       <div
         style={{ viewTransitionName: 'navigation-sidebar' }}
-        className={`fixed top-0 left-0 h-full w-[90%] bg-white z-[1000] transform transition-transform duration-600 ease-in-out ${
-          isMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        } flex flex-col`}
+        className={`fixed top-0 left-0 h-full w-[90%] bg-white z-[1000] transform transition-transform duration-600 ease-in-out ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          } flex flex-col`}
       >
         {/* 사이드바 헤더 */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
@@ -151,18 +149,16 @@ const Navigation = ({ isMenuOpen, moveToLoginPage, toggleMenu, menuGroup }: Prop
                       {hasCategory && (
                         <ChevronDown
                           size={20}
-                          className={`text-gray-400 transition-transform duration-600 ${
-                            currentMenu === menuId ? 'rotate-180' : ''
-                          }`}
+                          className={`text-gray-400 transition-transform duration-600 ${currentMenu === menuId ? 'rotate-180' : ''
+                            }`}
                         />
                       )}
                     </button>
                     {/* 서브메뉴 */}
                     {hasCategory && (
                       <div
-                        className={`bg-amber-50/30 overflow-hidden transition-all duration-600 ease-in-out ${
-                          currentMenu === menuId ? 'max-h-48' : 'max-h-0'
-                        }`}
+                        className={`bg-amber-50/30 overflow-hidden transition-all duration-600 ease-in-out ${currentMenu === menuId ? 'max-h-48' : 'max-h-0'
+                          }`}
                       >
                         {filteredCategory.map((category, subIndex) => (
                           <button
@@ -192,10 +188,10 @@ const Navigation = ({ isMenuOpen, moveToLoginPage, toggleMenu, menuGroup }: Prop
                 </button>
                 <span className="text-gray-300 mx-5">|</span>
                 <button
-                  onClick={moveToCart}
+                  onClick={moveToMyPage}
                   className="text-gray-700 hover:text-black transition-colors cursor-pointer font-medium"
                 >
-                  오시는길
+                  마이페이지
                 </button>
                 {isLogin && (
                   <>

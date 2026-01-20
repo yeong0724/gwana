@@ -4,7 +4,7 @@ import UserDropdownContent from '@/components/layout/UserDropdownContent';
 import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import useNativeRouter from '@/hooks/useNativeRouter';
 import { useCartService } from '@/service';
-import { gwanaLogoCutoutImg, headerLogoImg, mainLogoImg } from '@/static/images';
+import { headerLogoImg, mainLogoImg } from '@/static/images';
 import { useCartStore, useLoginStore, useMenuStore } from '@/stores';
 import type { Menu, MenuGroup } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
@@ -72,12 +72,12 @@ const Header = ({ menuGroup }: HeaderProps) => {
   /**
    * 마이페이지 이동
    */
-  const moveToMyPage = () => {};
+  const moveToMyPage = () => { };
 
   /**
    * 주문조회 이동
    */
-  const moveToOrderHistory = () => {};
+  const moveToOrderHistory = () => { };
 
   /**
    * 장바구니 이동
@@ -172,11 +172,10 @@ const Header = ({ menuGroup }: HeaderProps) => {
       >
         {/* 카테고리 배경 영역 - 카테고리가 있는 메뉴에 마우스를 올렸을 때만 표시 */}
         <div
-          className={`absolute left-0 right-0 top-full bg-white border-t border-gray-100 shadow-xl transition-all duration-500 ease-in-out origin-top z-10 ${
-            isHeaderHovered && isMainHovered
-              ? 'scale-y-100 opacity-100 visible'
-              : 'scale-y-0 opacity-0 invisible'
-          }`}
+          className={`absolute left-0 right-0 top-full bg-white border-t border-gray-100 shadow-xl transition-all duration-500 ease-in-out origin-top z-10 ${isHeaderHovered && isMainHovered
+            ? 'scale-y-100 opacity-100 visible'
+            : 'scale-y-0 opacity-0 invisible'
+            }`}
           style={{ height: '180px' }}
         />
 
@@ -186,10 +185,10 @@ const Header = ({ menuGroup }: HeaderProps) => {
               <div
                 className="flex items-center flex-shrink-0 cursor-pointer pl-8"
                 style={{ filter: 'drop-shadow(0.5px 0 0 black) ' }}
-                // drop-shadow(0 0 0.5px black)
+              // drop-shadow(0 0 0.5px black)
               >
                 <Image
-                  src={gwanaLogoCutoutImg}
+                  src={headerLogoImg}
                   alt="gwana_logo"
                   width={120}
                   height={80}
@@ -232,11 +231,10 @@ const Header = ({ menuGroup }: HeaderProps) => {
 
                       {/* 카테고리 드롭다운 - 해당 메인 메뉴에 호버시에만 표시 */}
                       <div
-                        className={`absolute top-full pt-5 flex flex-col items-center space-y-3 z-30 transition-all duration-500 ease-in-out origin-top ${
-                          isHeaderHovered && isMainHovered
-                            ? 'scale-y-100 opacity-100 visible'
-                            : 'scale-y-0 opacity-0 invisible'
-                        }`}
+                        className={`absolute top-full pt-5 flex flex-col items-center space-y-3 z-30 transition-all duration-500 ease-in-out origin-top ${isHeaderHovered && isMainHovered
+                          ? 'scale-y-100 opacity-100 visible'
+                          : 'scale-y-0 opacity-0 invisible'
+                          }`}
                         onMouseEnter={() => setIsMainHovered(true)}
                       >
                         {categories.map((category) => (
@@ -296,9 +294,9 @@ const Header = ({ menuGroup }: HeaderProps) => {
         className={modileHeaderStyle}
         style={{
           background:
-            isHomePage || isScrolled || isHeaderHovered
+            isHomePage || isScrolled
               ? ''
-              : 'linear-gradient(to bottom, rgba(255,255,255,0.60) 0%, rgba(255,255,255,0) 100%)',
+              : 'linear-gradient(to bottom, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 100%)',
         }}
       >
         <div className="relative flex items-center justify-between px-4 h-full">
@@ -316,7 +314,7 @@ const Header = ({ menuGroup }: HeaderProps) => {
 
           {/* 로고 - 절대 중앙 */}
           <div className="absolute left-1/2 -translate-x-1/2 pt-1">
-            {isHomePage ? (
+            {pathname === '/about' && (
               <Image
                 src={mainLogoImg}
                 alt="gwana_logo"
@@ -325,7 +323,8 @@ const Header = ({ menuGroup }: HeaderProps) => {
                 onClick={() => router.push('/')}
                 className="cursor-pointer"
               />
-            ) : (
+            )}
+            {pathname !== '/about' && (
               <Image
                 src={headerLogoImg}
                 alt="gwana_logo"

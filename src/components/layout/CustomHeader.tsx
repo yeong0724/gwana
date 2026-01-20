@@ -14,6 +14,7 @@ const CustomHeader = () => {
     if (pathname.startsWith('/cart')) return 'SHOP';
     if (pathname.startsWith('/payment')) return '주문/결제';
     if (pathname.startsWith('/login')) return '로그인';
+    if (pathname.startsWith('/mypage')) return '마이페이지';
     return '';
   }, [pathname]);
 
@@ -29,10 +30,10 @@ const CustomHeader = () => {
 
   return (
     <header
-      className="relative h-[58px] flex items-center justify-center p-4 border-b border-gray-200 w-full flex-shrink-0 bg-white"
+      className="relative h-[48px] flex items-center justify-center p-4 border-b border-gray-200 w-full flex-shrink-0 bg-white"
       style={{ viewTransitionName: 'header' }}
     >
-      <h1 className="text-[16px] sm:text-[19px] md:text-[20px] lg:text-[22px] font-semibold text-gray-900">
+      <h1 className="text-[16px] sm:text-[19px] md:text-[20px] lg:text-[22px] font-semibold text-gray-900 tracking-widest">
         {title}
       </h1>
       <button

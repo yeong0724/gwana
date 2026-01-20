@@ -78,7 +78,7 @@ const delayAsync = (delay: number = 1000): Promise<number> => {
 };
 
 const noMainHeaderPage = (pathname: string) => {
-  return some(['/cart', '/login', '/payment', '/fail'], (path) => startsWith(pathname, path));
+  return some(['/cart', '/login', '/payment', '/fail', '/mypage'], (path) => startsWith(pathname, path));
 };
 
 const getIsMobile = () => {
