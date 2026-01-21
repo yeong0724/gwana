@@ -11,21 +11,30 @@ const CustomHeader = () => {
   const { backward } = useNativeRouter();
 
   const title = useMemo(() => {
-    if (pathname.startsWith('/cart')) return 'SHOP';
-    if (pathname.startsWith('/payment')) return '주문/결제';
-    if (pathname.startsWith('/login')) return '로그인';
-    if (pathname.startsWith('/mypage')) return '마이페이지';
-    return '';
+    switch (pathname) {
+      case '/cart':
+        return 'SHOP';
+      case '/payment':
+        return '주문/결제';
+      case '/login':
+        return '로그인';
+      case '/mypage':
+        return '마이페이지';
+      case '/mypage/inquiry':
+        return '문의 하기';
+      case '/mypage/inquiry/write':
+        return '문의 작성';
+      default:
+        return '';
+    }
   }, [pathname]);
 
   const goBack = () => {
-    // if (pathname.startsWith('/cart')) {
-    //   router.push('/');
-    // } else {
-    //   backward();
-    // }
-
-    backward();
+    if (pathname.startsWith('/cart')) {
+      router.push('/');
+    } else {
+      backward();
+    }
   };
 
   return (

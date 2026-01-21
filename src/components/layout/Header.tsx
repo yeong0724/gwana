@@ -342,7 +342,7 @@ const Header = ({ menuGroup }: HeaderProps) => {
               className="relative py-2 hover:bg-gray-100/20 rounded-md transition-colors"
               onClick={() => router.push('/cart')}
             >
-              <ShoppingBag
+              <ShoppingCart
                 size={20}
                 className={`${isHomePage ? 'text-white drop-shadow-[0_0_2px_rgba(0,0,0,0.5)]' : 'text-black'}`}
               />

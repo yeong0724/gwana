@@ -22,7 +22,6 @@ const ProductContainer = ({ categoryId }: Props) => {
 
   // 동시 슬라이드를 위한 상태
   const [currentCategory, setCurrentCategory] = useState<string>(categoryId);
-  const [prevCategory, setPrevCategory] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const router = useRouter();
 
@@ -77,13 +76,11 @@ const ProductContainer = ({ categoryId }: Props) => {
   useEffect(() => {
     if (currentCategory !== null && categoryId !== currentCategory && !isTransitioning) {
       // 이전 카테고리 저장하고 전환 시작
-      setPrevCategory(currentCategory);
       setCurrentCategory(categoryId);
       setIsTransitioning(true);
 
       // 애니메이션 완료 후 이전 카테고리 제거
       setTimeout(() => {
-        setPrevCategory(null);
         setIsTransitioning(false);
       }, CATEGORY_ANIMATION_DURATION);
     }
@@ -146,9 +143,8 @@ const ProductContainer = ({ categoryId }: Props) => {
                 <button
                   key={menuId}
                   data-category-id={menuId}
-                  className={`pb-[10px] px-1 cursor-pointer text-[13px] min-w-[80px] font-medium transition-colors duration-200 relative flex-shrink-0 ${
-                    categoryId === menuId ? 'text-black' : 'text-gray-500 hover:text-gray-700'
-                  }`}
+                  className={`pb-[10px] px-1 cursor-pointer text-[13px] min-w-[80px] font-medium transition-colors duration-200 relative flex-shrink-0 ${categoryId === menuId ? 'text-black' : 'text-gray-500 hover:text-gray-700'
+                    }`}
                   onClick={() => onClickCategory(menuId)}
                 >
                   {menuName}
@@ -173,11 +169,11 @@ const ProductContainer = ({ categoryId }: Props) => {
         {/* ProductList - 동시 슬라이드 애니메이션 */}
         <div className="relative overflow-hidden">
           {/* 나가는 리스트 (이전 카테고리) */}
-          {prevCategory && (
+          {/* {prevCategory && (
             <div className="absolute inset-0 animate-tab-slide-left-out">
               <ProductList key={prevCategory} categoryId={prevCategory} />
             </div>
-          )}
+          )} */}
 
           {/* 들어오는 리스트 (현재 카테고리) */}
           {currentCategory && (

@@ -1,5 +1,8 @@
 'use client';
 
+import { ReactNode, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+
 import { CustomHeader } from '@/components/common';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
@@ -8,8 +11,6 @@ import { refreshAccessTokenSingleton } from '@/lib/tokenManager';
 import { allClearPersistStore, cn, noMainHeaderPage, validateToken } from '@/lib/utils';
 import { useLoginStore } from '@/stores';
 import { initailState } from '@/stores/useLoginStore';
-import { usePathname } from 'next/navigation';
-import { ReactNode, useEffect } from 'react';
 
 interface Props {
   children: ReactNode;
