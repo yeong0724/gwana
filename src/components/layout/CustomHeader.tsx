@@ -21,9 +21,8 @@ const CustomHeader = () => {
       case '/mypage':
         return '마이페이지';
       case '/mypage/inquiry':
-        return '문의 하기';
       case '/mypage/inquiry/write':
-        return '문의 작성';
+        return '1:1 문의하기';
       default:
         return '';
     }

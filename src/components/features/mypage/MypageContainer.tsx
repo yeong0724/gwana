@@ -68,18 +68,22 @@ const MypageContainer = () => {
   } = useLoginStore();
 
   useEffect(() => {
-    // if (!_hasHydrated) return;
-    // if (!isLogin) {
-    //   (async () => {
-    //     await showConfirmAlert({
-    //       title: '안내',
-    //       description: '로그인이 만료되었습니다. 다시 로그인해 주세요.',
-    //       confirmText: '확인',
-    //     });
-    //     router.push('/login');
-    //   })();
-    // }
+    if (!_hasHydrated) return;
+    if (!isLogin) {
+      (async () => {
+        await showConfirmAlert({
+          title: '안내',
+          description: '로그인이 만료되었습니다. 다시 로그인해 주세요.',
+          confirmText: '확인',
+        });
+        router.push('/login');
+      })();
+    }
   }, [_hasHydrated, isLogin]);
+
+  useEffect(() => {
+    router.prefetch('/mypage/inquiry');
+  }, []);
 
   const handleMenuClick = (url: string) => {
     // router.push(url);
@@ -158,7 +162,7 @@ const MypageContainer = () => {
           <span>회원 탈퇴</span>
         </Button>
       </div>
-    </div>
+    </div >
   );
 };
 

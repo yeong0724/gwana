@@ -17,9 +17,19 @@ const getRegexpByType = (type: FormatEnum = '') => {
       return /[^0-9]/g;
     case 'text':
       return /[0-9]/g;
+    case 'alphanumericWithSymbols':
+      // 영어, 한글, 숫자, 공백, 허용된 특수기호(~ ? - _ ! ^ . ,)만 허용
+      return /^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣0-9~?\-_!^.,\s]*$/;
     default:
       return '';
   }
+};
+
+// 정규식 타입으로 문자열 유효성 검사
+const validateByType = (value: string, type: FormatEnum): boolean => {
+  const regexp = getRegexpByType(type);
+  if (!regexp) return true;
+  return regexp.test(value);
 };
 
 // 비밀번호에 특수문자가 최소 2개 포함되어 있는지 검증
@@ -90,6 +100,7 @@ const getIsMobile = () => {
 export {
   allClearPersistStore,
   getRegexpByType,
+  validateByType,
   localeFormat,
   pwdSpecialCharValidate,
   validateToken,

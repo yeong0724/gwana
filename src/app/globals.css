@@ -529,7 +529,7 @@
 
 /* 이미지 스타일 */
 .tiptap-editor .ProseMirror img {
-  @apply my-3 h-auto max-w-full rounded-lg;
+  @apply my-3 h-auto max-w-full;
 }
 
 /* 이미지 선택 상태 */

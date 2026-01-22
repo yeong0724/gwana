@@ -4,6 +4,8 @@ import useNativeRouter from '@/hooks/useNativeRouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { MessageCircleQuestion, PenLine, Inbox, ChevronRight } from 'lucide-react';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Inquiry {
   id: number;
@@ -78,6 +80,7 @@ const mockInquiryList: Inquiry[] = [
 
 const InquiryContainer = () => {
   const { forward } = useNativeRouter();
+  const router = useRouter();
 
   const inquiryList: Inquiry[] = mockInquiryList;
 
@@ -93,6 +96,10 @@ const InquiryContainer = () => {
       </div>
     );
   };
+
+  useEffect(() => {
+    router.prefetch('/mypage/inquiry/write');
+  }, []);
 
   return (
     <>

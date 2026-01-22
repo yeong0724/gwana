@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import type { Extension } from '@tiptap/core';
 import { Color } from '@tiptap/extension-color';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
@@ -11,6 +12,7 @@ import Underline from '@tiptap/extension-underline';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import {
+  ALargeSmall,
   Bold,
   ChevronDown,
   ImagePlus,
@@ -22,8 +24,10 @@ import {
   Underline as UnderlineIcon,
   Unlink,
 } from 'lucide-react';
+import FontSize from 'tiptap-extension-font-size';
 
 import { cn } from '@/lib/utils';
+import { useAlertStore } from '@/stores';
 
 interface Props {
   value: string;
@@ -39,6 +43,15 @@ interface ToolbarButtonProps {
   title: string;
   className?: string;
 }
+
+// 폰트 크기 옵션
+const FONT_SIZES = [
+  { name: '작게', value: '12px' },
+  { name: '기본', value: '14px' },
+  { name: '중간', value: '16px' },
+  { name: '크게', value: '18px' },
+  { name: '아주 크게', value: '24px' },
+];
 
 // 소셜커머스에서 자주 쓰이는 색상 팔레트
 const COLOR_PALETTE = [
@@ -68,9 +81,9 @@ function ToolbarButton({
       className={cn(
         'flex items-center justify-center rounded-md transition-all duration-200',
         // 모바일 (lg 미만)
-        'size-9 text-gray-600',
+        'size-8 text-gray-600',
         // PC (lg 이상)
-        'lg:size-8',
+        'lg:size-10',
         // 공통 호버/활성 상태
         isActive
           ? 'bg-primary text-primary-foreground shadow-sm'
@@ -84,7 +97,7 @@ function ToolbarButton({
 }
 
 function ToolbarDivider() {
-  return <div className="mx-1 h-5 w-px bg-gray-200 lg:mx-1.5 lg:h-4" />;
+  return <div className="mx-[1.5px] h-5 w-px bg-gray-200 lg:mx-1.5 lg:h-4" />;
 }
 
 interface ColorPickerProps {
@@ -95,7 +108,9 @@ interface ColorPickerProps {
 
 function ColorPicker({ currentColor, onColorChange, isMobile = false }: ColorPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const ref = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -107,34 +122,44 @@ function ColorPicker({ currentColor, onColorChange, isMobile = false }: ColorPic
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handleToggle = () => {
+    if (!isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + 4,
+        left: rect.left,
+      });
+    }
+    setIsOpen(!isOpen);
+  };
+
   return (
     <div ref={ref} className="relative">
       <button
+        ref={buttonRef}
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
         title="글자색"
         className={cn(
           'flex items-center justify-center gap-0.5 rounded-md transition-all duration-200',
-          isMobile ? 'size-9 text-gray-600' : 'h-8 px-2 text-gray-600',
+          'h-8 px-2 text-gray-600',
           'hover:bg-gray-100 hover:text-gray-900 active:bg-gray-200'
         )}
       >
-        <Palette className={isMobile ? 'size-5' : 'size-4'} />
+        <Palette className={isMobile ? 'size-5' : 'size-6'} />
         <div
-          className={cn('rounded-sm', isMobile ? 'h-4 w-4' : 'h-0.5 w-3')}
+          className={cn('rounded-sm', 'mx-1 h-5 w-6')}
           style={{ backgroundColor: currentColor || '#000000' }}
         />
-        {!isMobile && <ChevronDown className="size-3" />}
+        <ChevronDown className="size-3" />
       </button>
 
       {isOpen && (
         <div
-          className={cn(
-            'absolute z-50 mt-1 rounded-lg border border-gray-200 bg-white p-2 shadow-lg w-[180px]',
-            'left-0'
-          )}
+          className="fixed z-50 rounded-lg border border-gray-200 bg-white p-2 shadow-lg w-fit"
+          style={{ top: dropdownPosition.top, left: dropdownPosition.left }}
         >
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid w-max grid-cols-5 gap-2">
             {COLOR_PALETTE.map((color) => (
               <button
                 key={color.value}
@@ -169,6 +194,148 @@ function ColorPicker({ currentColor, onColorChange, isMobile = false }: ColorPic
   );
 }
 
+interface FontSizePickerProps {
+  currentSize: string;
+  onSizeChange: (size: string) => void;
+  isMobile?: boolean;
+}
+
+function FontSizePicker({ currentSize, onSizeChange, isMobile = false }: FontSizePickerProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [customSize, setCustomSize] = useState('');
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const ref = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const MAX_FONT_SIZE = 72;
+  const MIN_FONT_SIZE = 8;
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // 현재 크기에서 숫자만 추출해서 표시
+  const currentSizeNumber = currentSize ? parseInt(currentSize.replace('px', '')) : '';
+  const displaySize = currentSizeNumber || '기본';
+
+  const handleCustomSizeSubmit = () => {
+    const size = parseInt(customSize);
+    const fontSize = size > MAX_FONT_SIZE ? MAX_FONT_SIZE : size < MIN_FONT_SIZE ? MIN_FONT_SIZE : size;
+    onSizeChange(`${fontSize}px`);
+    setIsOpen(false);
+    setCustomSize('');
+  };
+
+  const handleToggle = () => {
+    if (!isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + 4,
+        left: rect.left,
+      });
+    }
+    setIsOpen(!isOpen);
+  };
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={handleToggle}
+        title="글자 크기"
+        className={cn(
+          'flex items-center justify-center gap-0.5 rounded-md transition-all duration-200',
+          'h-8 px-2 text-gray-600',
+          'hover:bg-gray-100 hover:text-gray-900 active:bg-gray-200'
+        )}
+      >
+        <ALargeSmall className={isMobile ? 'size-5' : 'size-4'} />
+        <span className="min-w-[28px] text-center text-[14px] px-[4px]">{displaySize}</span>
+        <ChevronDown className="size-3" />
+      </button>
+
+      {isOpen && (
+        <div
+          className="fixed z-50 rounded-lg border border-gray-200 bg-white p-2 shadow-lg w-fit"
+          style={{ top: dropdownPosition.top, left: dropdownPosition.left }}
+        >
+          <div className="flex w-max flex-col gap-1">
+            {/* 직접 입력 */}
+            <div className="flex items-center gap-1 pb-1 border-b border-gray-100">
+              <input
+                type="number"
+                min={MIN_FONT_SIZE}
+                max={MAX_FONT_SIZE}
+                placeholder="px"
+                value={customSize}
+                onChange={(e) => setCustomSize(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleCustomSizeSubmit();
+                  }
+                }}
+                className="w-16 rounded border border-gray-200 px-2 py-1 text-[16px] focus:border-primary focus:outline-none"
+              />
+              {/* <span className="text-[15px] text-gray-400 mr-[4px]">px</span> */}
+              <button
+                type="button"
+                onClick={handleCustomSizeSubmit}
+                className="rounded bg-primary ml-1 h-8 w-12 text-[14px] text-white hover:bg-primary/90"
+              >
+                적용
+              </button>
+            </div>
+
+            {/* 프리셋 버튼들 */}
+            <div className="flex flex-wrap gap-2 pt-1">
+              {FONT_SIZES.map((size) => (
+                <button
+                  key={size.value}
+                  type="button"
+                  onClick={() => {
+                    onSizeChange(size.value);
+                    setIsOpen(false);
+                  }}
+                  className={cn(
+                    'rounded-md px-2 py-1 text-xs transition-colors text-[15px]',
+                    currentSize === size.value
+                      ? 'bg-primary text-white'
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                  )}
+                >
+                  {size.value.replace('px', '')}
+                </button>
+              ))}
+            </div>
+
+            {/* 크기 초기화 버튼 */}
+            <button
+              type="button"
+              onClick={() => {
+                onSizeChange('');
+                setIsOpen(false);
+              }}
+              className="mt-1 rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
+            >
+              기본 크기로
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// 이미지 최대 용량 (2MB)
+const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
+
 export default function TiptapEditor({
   value,
   onChange,
@@ -176,6 +343,9 @@ export default function TiptapEditor({
   minHeight = '200px',
 }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { showConfirmAlert } = useAlertStore();
+  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [selectedFontSize, setSelectedFontSize] = useState<string>('');
 
   const editor = useEditor({
     extensions: [
@@ -204,6 +374,7 @@ export default function TiptapEditor({
       }),
       Underline,
       TextStyle,
+      FontSize as Extension,
       Color,
       Link.configure({
         openOnClick: false,
@@ -213,7 +384,7 @@ export default function TiptapEditor({
       }),
       Image.configure({
         HTMLAttributes: {
-          class: 'max-w-full h-auto rounded-lg my-3',
+          class: 'max-w-full h-auto my-3',
         },
       }),
       Placeholder.configure({
@@ -240,9 +411,19 @@ export default function TiptapEditor({
   }, [value, editor]);
 
   const handleImageUpload = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file && editor) {
+        // 이미지 용량 체크 (2MB 초과 시 alert)
+        if (file.size > MAX_IMAGE_SIZE) {
+          await showConfirmAlert({
+            title: '안내',
+            description: '이미지는 최대 5MB까지 첨부 가능합니다',
+          });
+          e.target.value = '';
+          return;
+        }
+
         // 파일을 Base64로 변환하여 삽입 (실제 서비스에서는 서버 업로드 후 URL 사용)
         const reader = new FileReader();
         reader.onload = () => {
@@ -253,7 +434,7 @@ export default function TiptapEditor({
         e.target.value = '';
       }
     },
-    [editor]
+    [editor, showConfirmAlert]
   );
 
   const addLink = useCallback(() => {
@@ -280,6 +461,7 @@ export default function TiptapEditor({
   const setColor = useCallback(
     (color: string) => {
       if (!editor) return;
+      setSelectedColor(color);
       if (color) {
         editor.chain().focus().setColor(color).run();
       } else {
@@ -289,42 +471,63 @@ export default function TiptapEditor({
     [editor]
   );
 
+  const setFontSize = useCallback(
+    (fontSize: string) => {
+      if (!editor) return;
+      setSelectedFontSize(fontSize);
+      if (fontSize) {
+        editor.chain().focus().setFontSize(fontSize).run();
+      } else {
+        editor.chain().focus().unsetFontSize().run();
+      }
+    },
+    [editor]
+  );
+
   if (!editor) return null;
 
-  const currentColor = editor.getAttributes('textStyle').color || '';
+  const editorColor = editor.getAttributes('textStyle').color || '';
+  const currentColor = selectedColor || editorColor;
+  const editorFontSize = editor.getAttributes('textStyle').fontSize || '';
+  const currentFontSize = selectedFontSize || editorFontSize;
 
   return (
-    <div className="tiptap-editor overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20">
+    <div className="tiptap-editor flex max-h-dvh flex-col overflow-hidden border border-gray-200 bg-white shadow-sm transition-all duration-200 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20">
       {/* 툴바 - PC 버전 */}
-      <div className="hidden border-b border-gray-100 bg-gray-50/80 px-3 py-2 lg:block">
+      <div className="hidden shrink-0 border-b border-gray-100 bg-gray-50/80 px-3 py-2 lg:block overflow-x-auto">
         <div className="flex items-center gap-0.5">
+          {/* 글자색 */}
+          <ColorPicker currentColor={currentColor} onColorChange={setColor} />
+          <ToolbarDivider />
+          {/* 글자 크기 */}
+          <FontSizePicker currentSize={currentFontSize} onSizeChange={setFontSize} />
+          <ToolbarDivider />
+          <ToolbarButton onClick={() => fileInputRef.current?.click()} title="이미지 첨부">
+            <ImagePlus className="size-6" />
+          </ToolbarButton>
+          <ToolbarDivider />
           {/* 텍스트 서식 */}
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleBold().run()}
             isActive={editor.isActive('bold')}
             title="굵게 (Ctrl+B)"
           >
-            <Bold className="size-4" strokeWidth={2.5} />
+            <Bold className="size-6" strokeWidth={2.5} />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleItalic().run()}
             isActive={editor.isActive('italic')}
             title="기울임 (Ctrl+I)"
           >
-            <Italic className="size-4" />
+            <Italic className="size-6" />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleUnderline().run()}
             isActive={editor.isActive('underline')}
             title="밑줄 (Ctrl+U)"
           >
-            <UnderlineIcon className="size-4" />
+            <UnderlineIcon className="size-6" />
           </ToolbarButton>
-
-          <ToolbarDivider />
-
-          {/* 글자색 */}
-          <ColorPicker currentColor={currentColor} onColorChange={setColor} />
 
           <ToolbarDivider />
 
@@ -334,36 +537,47 @@ export default function TiptapEditor({
             isActive={editor.isActive('bulletList')}
             title="글머리 기호 목록"
           >
-            <List className="size-4" />
+            <List className="size-6" />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
             isActive={editor.isActive('orderedList')}
             title="번호 매기기 목록"
           >
-            <ListOrdered className="size-4" />
+            <ListOrdered className="size-6" />
           </ToolbarButton>
 
           <ToolbarDivider />
 
           {/* 링크 & 이미지 */}
           <ToolbarButton onClick={addLink} isActive={editor.isActive('link')} title="링크 추가">
-            <Link2 className="size-4" />
+            <Link2 className="size-6" />
           </ToolbarButton>
           {editor.isActive('link') && (
             <ToolbarButton onClick={removeLink} title="링크 제거">
-              <Unlink className="size-4" />
+              <Unlink className="size-6" />
             </ToolbarButton>
           )}
-          <ToolbarButton onClick={() => fileInputRef.current?.click()} title="이미지 첨부">
-            <ImagePlus className="size-4" />
-          </ToolbarButton>
         </div>
       </div>
 
       {/* 툴바 - 모바일 버전 (lg 미만) */}
-      <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50/80 px-2 py-2 lg:hidden">
-        <div className="flex items-center gap-0.5">
+      <div className="shrink-0 overflow-x-auto border-b border-gray-100 bg-gray-50/80 px-2 py-2 lg:hidden">
+        <div className="flex w-max items-center gap-0.5">
+          {/* 글자색 */}
+          <ColorPicker currentColor={currentColor} onColorChange={setColor} isMobile />
+
+          {/* 글자 크기 */}
+          <FontSizePicker currentSize={currentFontSize} onSizeChange={setFontSize} isMobile />
+          <ToolbarDivider />
+          <ToolbarButton
+            onClick={() => fileInputRef.current?.click()}
+            title="이미지"
+            className="text-primary"
+          >
+            <ImagePlus className="size-5" />
+          </ToolbarButton>
+          <ToolbarDivider />
           {/* 텍스트 서식 */}
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleBold().run()}
@@ -389,11 +603,6 @@ export default function TiptapEditor({
 
           <ToolbarDivider />
 
-          {/* 글자색 */}
-          <ColorPicker currentColor={currentColor} onColorChange={setColor} isMobile />
-
-          <ToolbarDivider />
-
           {/* 목록 */}
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -409,9 +618,9 @@ export default function TiptapEditor({
           >
             <ListOrdered className="size-5" />
           </ToolbarButton>
-        </div>
 
-        <div className="flex items-center gap-0.5">
+          <ToolbarDivider />
+
           {/* 링크 & 이미지 */}
           <ToolbarButton onClick={addLink} isActive={editor.isActive('link')} title="링크">
             <Link2 className="size-5" />
@@ -421,13 +630,6 @@ export default function TiptapEditor({
               <Unlink className="size-5" />
             </ToolbarButton>
           )}
-          <ToolbarButton
-            onClick={() => fileInputRef.current?.click()}
-            title="이미지"
-            className="text-primary"
-          >
-            <ImagePlus className="size-5" />
-          </ToolbarButton>
         </div>
       </div>
 
@@ -435,6 +637,8 @@ export default function TiptapEditor({
       <EditorContent
         editor={editor}
         className={cn(
+          // 스크롤 가능하도록 설정 (flex-1로 남은 공간 채우고, min-h-0으로 shrink 허용)
+          'min-h-0 flex-1 overflow-y-auto',
           // 기본 스타일
           '[&_.ProseMirror]:min-h-[200px] [&_.ProseMirror]:px-4 [&_.ProseMirror]:py-3 [&_.ProseMirror]:text-sm [&_.ProseMirror]:leading-relaxed [&_.ProseMirror]:outline-none',
           'lg:[&_.ProseMirror]:px-5 lg:[&_.ProseMirror]:py-4 lg:[&_.ProseMirror]:text-base',
@@ -456,8 +660,8 @@ export default function TiptapEditor({
       />
 
       {/* 하단 안내 - 모바일에서만 표시 */}
-      <div className="flex items-center justify-between border-t border-gray-100 bg-gray-50/50 px-3 py-2 lg:hidden">
-        <p className="text-xs text-gray-400">이미지는 최대 5MB까지 첨부 가능합니다</p>
+      <div className="flex shrink-0 items-center justify-between border-t border-gray-100 bg-gray-50/50 px-3 py-2 lg:hidden">
+        <p className="text-xs text-gray-400">이미지는 최대 2MB까지 첨부 가능합니다</p>
       </div>
     </div>
   );
