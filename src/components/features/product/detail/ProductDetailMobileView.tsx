@@ -1,3 +1,9 @@
+import Image from 'next/image';
+
+import { clone, isEmpty, map } from 'lodash-es';
+import { ChevronDown, Share2, X } from 'lucide-react';
+import { createPortal } from 'react-dom';
+
 import { CustomDropdown } from '@/components/common';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,10 +15,6 @@ import {
 } from '@/components/ui/carousel';
 import { useControllerContext, useStateContext } from '@/context/productDetailContext';
 import { localeFormat } from '@/lib/utils';
-import { clone, isEmpty, map } from 'lodash-es';
-import { ChevronDown, Share2, X } from 'lucide-react';
-import Image from 'next/image';
-import { createPortal } from 'react-dom';
 
 const ProductDetailMobileView = () => {
   const { product, current, isMounted, isBottomPanelOpen, purchaseList, totalPrice } =
@@ -176,16 +178,18 @@ const ProductDetailMobileView = () => {
       {/* 모바일 하단 고정 버튼 영역 - Portal로 body에 직접 렌더링 */}
       {isMounted &&
         createPortal(
-          <div className="fixed bottom-0 left-0 right-0 z-70 lg:hidden">
+          <div
+            className="fixed bottom-0 left-0 right-0 z-70 lg:hidden"
+            style={{ viewTransitionName: 'none' }}
+          >
             {/* 메인 패널 */}
             <div
               className={`bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)] transition-all duration-300 ease-in-out ${isBottomPanelOpen ? 'rounded-t-2xl' : ''}`}
             >
               {/* 확장 패널: 구매수량 + 상품금액 합계 (옵션 없는 경우) */}
               <div
-                className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                  isBottomPanelOpen ? 'max-h-[500px]' : 'max-h-0'
-                }`}
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${isBottomPanelOpen ? 'max-h-[500px]' : 'max-h-0'
+                  }`}
               >
                 {/* 닫기 버튼 */}
                 <button

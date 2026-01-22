@@ -48,7 +48,7 @@ const InquiryWriteContainer = () => {
           placeholder="제목 (20자 이내)"
           value={title}
           onChange={(event) => handleTitleChange(event)}
-          className="h-8 flex-1 border-none p-0 text-base shadow-none focus-visible:ring-0"
+          className="h-8 flex-1 border-none p-0 text-base lg:text-[18px] shadow-none focus-visible:ring-0"
         />
         <button
           type="button"
