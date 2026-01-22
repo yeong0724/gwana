@@ -1,7 +1,6 @@
 'use client';
 
 import { Product } from '@/types';
-import Image from 'next/image';
 
 type ProductCardProps = {
   product: Product;
@@ -21,12 +20,12 @@ const ProductCard = ({ product, onClickProduct }: ProductCardProps) => {
       className="bg-white cursor-pointer group"
       onClick={() => onClickProduct(product.productId)}
     >
-      <Image
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src={images[0]}
         alt={`${product.productName} image`}
-        width={600}
-        height={600}
-        className="object-cover group-hover:scale-105 transition-transform duration-300"
+        loading="lazy"
+        className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300"
       />
       {/* 상품 정보 */}
       <div className="flex flex-col pt-4 space-y-2 justify-center items-center">
