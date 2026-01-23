@@ -1,7 +1,6 @@
-import { getRegexpByType } from '@/lib/utils';
-import type { FormatEnum, HandleChange, ReactHookFormEventType } from '@/types/type';
+import { ChangeEvent } from 'react';
+
 import { isEmpty } from 'lodash-es';
-import { ChangeEvent, useMemo } from 'react';
 import {
   FieldPath,
   FieldPathValue,
@@ -10,18 +9,22 @@ import {
   useFormContext,
 } from 'react-hook-form';
 
+import { getRegexpByType } from '@/lib/utils';
+import type { FormatEnum, HandleChange, ReactHookFormEventType } from '@/types/type';
+
 const ControllerInput = <T extends FieldValues>({
   required = false,
   name,
   className = '',
   wrapperClassName = '',
   placeholder = '',
-  type = '',
+  type = 'text',
   callbackFn = null,
   readOnly = false,
   disabled = false,
   disableErrorMessage = false,
   maxLength,
+  inputRef,
 }: {
   required?: boolean;
   name: FieldPath<T>;
@@ -34,10 +37,9 @@ const ControllerInput = <T extends FieldValues>({
   disableErrorMessage?: boolean;
   maxLength?: number;
   callbackFn?: HandleChange<HTMLInputElement, FieldPathValue<T, FieldPath<T>>> | null;
+  inputRef?: (el: HTMLInputElement | null) => void;
 }) => {
   const { setValue, control, clearErrors } = useFormContext<T>();
-
-  const REG_EXP = useMemo(() => getRegexpByType(type), [type]);
 
   const {
     field,
@@ -49,19 +51,25 @@ const ControllerInput = <T extends FieldValues>({
 
   const onFilterValue = (event: ChangeEvent<ReactHookFormEventType<T>>) => {
     const { value } = event.target;
-    return REG_EXP ? value.replace(REG_EXP, '') : value;
+
+    const REG_EXP = getRegexpByType(type);
+    if (!value || REG_EXP.test(value)) {
+      return value;
+    }
+
+    return field.value;
   };
 
   const onChangeHandler = (event: ChangeEvent<ReactHookFormEventType<T> & HTMLInputElement>) => {
-    let value = onFilterValue(event);
-
-    if (maxLength && (type === 'tel' || type === 'text')) {
-      value = value.slice(0, maxLength);
-    }
+    const value = onFilterValue(event);
 
     if (callbackFn) {
       callbackFn(null, { name, value });
       return;
+    }
+
+    if (!isEmpty(error)) {
+      clearErrors(name);
     }
 
     setValue(name, value, {
@@ -70,24 +78,20 @@ const ControllerInput = <T extends FieldValues>({
     });
   };
 
-  const handleFocus = () => {
-    if (!isEmpty(error)) {
-      clearErrors(name);
-    }
-  };
-
   return (
     <div className={wrapperClassName}>
       <input
+        ref={inputRef}
         name={name}
         placeholder={placeholder}
         value={field.value}
         onChange={onChangeHandler}
-        onFocus={handleFocus}
-        className={`${className} ${error?.message ? 'border-red-500' : ''} ${disabled ? 'bg-gray-100 text-gray-300 cursor-not-allowed' : ''}`}
+        // onFocus={handleFocus}
+        className={`${className} outline-none ${error?.message ? '!border-red-500 focus:!border-red-500' : ''} ${disabled ? 'bg-gray-100 text-gray-300 cursor-not-allowed' : ''}`}
         readOnly={readOnly}
         disabled={disabled}
         type={type}
+        maxLength={maxLength}
       />
       {!disableErrorMessage && error?.message && (
         <div className="text-red-500 pt-1 pl-2 text-[12px] sm:text-[8px]">{error.message}</div>

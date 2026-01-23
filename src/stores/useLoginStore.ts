@@ -15,6 +15,7 @@ export const initailState: LoginInfo = {
     userId: '',
     customerKey: '',
     phone: '',
+    profileImage: null,
   },
 };
 

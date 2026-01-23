@@ -125,13 +125,15 @@ export const apiClient = <T>({
 type AxiosOptions = {
   url: string;
   params: unknown;
+  headers?: Record<string, string>;
 };
 
-export const postAxios = <T>({ url, params }: AxiosOptions): Promise<T> => {
+export const postAxios = <T>({ url, params, headers }: AxiosOptions): Promise<T> => {
   return apiClient<T>({
     method: HttpMethod.POST,
     url,
     params,
+    headers,
   });
 };
 

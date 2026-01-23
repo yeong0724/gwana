@@ -1,71 +1,44 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useRef, useState, ChangeEvent } from 'react';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { PenLine, User } from 'lucide-react';
+import { Camera, PenLine, X } from 'lucide-react';
 import DaumPostcode, { Address } from 'react-daum-postcode';
-import { FieldErrors, FormProvider, useForm } from 'react-hook-form';
-import z from 'zod';
+import { FieldErrors, FormProvider } from 'react-hook-form';
 
 import ControllerInput from '@/components/common/ControllerInput';
 import SearchPostcodeModal from '@/components/common/modal/SearchPostcodeModal';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import useMyinfoForm from '@/hooks/useMyinfoForm';
 import { getIsMobile } from '@/lib/utils';
-import { useLoginStore } from '@/stores';
+import { useAlertStore } from '@/stores';
+import { MyinfoForm, ResultCode } from '@/types';
+import { useMypageService } from '@/service';
 
-interface MyInfoForm {
-  email: string;
-  name: string;
-  phoneFirst: string;
-  phoneMiddle: string;
-  phoneLast: string;
-  zonecode: string;
-  roadAddress: string;
-  detailAddress: string;
-}
+const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
 
 const MyinfoContainer = () => {
   const isMobile = getIsMobile();
-  const {
-    loginInfo: { user },
-    _hasHydrated,
-  } = useLoginStore();
-  const form = useForm<MyInfoForm>({
-    resolver: zodResolver(
-      z.object({
-        email: z.string().email({ message: '이메일 형식이 올바르지 않습니다' }),
-        name: z.string().min(3, { message: '이름을 입력해주세요' }),
-        phoneFirst: z.string().length(3),
-        phoneMiddle: z.string().length(4),
-        phoneLast: z.string().length(4),
-        zonecode: z.string().min(1, { message: '우편번호를 입력해주세요' }),
-        roadAddress: z.string().min(1, { message: '도로명 주소를 입력해주세요' }),
-        detailAddress: z.string().min(1, { message: '상세 주소를 입력해주세요' }),
-      })
-    ),
-    defaultValues: {
-      email: '',
-      name: '',
-      phoneFirst: '010',
-      phoneMiddle: '3561',
-      phoneLast: '8411',
-      zonecode: '',
-      roadAddress: '',
-      detailAddress: '',
-    },
-    mode: 'onSubmit',
-  });
+  const { showAlert } = useAlertStore();
 
-  const {
-    watch,
-    setValue,
-    handleSubmit,
-    clearErrors,
-    formState: { errors },
-  } = form;
+  const { form, setValue, handleSubmit, clearErrors, errors, watch } = useMyinfoForm();
+  // const profileImage = watch('profileImage');
+  const profileImage = '/images/myinfo/leg_profile.png';
+
+  const { useProfileImageUploadMutation } = useMypageService();
+  const { mutate: uploadProfileImage } = useProfileImageUploadMutation();
 
   const [addressOpen, setAddressOpen] = useState<boolean>(false);
+  const [previewImg, setPreviewImg] = useState<string | null>(null);
+
+  // input refs
+  const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const setInputRef = (name: string) => (el: HTMLInputElement | null) => {
+    inputRefs.current[name] = el;
+  };
 
   const handleAddressComplete = (addressData: Address) => {
     setValue('zonecode', addressData.zonecode);
@@ -78,39 +51,146 @@ const MyinfoContainer = () => {
     setAddressOpen((prev) => !prev);
   };
 
-  const onSubmit = (formData: MyInfoForm) => {
+  const handleFileInputClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 확장자 검사
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      showAlert({
+        title: '업로드 불가',
+        description: '허용된 확장자는 jpeg, png, webp 입니다.',
+      });
+      e.target.value = '';
+      return;
+    }
+
+    // 용량 검사
+    if (file.size > MAX_FILE_SIZE) {
+      showAlert({
+        title: '업로드 불가',
+        description: '업로드 가능한 용량은 1MB 이하입니다.',
+      });
+      e.target.value = '';
+      return;
+    }
+
+    // 미리보기 이미지 세팅
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewImg(reader.result as string);
+    };
+
+    const formData = new FormData();
+    formData.append('profileImage', file);
+
+    reader.readAsDataURL(file);
+
+    uploadProfileImage(formData, {
+      onSuccess: ({ code, data }) => {
+        if (code === ResultCode.SUCCESS) {
+          showAlert({ title: '알림', description: data });
+        }
+      },
+      onError: (error) => {
+        console.log('uploadProfileImage error:', error);
+      },
+    });
+
+    e.target.value = '';
+  };
+
+  const handleClearPreview = () => {
+    setPreviewImg(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const onSubmit = (formData: MyinfoForm) => {
     console.log('수정하기:', formData);
   };
 
-  const onError = (errors: FieldErrors<MyInfoForm>) => { };
+  const onError = (errors: FieldErrors<MyinfoForm>) => {
+    const focusOrder: (keyof MyinfoForm)[] = [
+      'username',
+      'phoneFirst',
+      'phoneMiddle',
+      'phoneLast',
+      'zonecode',
+      'roadAddress',
+      'detailAddress',
+    ];
 
-  useEffect(() => {
-    if (_hasHydrated) {
-      const { email, username } = user;
-      setValue('email', email);
-      setValue('name', username);
+    // 우선순위대로 첫 번째 에러 필드 찾아서 포커스
+    for (const fieldName of focusOrder) {
+      if (errors[fieldName] && inputRefs.current[fieldName]) {
+        inputRefs.current[fieldName]?.focus();
+        break;
+      }
     }
-  }, [_hasHydrated]);
+  };
 
   return (
     <div className="bg-white h-[calc(100dvh-56px)] flex flex-col overflow-hidden">
       {/* 폼 영역 */}
       <FormProvider {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit, onError)}
+          onSubmit={handleSubmit(onSubmit, onError)}
           className="flex flex-col flex-1 overflow-hidden"
         >
           <div className="w-full flex-1 flex flex-col min-h-0 bg-white">
-            {/* 헤더: 타이틀 */}
-            <div className="flex items-center py-4 border-b border-gray-100 px-4 bg-white sticky top-0 z-10">
-              <div className="flex items-center gap-2 pl-[5px]">
-                <User className="size-6 text-gray-800" />
-                <span className="text-xl font-bold text-gray-800">내 정보</span>
-              </div>
-            </div>
-
             <div className="flex-1 min-h-0 overflow-y-auto">
               <div className="p-4 space-y-6">
+                {/* 프로필 이미지 */}
+                <div className="flex justify-center py-4">
+                  <div className="relative">
+                    {/* 프로필 이미지 원형 */}
+                    <div className="w-28 h-28 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200">
+                      {!previewImg && !profileImage ? (
+
+
+                        <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                          <span className="text-gray-400 text-4xl font-bold">?</span>
+                        </div>
+                      ) : (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={previewImg || (profileImage || '')}
+                          alt="프로필 미리보기"
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </div>
+
+                    {/* 카메라/X 아이콘 버튼 (5시 방향) */}
+                    <button
+                      type="button"
+                      onClick={previewImg ? handleClearPreview : handleFileInputClick}
+                      className="absolute bottom-1 right-1 w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-900 flex items-center justify-center transition-colors shadow-md"
+                    >
+                      {previewImg ? (
+                        <X className="w-4 h-4 text-white" />
+                      ) : (
+                        <Camera className="w-4 h-4 text-white" />
+                      )}
+                    </button>
+
+                    {/* 숨겨진 파일 input */}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                  </div>
+                </div>
+
                 {/* 이메일 */}
                 <div className="space-y-2">
                   <div className="px-[5px]">
@@ -121,7 +201,7 @@ const MyinfoContainer = () => {
                     name="email"
                     placeholder="이메일"
                     disabled
-                    className="w-full px-4 py-2 border-1 border-gray-400 rounded-md text-gray-700 text-base focus:outline-none focus:border-gray-900"
+                    className="w-full px-4 py-2 border-1 border-gray-400 rounded-md text-gray-700 text-base"
                   />
                 </div>
 
@@ -132,9 +212,10 @@ const MyinfoContainer = () => {
                   </div>
                   <ControllerInput
                     type="text"
-                    name="name"
+                    name="username"
                     placeholder="이름"
-                    className="w-full px-4 py-2 border-1 border-gray-400 rounded-md text-gray-700 text-base focus:outline-none focus:border-gray-900"
+                    className="w-full px-4 py-2 border-1 border-gray-400 rounded-md text-gray-700 text-base"
+                    inputRef={setInputRef('username')}
                   />
                 </div>
 
@@ -147,31 +228,34 @@ const MyinfoContainer = () => {
                     <ControllerInput
                       type="tel"
                       name="phoneFirst"
-                      className="w-full px-4 py-2 border-1 border-gray-400 rounded-md text-gray-700 text-base focus:outline-none focus:border-gray-900"
+                      className="w-full px-4 py-2 border-1 border-gray-400 rounded-md text-gray-700 text-base"
                       disableErrorMessage
                       maxLength={3}
+                      inputRef={setInputRef('phoneFirst')}
                     />
                     <span className="text-gray-400 text-lg">-</span>
                     <ControllerInput
                       type="tel"
                       name="phoneMiddle"
-                      className="w-full px-4 py-2 border-1 border-gray-400 rounded-md text-gray-700 text-base focus:outline-none focus:border-gray-900"
-                      maxLength={4}
+                      className="w-full px-4 py-2 border-1 border-gray-400 rounded-md text-gray-700 text-base"
                       disableErrorMessage
+                      maxLength={4}
+                      inputRef={setInputRef('phoneMiddle')}
                     />
                     <span className="text-gray-400 text-lg">-</span>
                     <ControllerInput
                       type="tel"
                       name="phoneLast"
-                      className="w-full px-4 py-2 border-1 border-gray-400 rounded-md text-gray-700 text-base focus:outline-none focus:border-gray-900"
-                      maxLength={4}
+                      className="w-full px-4 py-2 border-1 border-gray-400 rounded-md text-gray-700 text-base"
                       disableErrorMessage
+                      maxLength={4}
+                      inputRef={setInputRef('phoneLast')}
                     />
                   </div>
                   <span
                     className={`pl-2 text-[12px] sm:text-[8px] block ${errors.phoneFirst || errors.phoneMiddle || errors.phoneLast
-                        ? 'text-red-500'
-                        : 'invisible'
+                      ? 'text-red-500'
+                      : 'invisible'
                       }`}
                   >
                     휴대폰 번호를 입력해주세요
@@ -180,15 +264,14 @@ const MyinfoContainer = () => {
 
                 {/* 우편번호 */}
                 <div className="space-y-2">
-                  <div className="px-[5px]">
-                    <label className="text-gray-800 font-medium text-base">우편번호</label>
-                  </div>
+                  <div className="px-[5px] text-gray-800 font-medium text-base">우편번호</div>
                   <div className="flex items-start gap-2">
                     <ControllerInput
                       type="tel"
                       name="zonecode"
                       className="w-full px-4 py-2 border-1 border-gray-400 rounded-md text-gray-700 text-base"
                       readOnly
+                      inputRef={setInputRef('zonecode')}
                     />
                     <button
                       type="button"
@@ -202,19 +285,21 @@ const MyinfoContainer = () => {
 
                 {/* 주소 */}
                 <div className="space-y-2">
-                  <label className="text-gray-800 font-medium text-base">주소</label>
-                  <ControllerInput
-                    type="tel"
-                    name="roadAddress"
-                    className="w-full px-4 py-2 border-1 border-gray-400 rounded-md text-gray-700 text-base"
-                    maxLength={4}
-                    readOnly
-                  />
+                  <div className="px-[5px] text-gray-800 font-medium text-base">주소</div>
                   <ControllerInput
                     type="text"
+                    name="roadAddress"
+                    className="w-full px-4 py-2 border-1 border-gray-400 rounded-md text-gray-700 text-base"
+                    readOnly
+                    inputRef={setInputRef('roadAddress')}
+                  />
+                  <ControllerInput
+                    type="alphanumericWithSymbols"
                     name="detailAddress"
                     placeholder="상세주소를 입력해주세요"
-                    className="w-full px-4 py-2 border-1 border-gray-400 rounded-md text-gray-700 text-base focus:outline-none focus:border-gray-900"
+                    maxLength={30}
+                    className="w-full px-4 py-2 border-1 border-gray-400 rounded-md text-gray-700 text-base"
+                    inputRef={setInputRef('detailAddress')}
                   />
                 </div>
               </div>

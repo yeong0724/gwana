@@ -37,3 +37,16 @@ export type PaymentForm = {
   deliveryRequest: string;
   deliveryRequestDetail: string;
 };
+
+export interface MyinfoForm {
+  profileImage: string | null;
+  email: string;
+  username: string;
+  phoneFirst: string;
+  phoneMiddle: string;
+  phoneLast: string;
+  zonecode: string;
+  roadAddress: string;
+  detailAddress: string;
+}
+

@@ -10,18 +10,16 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const getRegexpByType = (type: FormatEnum = '') => {
+const getRegexpByType = (type: FormatEnum = 'text') => {
   switch (type) {
     case 'number':
     case 'tel':
-      return /[^0-9]/g;
+      return /^[0-9]+$/g;
     case 'text':
-      return /[0-9]/g;
+      return /^[가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z\s0-9]+$/;
     case 'alphanumericWithSymbols':
       // 영어, 한글, 숫자, 공백, 허용된 특수기호(~ ? - _ ! ^ . ,)만 허용
-      return /^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣0-9~?\-_!^.,\s]*$/;
-    default:
-      return '';
+      return /^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣0-9~?\-_!^.,\s()]*$/;
   }
 };
 

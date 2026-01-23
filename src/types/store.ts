@@ -9,6 +9,7 @@ export type LoginInfo = {
     userId: string;
     customerKey: string;
     phone: string;
+    profileImage: string | null;
   };
 };
 
