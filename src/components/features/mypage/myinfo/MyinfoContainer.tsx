@@ -168,13 +168,14 @@ const MyinfoContainer = () => {
                       disableErrorMessage
                     />
                   </div>
-                  <div className="h-[18px] sm:h-[14px]">
-                    {(errors.phoneFirst || errors.phoneMiddle || errors.phoneLast) && (
-                      <span className="text-red-500 pl-2 text-[12px] sm:text-[8px]">
-                        휴대폰 번호를 입력해주세요
-                      </span>
-                    )}
-                  </div>
+                  <span
+                    className={`pl-2 text-[12px] sm:text-[8px] block ${errors.phoneFirst || errors.phoneMiddle || errors.phoneLast
+                        ? 'text-red-500'
+                        : 'invisible'
+                      }`}
+                  >
+                    휴대폰 번호를 입력해주세요
+                  </span>
                 </div>
 
                 {/* 우편번호 */}
