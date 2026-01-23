@@ -32,7 +32,7 @@ const refreshAccessToken = async (): Promise<string> => {
 
     loginActions.setLoginInfo({
       accessToken: newAccessToken,
-      user: { username, email, userId, customerKey, phone },
+      user: { username, email, userId, customerKey, phone, profileImage: null },
       isLogin: true,
       redirectUrl: '/',
       loginType,

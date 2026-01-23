@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, ChangeEvent } from 'react';
+import { ChangeEvent, useRef, useState } from 'react';
 
 import { Camera, PenLine, X } from 'lucide-react';
 import DaumPostcode, { Address } from 'react-daum-postcode';
@@ -11,9 +11,9 @@ import SearchPostcodeModal from '@/components/common/modal/SearchPostcodeModal';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import useMyinfoForm from '@/hooks/useMyinfoForm';
 import { getIsMobile } from '@/lib/utils';
+import { useMypageService } from '@/service';
 import { useAlertStore } from '@/stores';
 import { MyinfoForm, ResultCode } from '@/types';
-import { useMypageService } from '@/service';
 
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
@@ -23,8 +23,8 @@ const MyinfoContainer = () => {
   const { showAlert } = useAlertStore();
 
   const { form, setValue, handleSubmit, clearErrors, errors, watch } = useMyinfoForm();
-  // const profileImage = watch('profileImage');
-  const profileImage = '/images/myinfo/leg_profile.png';
+  const profileImage = watch('profileImage');
+  // const profileImage = '/images/myinfo/leg_profile.png';
 
   const { useProfileImageUploadMutation } = useMypageService();
   const { mutate: uploadProfileImage } = useProfileImageUploadMutation();
@@ -152,15 +152,13 @@ const MyinfoContainer = () => {
                     {/* 프로필 이미지 원형 */}
                     <div className="w-28 h-28 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200">
                       {!previewImg && !profileImage ? (
-
-
                         <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                          <span className="text-gray-400 text-4xl font-bold">?</span>
+                          <span className="text-gray-400 text-4xl font-bold">{watch("username")?.substring(1, 3)}</span>
                         </div>
                       ) : (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                          src={previewImg || (profileImage || '')}
+                          src={previewImg || profileImage || ''}
                           alt="프로필 미리보기"
                           className="w-full h-full object-cover"
                         />

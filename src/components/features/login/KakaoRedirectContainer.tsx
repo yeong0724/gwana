@@ -37,7 +37,7 @@ const KakaoRedirectContainer = ({ code }: Props) => {
               accessToken,
               isLogin: true,
               redirectUrl: '/',
-              user: { email, username, userId, customerKey, phone },
+              user: { email, username, userId, customerKey, phone, profileImage: null },
               loginType,
             });
 
