@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { forEach } from 'lodash-es';
 import {
   ChevronRight,
   ClipboardList,
@@ -17,14 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import useNativeRouter from '@/hooks/useNativeRouter';
-import { useAlertStore, useLoginStore } from '@/stores';
-import { forEach } from 'lodash-es';
-
-// 하드코딩된 유저 데이터
-const userData = {
-  name: '최혜지',
-  profileImage: '/images/profile-placeholder.png',
-};
+import { useAlertStore, useLoginStore, useUserStore } from '@/stores';
 
 // 하드코딩된 통계 데이터
 const statsData = [
@@ -63,14 +57,11 @@ const MypageContainer = () => {
   const router = useRouter();
   const { showConfirmAlert } = useAlertStore();
   const { forward } = useNativeRouter();
-  const {
-    _hasHydrated,
-    loginInfo: { user, isLogin },
-  } = useLoginStore();
+  const { isLoggedIn } = useLoginStore();
+  const { user } = useUserStore();
 
   useEffect(() => {
-    if (!_hasHydrated) return;
-    if (!isLogin) {
+    if (!isLoggedIn) {
       (async () => {
         await showConfirmAlert({
           title: '안내',
@@ -80,7 +71,7 @@ const MypageContainer = () => {
         router.push('/login');
       })();
     }
-  }, [_hasHydrated, isLogin]);
+  }, [isLoggedIn]);
 
   useEffect(() => {
     forEach(menuItems, ({ url }) => {
@@ -101,7 +92,7 @@ const MypageContainer = () => {
           <div className="p-6">
             <div className="flex items-center gap-4">
               <Avatar className="size-20 border-2 border-gray-200 shadow-md mr-[10px]">
-                <AvatarImage src='images/myinfo/leg_profile.png' alt={user.username} />
+                <AvatarImage src="images/myinfo/leg_profile.png" alt={user.username} />
                 <AvatarFallback className="bg-white text-black text-xl font-bold">
                   {user.username.charAt(0)}
                 </AvatarFallback>
@@ -165,7 +156,7 @@ const MypageContainer = () => {
           <span>회원 탈퇴</span>
         </Button>
       </div>
-    </div >
+    </div>
   );
 };
 

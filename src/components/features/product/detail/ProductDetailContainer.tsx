@@ -1,5 +1,12 @@
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+
+import { useQueryClient } from '@tanstack/react-query';
+import { clone, findIndex, forEach, isEmpty, pick, sumBy } from 'lodash-es';
+import { toast } from 'sonner';
+
 import { PurchaseGuideModal, ShareModal } from '@/components/common/modal';
 import ProductDetailMobileView from '@/components/features/product/detail/ProductDetailMobileView';
 import { type CarouselApi } from '@/components/ui/carousel';
@@ -8,11 +15,7 @@ import { useCartService, useProductService } from '@/service';
 import { useAlertStore, useCartStore, useLoginStore } from '@/stores';
 import { cartActions } from '@/stores/useCartStore';
 import { Cart, CartOption, ProductDetailResponse, ProductOption, PurchaseList } from '@/types';
-import { useQueryClient } from '@tanstack/react-query';
-import { clone, findIndex, forEach, isEmpty, pick, sumBy } from 'lodash-es';
-import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
-import { toast } from 'sonner';
+
 import ProductDetailWebView from './ProductDetailWebView';
 
 const purchasePick = [
@@ -33,7 +36,7 @@ const ProductDetailContainer = ({ productId }: Props) => {
   const queryClient = useQueryClient();
   const pathname = usePathname();
   const router = useRouter();
-  const { isLogin } = useLoginStore();
+  const { isLoggedIn } = useLoginStore();
   const { showAlert } = useAlertStore();
   const { setCart, addCart } = useCartStore();
 
@@ -177,7 +180,7 @@ const ProductDetailContainer = ({ productId }: Props) => {
     }
 
     // 로그인 상태인 경우
-    if (isLogin) {
+    if (isLoggedIn) {
       updateCartListMutate(purchaseList, {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ['cartList'], refetchType: 'all' });

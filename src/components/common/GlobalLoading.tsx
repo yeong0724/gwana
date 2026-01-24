@@ -64,7 +64,13 @@ const CubeGrid = () => {
 };
 
 const GlobalLoading = () => {
-  const isMutating = useIsMutating();
+  const isMutating = useIsMutating({
+    predicate: (mutation) => {
+      // refreshAccessToken은 로딩 표시에서 제외
+      const mutationKey = mutation.options.mutationKey;
+      return !(Array.isArray(mutationKey) && mutationKey[0] === 'refreshAccessToken');
+    },
+  });
 
   if (!isMutating) return null;
 

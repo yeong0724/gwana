@@ -1,52 +1,69 @@
 'use client';
 
-import { ReactNode, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { ReactNode, useEffect, useRef } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 
 import { CustomHeader } from '@/components/common';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import { menuGroup } from '@/constants';
-import { refreshAccessTokenSingleton } from '@/lib/tokenManager';
-import { allClearPersistStore, cn, noMainHeaderPage, validateToken } from '@/lib/utils';
-import { useLoginStore } from '@/stores';
-import { initailState } from '@/stores/useLoginStore';
+import { allClearPersistStore, cn, getAccessToken, noMainHeaderPage, renewLoginInfo } from '@/lib/utils';
+import { useLoginService } from '@/service';
+import { useAlertStore } from '@/stores';
+import { ResultCode } from '@/types';
 
 interface Props {
   children: ReactNode;
 }
 
 const MainLayout = ({ children }: Props) => {
+  const router = useRouter();
   const pathname = usePathname();
   const isNoMainHeaderPage = noMainHeaderPage(pathname);
-  const { setLoginInfo, loginInfo, _hasHydrated } = useLoginStore();
 
-  const onCheckLoginStatus = async () => {
-    const { accessToken } = loginInfo;
+  const { useRefreshAccessToken } = useLoginService();
+  const { mutate: refreshAccessToken } = useRefreshAccessToken();
 
-    if (!accessToken) {
-      setLoginInfo(initailState);
-      return;
-    }
+  const { showConfirmAlert } = useAlertStore();
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Access Token이 아직 유효한 경우
-    if (validateToken(accessToken)) {
-      setLoginInfo(loginInfo);
-      return;
-    }
+  const validateAuthorization = () => {
+    const accessToken = getAccessToken();
 
-    // Access Token 만료 시 갱신 시도
-    try {
-      await refreshAccessTokenSingleton();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      allClearPersistStore();
-    }
+    // 토큰이 없다면 검증 미진행
+    if (!accessToken) return;
+
+    refreshAccessToken(
+      { accessToken },
+      {
+        onSuccess: async ({ code, data, message }) => {
+          if (code === ResultCode.SUCCESS) {
+            renewLoginInfo(data);
+          } else {
+            await showConfirmAlert({ title: '에러', description: message || '' });
+            allClearPersistStore();
+            router.push('/');
+          }
+        },
+        onError: () => {
+          allClearPersistStore();
+          router.push('/');
+        },
+      }
+    );
   };
 
   useEffect(() => {
-    if (_hasHydrated) onCheckLoginStatus();
-  }, [_hasHydrated]);
+    validateAuthorization();
+
+    intervalRef.current = setInterval(validateAuthorization, 30 * 1000 * 60);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
 
   return isNoMainHeaderPage ? (
     <div className="h-dvh  flex flex-col relative overflow-hidden bg-white">

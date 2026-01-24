@@ -1,12 +1,15 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+import { forEach, isEmpty, reduce } from 'lodash-es';
+
+import { renewLoginInfo } from '@/lib/utils';
 import { useCartService, useLoginService } from '@/service';
 import { useAlertStore, useCartStore, useLoginStore } from '@/stores';
 import { loginActions } from '@/stores/useLoginStore';
 import { ResultCode, UpdateCartRequest } from '@/types';
-import { forEach, isEmpty, reduce } from 'lodash-es';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 
 interface Props {
   code: string;
@@ -15,8 +18,8 @@ interface Props {
 const KakaoRedirectContainer = ({ code }: Props) => {
   const router = useRouter();
   const { showConfirmAlert } = useAlertStore();
-  const { setLoginInfo, clearLoginInfo } = useLoginStore();
   const { cart, _hasHydrated } = useCartStore();
+  const { clearLogout } = useLoginStore();
 
   const { useGetAccessTokenByKakaoCode } = useLoginService();
   const { useUpdateCartListMutation } = useCartService();
@@ -30,16 +33,9 @@ const KakaoRedirectContainer = ({ code }: Props) => {
       {
         onSuccess: async ({ code, data }) => {
           if (code === ResultCode.SUCCESS) {
-            const url = loginActions.getLoginInfo().redirectUrl || '/';
+            const redirectUrl = loginActions.getRedirectUrl() || '/';
 
-            const { accessToken, userId, username, email, loginType, customerKey, phone } = data;
-            setLoginInfo({
-              accessToken,
-              isLogin: true,
-              redirectUrl: '/',
-              user: { email, username, userId, customerKey, phone, profileImage: null },
-              loginType,
-            });
+            renewLoginInfo(data);
 
             if (!isEmpty(cart)) {
               const updateCartList = reduce(
@@ -70,7 +66,7 @@ const KakaoRedirectContainer = ({ code }: Props) => {
               await updateCartListAsync(updateCartList);
             }
 
-            router.replace(url);
+            router.replace(redirectUrl);
           }
         },
         onError: async () => {
@@ -81,7 +77,7 @@ const KakaoRedirectContainer = ({ code }: Props) => {
           });
 
           if (confirm) {
-            clearLoginInfo();
+            clearLogout();
             router.push('/login');
           }
         },

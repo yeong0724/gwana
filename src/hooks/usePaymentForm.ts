@@ -4,11 +4,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 
-import { useLoginStore } from '@/stores';
+import { useLoginStore, useUserStore } from '@/stores';
 import { DeliveryRequestEnum, PaymentForm } from '@/types';
 
 const usePaymentForm = () => {
-  const { user, _hasHydrated } = useLoginStore();
+  const { isLoggedIn } = useLoginStore();
+  const { user } = useUserStore();
 
   const form = useForm<PaymentForm>({
     resolver: zodResolver(
@@ -55,11 +56,13 @@ const usePaymentForm = () => {
 
   // hydration 완료 후 store의 user 정보로 form 값 업데이트
   useEffect(() => {
-    if (_hasHydrated && user.username) {
-      setValue('senderName', user.username);
-      setValue('senderPhone', user?.phone?.replace('+82 ', '0').replaceAll('-', '') || '');
+    if (isLoggedIn) {
+      const { username, phone } = user;
+
+      setValue('senderName', username);
+      setValue('senderPhone', phone);
     }
-  }, [_hasHydrated, user.username, user.phone, setValue]);
+  }, [isLoggedIn, setValue]);
 
   return { form, setValue, clearErrors, watch };
 };

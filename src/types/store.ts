@@ -1,23 +1,18 @@
-export type LoginInfo = {
-  isLogin: boolean;
-  accessToken: string;
-  redirectUrl: string;
-  loginType: 'kakao' | 'naver' | 'google' | '';
-  user: {
-    email: string;
-    username: string;
-    userId: string;
-    customerKey: string;
-    phone: string;
-    profileImage: string | null;
-  };
-};
+import { SocialProviderEnum, User } from '@/types';
 
 export type UserStore = {
-  loginInfo: LoginInfo;
-  setIsLogin: (isLogin: boolean) => void;
-  setAccessToken: (accessToken: string) => void;
-  setLoginInfo: (userInfo: LoginInfo) => void;
-  clearLoginInfo: () => void;
+  user: User;
+  setUser: (user: Partial<User>) => void;
+  clearUser: () => void;
+};
+
+export type LoginStoreState = Omit<LoginStore, 'clearLogout' | 'setLogin' | 'setRedirectUrl'>;
+
+export type LoginStore = {
+  isLoggedIn: boolean;
+  provider: SocialProviderEnum;
+  redirectUrl: string;
+  setLogin: (loginInfo: LoginStoreState) => void;
+  clearLogout: () => void;
   setRedirectUrl: (redirectUrl: string) => void;
 };

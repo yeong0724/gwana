@@ -4,11 +4,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 
-import { useLoginStore } from '@/stores';
+import { useLoginStore, useUserStore } from '@/stores';
 import { MyinfoForm } from '@/types';
 
 const useMyinfoForm = () => {
-  const { user, isLogin, _hasHydrated } = useLoginStore();
+  const { isLoggedIn } = useLoginStore();
+  const { user } = useUserStore();
 
   const form = useForm<MyinfoForm>({
     resolver: zodResolver(
@@ -47,16 +48,28 @@ const useMyinfoForm = () => {
   } = form;
 
   useEffect(() => {
-    if (_hasHydrated && isLogin) {
-      const { email, username, phone, profileImage } = user;
+    if (isLoggedIn) {
+      const {
+        email,
+        username,
+        phone,
+        profileImage,
+        zonecode,
+        roadAddress,
+        detailAddress,
+      } = user;
+
       setValue('profileImage', profileImage ?? null);
       setValue('email', email);
       setValue('username', username);
       setValue('phoneFirst', phone?.slice(0, 3));
       setValue('phoneMiddle', phone?.slice(3, 7));
       setValue('phoneLast', phone?.slice(7));
+      setValue('zonecode', zonecode ?? '');
+      setValue('roadAddress', roadAddress ?? '');
+      setValue('detailAddress', detailAddress ?? '');
     }
-  }, [_hasHydrated, isLogin]);
+  }, [isLoggedIn]);
 
   return { form, setValue, handleSubmit, clearErrors, errors, watch };
 };

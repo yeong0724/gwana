@@ -1,12 +1,9 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { get, isEmpty } from 'lodash-es';
+import { get } from 'lodash-es';
 
-import { refreshAccessTokenSingleton } from '@/lib/tokenManager';
-import { allClearPersistStore } from '@/lib/utils';
+import { allClearPersistStore, getAccessToken } from '@/lib/utils';
 import { alertStore } from '@/stores/useAlertStore';
-import { loginActions } from '@/stores/useLoginStore';
-import { ResultCode } from '@/types';
-import { HttpMethod } from '@/types/api';
+import { HttpMethod } from '@/types';
 
 // API 인스턴스 생성
 const axiosOption = {
@@ -25,7 +22,7 @@ const instance: AxiosInstance = axios.create(axiosOption);
 // 요청 인터셉터 - Bearer 토큰 자동 설정
 instance.interceptors.request.use(
   async (config) => {
-    const { accessToken } = loginActions.getLoginInfo();
+    const accessToken = getAccessToken();
 
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
@@ -50,34 +47,21 @@ instance.interceptors.response.use(
     return response.data;
   },
   async (error) => {
-    const errorResponse = get(error, 'response', {});
-    if (isEmpty(errorResponse)) {
-      throw get(error, 'message', '');
+    const status = get(error, 'response.status', {});
+
+    let description = get(error, 'message', '');
+    if (status === 401 || status === 403) {
+      description = '로그인이 만료되었습니다. 로그인 후 이용해주세요.';
     }
 
-    const { status, data } = errorResponse;
+    await alertStore.getState().showConfirmAlert({
+      title: '알림',
+      description,
+      size: 'sm',
+    });
 
-    if (status === 401) {
-      if (data.code === ResultCode.UNAUTHORIZED) {
-        try {
-          const newAccessToken = await refreshAccessTokenSingleton();
-          error.config.headers.Authorization = `Bearer ${newAccessToken}`;
-          return instance(error.config);
-        } catch {
-          allClearPersistStore();
-          window.location.href = '/';
-        }
-      } else if (data.code === ResultCode.INVALID || data.code === ResultCode.FORBIDDEN) {
-        allClearPersistStore();
-        await alertStore.getState().showConfirmAlert({
-          title: '알림',
-          description: data.message,
-          size: 'sm',
-        });
-        window.location.href = '/';
-        throw error;
-      }
-    }
+    allClearPersistStore();
+    window.location.href = '/';
 
     throw error;
   }

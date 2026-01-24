@@ -18,3 +18,24 @@ export enum FlowType {
   Previous = 'previous',
   Next = 'next',
 }
+
+// HTTP 메소드 타입 정의
+export enum HttpMethod {
+  GET = 'GET',
+  POST = 'POST',
+  PUT = 'PUT',
+  PATCH = 'PATCH',
+  DELETE = 'DELETE',
+}
+
+export enum SocialProviderEnum {
+  KAKAO = 'kakao',
+  NAVER = 'naver',
+  GOOGLE = 'google',
+  NONE = 'none',
+}
+
+export enum RoleEnum {
+  ADMIN = 'ADMIN',
+  GENERAL = 'GENERAL',
+}

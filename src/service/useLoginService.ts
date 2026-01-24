@@ -15,6 +15,7 @@ const useLoginService = () => {
 
   const useRefreshAccessToken = () =>
     useMutation({
+      mutationKey: ['refreshAccessToken'],
       mutationFn: (param: RefreshAccessTokenRequest) => refreshAccessToken(param),
     });
 

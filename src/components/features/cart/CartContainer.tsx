@@ -19,7 +19,7 @@ const CartContainer = () => {
   const router = useRouter();
   const { forward } = useNativeRouter();
   const { cart: cartStore, setCart: setCartStore, _hasHydrated } = useCartStore();
-  const { isLogin, setRedirectUrl } = useLoginStore();
+  const { isLoggedIn, setRedirectUrl } = useLoginStore();
   const { showConfirmAlert } = useAlertStore();
   const [purchaseGuideModalOpen, setPurchaseGuideModalOpen] = useState<boolean>(false);
 
@@ -33,7 +33,7 @@ const CartContainer = () => {
   const { useCreatePaymentSessionMutation } = usePaymentService();
 
   const { data: cartListData, error: cartListError } = useGetCartListQuery({
-    enabled: isLogin,
+    enabled: isLoggedIn,
   });
 
   const { mutate: deleteCartMutate } = useDeleteCartMutation();
@@ -83,7 +83,7 @@ const CartContainer = () => {
 
     if (!confirmed) return;
 
-    if (isLogin) {
+    if (isLoggedIn) {
       deleteCartMutate({ cartId, optionId });
     } else {
       setCartStore(removeCartItem(cartStore, optionId, index));
@@ -117,7 +117,7 @@ const CartContainer = () => {
     if (!confirmed) return;
 
     const selectedCart = filter(cart, { checked: true });
-    if (isLogin) {
+    if (isLoggedIn) {
       deleteCartListMutate(map(selectedCart, 'productId'));
     } else {
       setCartStore(
@@ -138,7 +138,7 @@ const CartContainer = () => {
   ) => {
     const payload: AddToCartRequest = { productId, optionId, quantity: quantityDelta };
 
-    if (isLogin) {
+    if (isLoggedIn) {
       if (!isPendingAddToCart) addToCartAsync(payload);
     } else {
       const cloneCartStore = cloneDeep(cartStore);
@@ -163,7 +163,7 @@ const CartContainer = () => {
   };
 
   const moveToOrderPage = async () => {
-    if (!isLogin) {
+    if (!isLoggedIn) {
       setPurchaseGuideModalOpen(true);
       return;
     }
@@ -204,7 +204,7 @@ const CartContainer = () => {
   useEffect(() => {
     if (!_hasHydrated) return;
 
-    if (!isLogin) {
+    if (!isLoggedIn) {
       setCart(addCheckParamToCartList(cartStore));
       return;
     }
@@ -218,7 +218,7 @@ const CartContainer = () => {
       const { data } = cartListData;
       setCart(addCheckParamToCartList(data));
     }
-  }, [cartListData, isLogin, _hasHydrated]);
+  }, [cartListData, isLoggedIn, _hasHydrated]);
 
   useEffect(() => {
     router.prefetch('/payment');

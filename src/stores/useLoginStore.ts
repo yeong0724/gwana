@@ -1,80 +1,40 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { useShallow } from 'zustand/shallow';
 
-import { LoginInfo, UserStore } from '@/types';
+import { LoginStore, LoginStoreState } from '@/types';
+import { SocialProviderEnum } from '@/types/enum';
 
-export const initailState: LoginInfo = {
-  isLogin: false,
-  accessToken: '',
+export const initailLoginStoreState: LoginStoreState = {
+  isLoggedIn: false,
+  provider: SocialProviderEnum.NONE,
   redirectUrl: '/',
-  loginType: '',
-  user: {
-    email: '',
-    username: '',
-    userId: '',
-    customerKey: '',
-    phone: '',
-    profileImage: null,
-  },
 };
 
-type ExtendedUserStore = UserStore & {
-  _hasHydrated: boolean;
-  setHasHydrated: (hasHydrated: boolean) => void;
-};
-
-export const loginStore = create<ExtendedUserStore>()(
-  persist(
-    (set) => ({
-      loginInfo: initailState,
-      _hasHydrated: false,
-      setIsLogin: (isLogin: boolean) =>
-        set((state) => ({
-          loginInfo: { ...state.loginInfo, isLogin },
-        })),
-      setAccessToken: (accessToken: string) =>
-        set((state) => ({
-          loginInfo: { ...state.loginInfo, accessToken },
-        })),
-      setRedirectUrl: (redirectUrl: string) =>
-        set((state) => ({
-          loginInfo: { ...state.loginInfo, redirectUrl },
-        })),
-      setLoginInfo: (loginInfo: LoginInfo) => set({ loginInfo }),
-      clearLoginInfo: () => set({ loginInfo: initailState }),
-      setHasHydrated: (hasHydrated: boolean) => set({ _hasHydrated: hasHydrated }),
-    }),
-    {
-      name: 'login',
-      onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true);
-      },
-    }
-  )
-);
-
-export const loginActions = {
-  getLoginInfo: () => loginStore.getState().loginInfo,
-  setLoginInfo: (loginInfo: LoginInfo) => loginStore.getState().setLoginInfo(loginInfo),
-  clearLoginInfo: () => loginStore.getState().clearLoginInfo(),
-};
+export const loginStore = create<LoginStore>((set) => ({
+  ...initailLoginStoreState,
+  clearLogout: () => set({ ...initailLoginStoreState }),
+  setLogin: (loginInfo: LoginStoreState) => set({ ...loginInfo }),
+  setRedirectUrl: (redirectUrl: string) => set((state) => ({ ...state, redirectUrl })),
+}));
 
 const useLoginStore = () =>
   loginStore(
     useShallow((state) => ({
-      loginInfo: state.loginInfo,
-      isLogin: state.loginInfo.isLogin,
-      accessToken: state.loginInfo.accessToken,
-      user: state.loginInfo.user,
-      redirectUrl: state.loginInfo.redirectUrl,
-      _hasHydrated: state._hasHydrated,
-      setIsLogin: state.setIsLogin,
-      setAccessToken: state.setAccessToken,
+      isLoggedIn: state.isLoggedIn,
+      provider: state.provider,
+      redirectUrl: state.redirectUrl,
+      clearLogout: state.clearLogout,
+      setLogin: state.setLogin,
       setRedirectUrl: state.setRedirectUrl,
-      setLoginInfo: state.setLoginInfo,
-      clearLoginInfo: state.clearLoginInfo,
     }))
   );
+
+export const loginActions = {
+  clearLogout: () => loginStore.getState().clearLogout(),
+  getLogin: () => loginStore.getState().isLoggedIn,
+  getProvider: () => loginStore.getState().provider,
+  getRedirectUrl: () => loginStore.getState().redirectUrl,
+  setLogin: (loginInfo: LoginStoreState) => loginStore.getState().setLogin(loginInfo),
+};
 
 export default useLoginStore;

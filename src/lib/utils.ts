@@ -4,6 +4,8 @@ import { twMerge } from 'tailwind-merge';
 
 import { cartActions } from '@/stores/useCartStore';
 import { loginActions } from '@/stores/useLoginStore';
+import { userActions } from '@/stores/useUserStore';
+import { LoginResponse } from '@/types';
 import { DecodedToken, FormatEnum } from '@/types/type';
 
 export function cn(...inputs: ClassValue[]) {
@@ -74,7 +76,10 @@ const localeFormat = (price: number) => {
 
 const allClearPersistStore = () => {
   cartActions.clearCart();
-  loginActions.clearLoginInfo();
+  loginActions.clearLogout();
+  userActions.clearUser();
+
+  removeAccessToken();
 };
 
 const delayAsync = (delay: number = 1000): Promise<number> => {
@@ -86,13 +91,61 @@ const delayAsync = (delay: number = 1000): Promise<number> => {
 };
 
 const noMainHeaderPage = (pathname: string) => {
-  return some(['/cart', '/login', '/payment', '/fail', '/mypage', '/mypage/inquiry'], (path) => startsWith(pathname, path));
+  return some(['/cart', '/login', '/payment', '/fail', '/mypage', '/mypage/inquiry'], (path) =>
+    startsWith(pathname, path)
+  );
 };
 
 const getIsMobile = () => {
   const userAgent = navigator.userAgent;
   const isMobile = /mobile/i.test(userAgent);
   return isMobile;
+};
+
+const setAccessToken = (accessToken: string) => {
+  localStorage.setItem('accessToken', accessToken);
+};
+
+const getAccessToken = () => {
+  return localStorage.getItem('accessToken') || '';
+};
+
+const removeAccessToken = () => {
+  localStorage.removeItem('accessToken');
+};
+
+const renewLoginInfo = (refreshResponse: LoginResponse) => {
+  const {
+    accessToken,
+    provider,
+    customerKey,
+    email,
+    username,
+    phone,
+    profileImage,
+    zonecode,
+    roadAddress,
+    detailAddress,
+    role,
+  } = refreshResponse;
+
+  setAccessToken(accessToken);
+  userActions.setUser({
+    customerKey,
+    email,
+    username,
+    phone,
+    profileImage,
+    zonecode,
+    roadAddress,
+    detailAddress,
+    role,
+  });
+  loginActions.setLogin({
+    isLoggedIn: true,
+    provider,
+    redirectUrl: '/',
+  });
 };
 
 export {
@@ -106,4 +159,8 @@ export {
   delayAsync,
   noMainHeaderPage,
   getIsMobile,
+  setAccessToken,
+  getAccessToken,
+  removeAccessToken,
+  renewLoginInfo
 };

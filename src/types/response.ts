@@ -1,3 +1,19 @@
+import { RoleEnum, SocialProviderEnum } from '@/types';
+
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  data: T;
+  message?: string;
+  code: string;
+}
+
+export interface ErrorResponse {
+  success: boolean;
+  code: string;
+  message: string;
+  data: null;
+}
+
 export interface UserResponse {
   userId: string;
   username: string;
@@ -48,12 +64,16 @@ export type PaymentSessionResponse = {
 
 export interface LoginResponse {
   accessToken: string;
-  userId: string;
+  provider: SocialProviderEnum;
+  customerKey: string;
   username: string;
   email: string;
-  customerKey: string;
   phone: string;
-  loginType: 'kakao' | 'naver' | 'google' | '';
+  profileImage: string | null;
+  zonecode: string | null;
+  roadAddress: string | null;
+  detailAddress: string | null;
+  role: RoleEnum;
 }
 
 export interface RequestPaymentApproveResponse {

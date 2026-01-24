@@ -72,3 +72,9 @@ export interface UpdateCartRequest {
   optionId: string | null;
   quantity: number;
 }
+
+export interface RefreshAccessTokenRequest {
+  accessToken: string;
+}
+
+

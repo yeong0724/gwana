@@ -1,19 +1,19 @@
 'use client';
 
-import { allClearPersistStore } from '@/lib/utils';
-import { useLoginService } from '@/service';
-import { useLoginStore } from '@/stores';
 import { useRouter } from 'next/navigation';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
+
+import { allClearPersistStore, getAccessToken } from '@/lib/utils';
+import { useLoginService } from '@/service';
 
 const KakaoLogoutRedirect = () => {
   const router = useRouter();
-  const { accessToken } = useLoginStore();
   const { useKakaoLogout } = useLoginService();
 
   const { mutate: kakaoLogoutMutate, isPending } = useKakaoLogout();
 
   const callbackKakaoLogout = () => {
+    const accessToken = getAccessToken();
     kakaoLogoutMutate(
       { accessToken },
       {

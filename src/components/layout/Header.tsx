@@ -35,7 +35,7 @@ const Header = ({ menuGroup }: HeaderProps) => {
   const router = useRouter();
   const { backward } = useNativeRouter();
   const { setMenu } = useMenuStore();
-  const { isLogin } = useLoginStore();
+  const { isLoggedIn } = useLoginStore();
   const { cart } = useCartStore();
 
   const { useGetCartListQuery } = useCartService();
@@ -45,15 +45,15 @@ const Header = ({ menuGroup }: HeaderProps) => {
   const [isMainHovered, setIsMainHovered] = useState<boolean>(false);
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
 
-  const { data: cartListData } = useGetCartListQuery({ enabled: isLogin });
+  const { data: cartListData } = useGetCartListQuery({ enabled: isLoggedIn });
 
   const cartCount = useMemo(() => {
-    if (isLogin && cartListData) {
+    if (isLoggedIn && cartListData) {
       return size(cartListData.data);
     }
 
     return size(cart);
-  }, [cart, cartListData, isLogin]);
+  }, [cart, cartListData, isLoggedIn]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -177,8 +177,8 @@ const Header = ({ menuGroup }: HeaderProps) => {
         {/* 카테고리 배경 영역 - 카테고리가 있는 메뉴에 마우스를 올렸을 때만 표시 */}
         <div
           className={`absolute left-0 right-0 top-full bg-white border-t border-gray-100 shadow-xl transition-all duration-500 ease-in-out origin-top z-10 ${isHeaderHovered && isMainHovered
-              ? 'scale-y-100 opacity-100 visible'
-              : 'scale-y-0 opacity-0 invisible'
+            ? 'scale-y-100 opacity-100 visible'
+            : 'scale-y-0 opacity-0 invisible'
             }`}
           style={{ height: '180px' }}
         />
@@ -236,8 +236,8 @@ const Header = ({ menuGroup }: HeaderProps) => {
                       {/* 카테고리 드롭다운 - 해당 메인 메뉴에 호버시에만 표시 */}
                       <div
                         className={`absolute top-full pt-5 flex flex-col items-center space-y-3 z-30 transition-all duration-500 ease-in-out origin-top ${isHeaderHovered && isMainHovered
-                            ? 'scale-y-100 opacity-100 visible'
-                            : 'scale-y-0 opacity-0 invisible'
+                          ? 'scale-y-100 opacity-100 visible'
+                          : 'scale-y-0 opacity-0 invisible'
                           }`}
                         onMouseEnter={() => setIsMainHovered(true)}
                       >
@@ -268,7 +268,7 @@ const Header = ({ menuGroup }: HeaderProps) => {
                   {cartCount > 99 ? '99+' : cartCount}
                 </span>
               </button>
-              {isLogin ? (
+              {isLoggedIn ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="text-black cursor-pointer hover:text-gray-400 transition-all p-3 lg:p-4 xl:p-5 duration-500">

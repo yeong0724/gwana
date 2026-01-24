@@ -1,6 +1,6 @@
 'use client';
 
-import { useLoginStore } from '@/stores';
+import { useLoginStore, useUserStore } from '@/stores';
 import { MenuGroup } from '@/types';
 import { concat, filter, isEmpty } from 'lodash-es';
 import { ChevronDown, ChevronRight, LogOut, User, X } from 'lucide-react';
@@ -18,7 +18,8 @@ type Props = {
 const Navigation = ({ isMenuOpen, moveToLoginPage, toggleMenu, menuGroup }: Props) => {
   const router = useRouter();
   const { main, category } = menuGroup;
-  const { isLogin, user } = useLoginStore();
+  const { isLoggedIn } = useLoginStore();
+  const { user } = useUserStore();
 
   const [currentMenu, setCurrentMenu] = useState<string>('');
 
@@ -101,7 +102,7 @@ const Navigation = ({ isMenuOpen, moveToLoginPage, toggleMenu, menuGroup }: Prop
       >
         {/* 사이드바 헤더 */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
-          {isLogin ? (
+          {isLoggedIn ? (
             <button
               onClick={moveToHome}
               className="flex items-center hover:bg-gray-100 rounded-md transition-colors cursor-pointer p-2"
@@ -193,7 +194,7 @@ const Navigation = ({ isMenuOpen, moveToLoginPage, toggleMenu, menuGroup }: Prop
                 >
                   마이페이지
                 </button>
-                {isLogin && (
+                {isLoggedIn && (
                   <>
                     <span className="text-gray-300 mx-5">|</span>
                     <button

@@ -8,16 +8,16 @@ const getAccessTokenByKakaoCode = async <T>(params: T) => {
   });
 };
 
-const fetchLogin = async <T, V>(params: V) => {
-  return postAxios<T>({
-    url: '/user/signin',
+const refreshAccessToken = async <T>(params: T) => {
+  return postAxios<ApiResponse<LoginResponse>>({
+    url: '/user/refresh/token',
     params,
   });
 };
 
-const refreshAccessToken = async <T>(params: T) => {
-  return postAxios<ApiResponse<string>>({
-    url: '/user/refresh/token',
+const fetchLogin = async <T, V>(params: V) => {
+  return postAxios<T>({
+    url: '/user/signin',
     params,
   });
 };

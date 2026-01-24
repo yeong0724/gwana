@@ -1,8 +1,10 @@
 'use client';
 
-import { useLoginStore } from '@/stores';
-import { loadTossPayments, TossPaymentsWidgets } from '@tosspayments/tosspayments-sdk';
 import { useEffect } from 'react';
+
+import { loadTossPayments, TossPaymentsWidgets } from '@tosspayments/tosspayments-sdk';
+
+import { useUserStore } from '@/stores';
 
 type TossPaymentsProps = {
   widgets: TossPaymentsWidgets | null;
@@ -11,8 +13,8 @@ type TossPaymentsProps = {
 };
 
 export default function TossPayments({ widgets, setWidgets, setReady }: TossPaymentsProps) {
-  const { loginInfo } = useLoginStore();
-  const { customerKey } = loginInfo.user;
+  const { user } = useUserStore();
+  const { customerKey } = user;
 
   useEffect(() => {
     if (!customerKey) return;

@@ -40,7 +40,7 @@ export const cartActions = {
   cart: () => cartStore.getState().cart,
 };
 
-const useAlertStore = () =>
+const useCartStore = () =>
   cartStore(
     useShallow((state) => ({
       cart: state.cart,
@@ -51,4 +51,4 @@ const useAlertStore = () =>
     }))
   );
 
-export default useAlertStore;
+export default useCartStore;

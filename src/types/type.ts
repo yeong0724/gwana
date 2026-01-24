@@ -1,6 +1,7 @@
 import { ChangeEvent } from 'react';
 
 import { FieldPath, FieldPathValue, FieldValues } from 'react-hook-form';
+import { RoleEnum } from '@/types';
 
 export type HandleChange<T, V> = (
   event: ChangeEvent<T> | null,
@@ -60,3 +61,15 @@ export type CurrentMenu = {
   mainMenuId: string;
   categoryMenuId: string;
 };
+
+export interface User {
+  customerKey: string;
+  email: string;
+  username: string;
+  phone: string;
+  profileImage: string | null;
+  zonecode: string | null;
+  roadAddress: string | null;
+  detailAddress: string | null;
+  role: RoleEnum;
+}
