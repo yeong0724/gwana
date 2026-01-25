@@ -1,7 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
 
 import { ChevronRight, MessageCircleQuestion, PenLine, Search } from 'lucide-react';
 
@@ -11,11 +11,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import useNativeRouter from '@/hooks/useNativeRouter';
 import { formatDate } from '@/lib/utils';
 import { useMypageService } from '@/service';
-import { Inquiry, YesOrNoEnum } from '@/types';
+import { Inquiry, InquiryListSearchRequest, YesOrNoEnum } from '@/types';
 
 type SearchParams = {
   startDate: Date | undefined;
   endDate: Date | undefined;
+  isChanged: boolean;
 };
 
 const InquiryContainer = () => {
@@ -25,20 +26,19 @@ const InquiryContainer = () => {
   const [searchDate, setSearchDate] = useState<SearchParams>({
     startDate: undefined,
     endDate: undefined,
+    isChanged: false,
   });
 
-  const searchPayload = useMemo(
-    () => ({
-      startDate: formatDate(searchDate.startDate),
-      endDate: formatDate(searchDate.endDate),
-    }),
-    [searchDate]
-  );
+  const [searchPayload, setSearchPayload] = useState<InquiryListSearchRequest>({
+    startDate: null,
+    endDate: null,
+  });
+
   const [inquiryList, setInquiryList] = useState<Inquiry[]>([]);
 
   const { useGetInquiryListQuery } = useMypageService();
   const { data: inquiryListData, refetch } = useGetInquiryListQuery(searchPayload, {
-    enabled: false,
+    enabled: true,
   });
 
   const handleWriteInquiry = () => {
@@ -46,11 +46,20 @@ const InquiryContainer = () => {
   };
 
   const onChangeSearchParams = (name: string, value: Date | undefined) => {
-    setSearchDate((prev) => ({ ...prev, [name]: value }));
+    setSearchDate((prev) => ({ ...prev, [name]: value, isChanged: true }));
   };
 
   const onSearch = () => {
-    refetch();
+    if (searchDate.isChanged) {
+      setSearchPayload({
+        startDate: formatDate(searchDate.startDate),
+        endDate: formatDate(searchDate.endDate),
+      });
+    } else {
+      refetch();
+    }
+
+    setSearchDate((prev) => ({ ...prev, isChanged: true }));
   };
 
   useEffect(() => {
@@ -138,8 +147,8 @@ const InquiryContainer = () => {
                         <span className="text-sm text-gray-400">{createdAt}</span>
                         <span
                           className={`text-xs px-2 py-0.5 rounded-full font-medium ${isAnswered === YesOrNoEnum.YES
-                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
-                            : 'bg-amber-50 text-amber-600 border border-amber-100'
+                              ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                              : 'bg-amber-50 text-amber-600 border border-amber-100'
                             }`}
                         >
                           {isAnswered === YesOrNoEnum.YES ? '답변완료' : '답변 대기중'}

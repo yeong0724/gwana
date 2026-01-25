@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 import TiptapEditor from '@/components/common/editor';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import useNativeRouter from '@/hooks/useNativeRouter';
 import { validateByType } from '@/lib/utils';
 import { useMypageService } from '@/service';
 import { useAlertStore } from '@/stores';
@@ -13,7 +13,7 @@ import { YesOrNoEnum } from '@/types/enum';
 import { CreateInquiryRequest } from '@/types/request';
 
 const InquiryWriteContainer = () => {
-  const router = useRouter();
+  const { backward } = useNativeRouter();
   const { showAlert, showConfirmAlert } = useAlertStore();
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
@@ -53,7 +53,7 @@ const InquiryWriteContainer = () => {
           description: '문의가 제출되었습니다.',
         });
 
-        router.back();
+        backward();
       },
       onError: (error) => {
         console.error(error);
