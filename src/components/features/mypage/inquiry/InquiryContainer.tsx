@@ -12,6 +12,7 @@ import useNativeRouter from '@/hooks/useNativeRouter';
 import { formatDate } from '@/lib/utils';
 import { useMypageService } from '@/service';
 import { Inquiry, InquiryListSearchRequest, YesOrNoEnum } from '@/types';
+import { forEach } from 'lodash-es';
 
 type SearchParams = {
   startDate: Date | undefined;
@@ -74,7 +75,11 @@ const InquiryContainer = () => {
 
   useEffect(() => {
     router.prefetch('/mypage/inquiry/write');
-  }, []);
+
+    forEach(inquiryList, ({ inquiryId }) => {
+      router.prefetch(`/mypage/inquiry/${inquiryId.toString()}`);
+    });
+  }, [inquiryList]);
 
   return (
     <div className="bg-white h-[calc(100dvh-56px)] flex flex-col overflow-hidden">
