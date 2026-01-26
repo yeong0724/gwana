@@ -145,7 +145,6 @@ export type Cart = {
 
 export type CartState = Cart & { checked: boolean };
 
-
 export interface UpdateMyinfoResponse {
   phone: string;
   profileImage: string | null;
@@ -165,4 +164,9 @@ export type Inquiry = {
   createdAt: string;
   createdBy: string;
   username: string;
+  answer: {
+    title: string;
+    content: string;
+    createdAt: string;
+  };
 };

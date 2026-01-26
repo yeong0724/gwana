@@ -34,6 +34,11 @@ const InquiryDetailContainer = ({ inquiryId }: Props) => {
     createdAt: '',
     createdBy: '',
     username: '',
+    answer: {
+      title: '',
+      content: '',
+      createdAt: '',
+    },
   });
 
   useEffect(() => {
@@ -80,12 +85,54 @@ const InquiryDetailContainer = ({ inquiryId }: Props) => {
         {/* 구분선 */}
         <div className="w-[90%] mx-auto border-t border-gray-200" />
 
-        {/* 문의 내용 영역 */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-4 py-3">
-          <div
-            className="text-gray-700 leading-relaxed whitespace-pre-wrap break-words"
-            dangerouslySetInnerHTML={{ __html: getCleanHtmlContent(content) }}
-          />
+        {/* 문의 내용 + 답변 영역 (스크롤 가능) */}
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          {/* 문의 내용 */}
+          <div className="px-4 py-3">
+            <div
+              className="text-gray-700 leading-relaxed whitespace-pre-wrap break-words"
+              dangerouslySetInnerHTML={{ __html: getCleanHtmlContent(content) }}
+            />
+          </div>
+
+          {/* 답변 내용 - 답변완료일 때만 표시 */}
+          {isAnswered === YesOrNoEnum.YES && inquiry.answer && (
+            <>
+              {/* 두꺼운 border 구분선 */}
+              <div className="w-full border-t-[1px] border-gray-200" />
+
+              {/* 답변 헤더 영역 - 문의와 동일한 구조 */}
+              <div className="px-3 py-3">
+                {/* 답변 뱃지 + 제목 */}
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="shrink-0 text-[11px] px-2 py-1 rounded-full font-medium border bg-amber-50 text-amber-600 border-amber-200">
+                    답변
+                  </span>
+                  {inquiry.answer.title && (
+                    <div className="text-[14px] font-semibold text-gray-700 break-words">
+                      {inquiry.answer.title}
+                    </div>
+                  )}
+                </div>
+
+                {/* 작성일 */}
+                <div className="text-gray-500 text-[12px] px-1">
+                  {inquiry.answer.createdAt}
+                </div>
+              </div>
+
+              {/* 구분선 */}
+              <div className="w-[92%] mx-auto border-t border-gray-200" />
+
+              {/* 답변 내용 */}
+              <div className="px-4 py-3">
+                <div
+                  className="text-gray-700 leading-relaxed whitespace-pre-wrap break-words"
+                  dangerouslySetInnerHTML={{ __html: getCleanHtmlContent(inquiry.answer.content) }}
+                />
+              </div>
+            </>
+          )}
         </div>
 
         {/* 답변하기 버튼 - ADMIN만 표시, 하단 고정 */}
