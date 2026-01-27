@@ -1,4 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
+import DOMPurify from 'dompurify';
 import { some, startsWith } from 'lodash-es';
 import { twMerge } from 'tailwind-merge';
 
@@ -7,9 +10,6 @@ import { loginActions } from '@/stores/useLoginStore';
 import { userActions } from '@/stores/useUserStore';
 import { LoginResponse } from '@/types';
 import { DecodedToken, FormatEnum } from '@/types/type';
-import { ko } from 'date-fns/locale';
-import { format } from 'date-fns';
-import DOMPurify from 'dompurify';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -21,9 +21,9 @@ const getRegexpByType = (type: FormatEnum = 'text') => {
     case 'tel':
       return /^[0-9]+$/g;
     case 'text':
-      return /^[가-힣ㄱ-ㅎㅏ-ㅣ·a-zA-Z\s0-9]+$/;
+      return /^[가-힣ㄱ-ㅎㅏ-ㅣ·:a-zA-Z\s0-9]+$/;
     case 'alphanumericWithSymbols':
-      return /^[a-zA-Zㄱ-ㅎㅏ-ㅣㆍ가-힣0-9~?\-_!^.,·\s()]*$/;
+      return /^[a-zA-Zㄱ-ㅎㅏ-ㅣㆍ가-힣0-9~?\-_!^.,·:\s()]*$/;
   }
 };
 
@@ -191,5 +191,5 @@ export {
   getRedirectUrl,
   setRedirectUrl,
   formatDate,
-  getCleanHtmlContent
+  getCleanHtmlContent,
 };

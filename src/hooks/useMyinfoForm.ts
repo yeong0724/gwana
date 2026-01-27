@@ -49,15 +49,7 @@ const useMyinfoForm = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      const {
-        email,
-        username,
-        phone,
-        profileImage,
-        zonecode,
-        roadAddress,
-        detailAddress,
-      } = user;
+      const { email, username, phone, profileImage, zonecode, roadAddress, detailAddress } = user;
 
       setValue('profileImage', profileImage ?? null);
       setValue('email', email);
@@ -69,7 +61,7 @@ const useMyinfoForm = () => {
       setValue('roadAddress', roadAddress ?? '');
       setValue('detailAddress', detailAddress ?? '');
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, user]);
 
   return { form, setValue, handleSubmit, clearErrors, errors, watch };
 };
