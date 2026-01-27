@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent } from 'react';
 
 import { isEmpty } from 'lodash-es';
 import {
@@ -39,7 +39,6 @@ const ControllerInput = <T extends FieldValues>({
   callbackFn?: HandleChange<HTMLInputElement, FieldPathValue<T, FieldPath<T>>> | null;
   inputRef?: (el: HTMLInputElement | null) => void;
 }) => {
-  const [composingValue, setComposingValue] = useState<string | null>(null);
   const { setValue, control, clearErrors } = useFormContext<T>();
 
   const {
@@ -61,11 +60,6 @@ const ControllerInput = <T extends FieldValues>({
   const onChangeHandler = (event: ChangeEvent<ReactHookFormEventType<T> & HTMLInputElement>) => {
     const inputValue = event.target.value;
 
-    if ((event.nativeEvent as KeyboardEvent).isComposing) {
-      setComposingValue(inputValue);
-      return;
-    }
-
     const value = onFilterValue(inputValue) as FieldPathValue<T, FieldPath<T>>;
 
     if (callbackFn) {
@@ -81,8 +75,6 @@ const ControllerInput = <T extends FieldValues>({
       shouldDirty: false,
       shouldValidate: required, // required가 false면 검증하지 않음
     });
-
-    setComposingValue(null);
   };
 
   return (
@@ -91,9 +83,8 @@ const ControllerInput = <T extends FieldValues>({
         ref={inputRef}
         name={name}
         placeholder={placeholder}
-        value={composingValue || field.value}
+        value={field.value}
         onChange={onChangeHandler}
-        // onFocus={handleFocus}
         className={`${className} outline-none ${error?.message ? '!border-red-500 focus:!border-red-500' : ''} ${disabled ? 'bg-gray-100 text-gray-300 cursor-not-allowed' : ''}`}
         readOnly={readOnly}
         disabled={disabled}
