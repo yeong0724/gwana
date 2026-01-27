@@ -104,6 +104,7 @@ const InquiryContainer = () => {
               onSelectDate={onChangeSearchParams}
               placeholder="시작일"
               align="start"
+              captionLayout="dropdown"
               disabled={searchDate.endDate ? (date) => date > searchDate.endDate! : undefined}
               useReset
             />
@@ -119,6 +120,7 @@ const InquiryContainer = () => {
               onSelectDate={onChangeSearchParams}
               align="end"
               placeholder="종료일"
+              captionLayout="dropdown"
               disabled={searchDate.startDate ? (date) => date < searchDate.startDate! : undefined}
               useReset
             />

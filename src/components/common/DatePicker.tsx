@@ -1,12 +1,12 @@
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { Matcher } from 'react-day-picker';
+import { CalendarIcon } from 'lucide-react';
+import { DayPickerProps, Matcher } from 'react-day-picker';
 
 import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 type DatePickerProps = {
   /** 필드 이름 (콜백에서 구분 용도) */
@@ -25,6 +25,7 @@ type DatePickerProps = {
   className?: string;
   /** 초기화 버튼 표출 여부 */
   useReset?: boolean;
+  captionLayout?: DayPickerProps['captionLayout'];
 };
 
 const DatePicker = ({
@@ -36,6 +37,7 @@ const DatePicker = ({
   align = 'start',
   className,
   useReset = false,
+  captionLayout = 'label',
 }: DatePickerProps) => {
   const handleSelect = (date: Date | undefined) => {
     onSelectDate?.(name, date);
@@ -59,6 +61,7 @@ const DatePicker = ({
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align={align}>
         <Calendar
+          captionLayout={captionLayout}
           mode="single"
           selected={value}
           onSelect={handleSelect}
@@ -66,6 +69,7 @@ const DatePicker = ({
           disabled={disabled}
           useReset={useReset}
           onReset={() => handleSelect(undefined)}
+          defaultMonth={value}
           initialFocus
         />
       </PopoverContent>
