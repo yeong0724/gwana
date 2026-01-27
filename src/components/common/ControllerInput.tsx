@@ -50,11 +50,11 @@ const ControllerInput = <T extends FieldValues>({
   });
 
   const onFilterValue = (event: ChangeEvent<ReactHookFormEventType<T>>) => {
-    if ((event.nativeEvent as KeyboardEvent).isComposing) {
+    const { value } = event.target;
+
+    if ((event.nativeEvent as KeyboardEvent).isComposing && value) {
       return null;
     }
-
-    const { value } = event.target;
 
     const REG_EXP = getRegexpByType(type);
     if (!value || REG_EXP.test(value)) {

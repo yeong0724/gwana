@@ -1,25 +1,31 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-import { MessageSquareReply } from "lucide-react";
+import { MessageSquareReply } from 'lucide-react';
 
-import { getCleanHtmlContent } from "@/lib/utils";
-import { useMypageService } from "@/service";
-import { useUserStore } from "@/stores";
-import { Inquiry, ResultCode, RoleEnum, YesOrNoEnum } from "@/types";
-import useNativeRouter from "@/hooks/useNativeRouter";
+import useNativeRouter from '@/hooks/useNativeRouter';
+import { getCleanHtmlContent } from '@/lib/utils';
+import { useMypageService } from '@/service';
+import { useLoginStore, useUserStore } from '@/stores';
+import { Inquiry, ResultCode, RoleEnum, YesOrNoEnum } from '@/types';
 
 type Props = {
   inquiryId: string;
 };
 
 const InquiryDetailContainer = ({ inquiryId }: Props) => {
+  const router = useRouter();
   const { forward } = useNativeRouter();
+  const { isLoggedIn } = useLoginStore();
   const { user } = useUserStore();
 
   const { useGetInquiryQuery } = useMypageService();
-  const { data: inquiryData } = useGetInquiryQuery({ inquiryId }, { enabled: !!inquiryId });
+  const { data: inquiryData } = useGetInquiryQuery(
+    { inquiryId },
+    { enabled: !!inquiryId && isLoggedIn }
+  );
 
   const isAdmin = useMemo(() => user.role === RoleEnum.ADMIN, [user]);
 
@@ -41,6 +47,10 @@ const InquiryDetailContainer = ({ inquiryId }: Props) => {
     },
   });
 
+  const moveToInquiryWritePage = () => {
+    forward(`/mypage/inquiry/write?inquiryId=${inquiryId}`);
+  };
+
   useEffect(() => {
     if (inquiryData) {
       const { code, data } = inquiryData;
@@ -50,10 +60,13 @@ const InquiryDetailContainer = ({ inquiryId }: Props) => {
     }
   }, [inquiryData]);
 
-  const moveToInquiryWritePage = () => {
-    forward(`/mypage/inquiry/write?inquiryId=${inquiryId}`);
-  };
+  useEffect(() => {
+    router.prefetch('/mypage/inquiry/write');
+  }, [router]);
 
+  /**
+   * 문의내용
+   */
   const { title, content, isAnswered, createdAt, username } = inquiry;
 
   return (
@@ -64,16 +77,15 @@ const InquiryDetailContainer = ({ inquiryId }: Props) => {
           {/* 답변 상태 뱃지 + 제목 */}
           <div className="flex items-center gap-3 mb-3">
             <span
-              className={`shrink-0 text-[10px] px-2 py-1 rounded-full font-medium border ${isAnswered === YesOrNoEnum.YES
-                ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
-                : 'bg-amber-50 text-amber-600 border-amber-200'
-                }`}
+              className={`shrink-0 text-[10px] px-2 py-1 rounded-full font-medium border ${
+                isAnswered === YesOrNoEnum.YES
+                  ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                  : 'bg-amber-50 text-amber-600 border-amber-200'
+              }`}
             >
               {isAnswered === YesOrNoEnum.YES ? '답변완료' : '답변대기'}
             </span>
-            <div className="text-[14px] font-semibold text-gray-700 break-words">
-              {title}
-            </div>
+            <div className="text-[14px] font-semibold text-gray-700 break-words">{title}</div>
           </div>
 
           {/* 작성일 | 작성자 */}
@@ -116,9 +128,7 @@ const InquiryDetailContainer = ({ inquiryId }: Props) => {
                 </div>
 
                 {/* 작성일 */}
-                <div className="text-gray-500 text-[12px] px-1">
-                  {inquiry.answer.createdAt}
-                </div>
+                <div className="text-gray-500 text-[12px] px-1">{inquiry.answer.createdAt}</div>
               </div>
 
               {/* 구분선 */}

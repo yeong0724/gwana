@@ -29,7 +29,7 @@ const InquiryWriteContainer = ({ inquiryId }: Props) => {
   const { mutate: createInquiry } = useCreateInquiryMutation();
 
   const isAdmin = useMemo(() => {
-    if (user.role === RoleEnum.ADMIN) {
+    if (user.role === RoleEnum.ADMIN && inquiryId) {
       setTitle('안녕하세요 고객님. 답변 드립니다.');
       return true;
     }
@@ -113,14 +113,16 @@ const InquiryWriteContainer = ({ inquiryId }: Props) => {
       {/* 하단 안내 영역 */}
       <div className="flex shrink-0 items-center justify-between border-x border-b border-gray-200 bg-gray-50/50 px-4 py-2.5">
         <p className="text-[13px] text-gray-400">이미지는 최대 5MB까지 첨부 가능합니다</p>
-        {!isAdmin && <label className="flex cursor-pointer items-center gap-1.5">
-          <Checkbox
-            id="isSecret"
-            checked={isSecret === 'Y'}
-            onCheckedChange={(checked) => setIsSecret(checked ? YesOrNoEnum.YES : YesOrNoEnum.NO)}
-          />
-          <span className="text-[14px] text-gray-600">비밀글로 작성</span>
-        </label>}
+        {!isAdmin && (
+          <label className="flex cursor-pointer items-center gap-1.5">
+            <Checkbox
+              id="isSecret"
+              checked={isSecret === 'Y'}
+              onCheckedChange={(checked) => setIsSecret(checked ? YesOrNoEnum.YES : YesOrNoEnum.NO)}
+            />
+            <span className="text-[14px] text-gray-600">비밀글로 작성</span>
+          </label>
+        )}
       </div>
     </div>
   );

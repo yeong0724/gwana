@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { forEach } from 'lodash-es';
 import { ChevronRight, MessageCircleQuestion, PenLine, Search } from 'lucide-react';
 
 import DatePicker from '@/components/common/DatePicker';
@@ -11,8 +12,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import useNativeRouter from '@/hooks/useNativeRouter';
 import { formatDate } from '@/lib/utils';
 import { useMypageService } from '@/service';
+import { useLoginStore } from '@/stores';
 import { Inquiry, InquiryListSearchRequest, YesOrNoEnum } from '@/types';
-import { forEach } from 'lodash-es';
 
 type SearchParams = {
   startDate: Date | undefined;
@@ -21,8 +22,9 @@ type SearchParams = {
 };
 
 const InquiryContainer = () => {
-  const { forward } = useNativeRouter();
   const router = useRouter();
+  const { forward } = useNativeRouter();
+  const { isLoggedIn } = useLoginStore();
 
   const [searchDate, setSearchDate] = useState<SearchParams>({
     startDate: undefined,
@@ -39,7 +41,7 @@ const InquiryContainer = () => {
 
   const { useGetInquiryListQuery } = useMypageService();
   const { data: inquiryListData, refetch } = useGetInquiryListQuery(searchPayload, {
-    enabled: true,
+    enabled: isLoggedIn,
   });
 
   const moveToInquiryWritePage = () => {
@@ -157,10 +159,11 @@ const InquiryContainer = () => {
                       <div className="flex items-center gap-2 mt-1.5">
                         <span className="text-[12px] text-gray-400">{createdAt}</span>
                         <span
-                          className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${isAnswered === YesOrNoEnum.YES
-                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
-                            : 'bg-amber-50 text-amber-600 border border-amber-100'
-                            }`}
+                          className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                            isAnswered === YesOrNoEnum.YES
+                              ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                              : 'bg-amber-50 text-amber-600 border border-amber-100'
+                          }`}
                         >
                           {isAnswered === YesOrNoEnum.YES ? '답변완료' : '답변 대기중'}
                         </span>
