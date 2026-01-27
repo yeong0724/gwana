@@ -1,4 +1,4 @@
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useState } from 'react';
 
 import { isEmpty } from 'lodash-es';
 import {
@@ -39,6 +39,8 @@ const ControllerInput = <T extends FieldValues>({
   callbackFn?: HandleChange<HTMLInputElement, FieldPathValue<T, FieldPath<T>>> | null;
   inputRef?: (el: HTMLInputElement | null) => void;
 }) => {
+  const [isComposing, setIsComposing] = useState<boolean>(false);
+
   const { setValue, control, clearErrors } = useFormContext<T>();
 
   const {
@@ -82,7 +84,7 @@ const ControllerInput = <T extends FieldValues>({
       <input
         ref={inputRef}
         name={name}
-        placeholder={placeholder}
+        placeholder={isComposing ? '' : placeholder}
         value={field.value}
         onChange={onChangeHandler}
         className={`${className} outline-none ${error?.message ? '!border-red-500 focus:!border-red-500' : ''} ${disabled ? 'bg-gray-100 text-gray-300 cursor-not-allowed' : ''}`}
@@ -90,6 +92,8 @@ const ControllerInput = <T extends FieldValues>({
         disabled={disabled}
         type={type}
         maxLength={maxLength}
+        onCompositionStart={() => setIsComposing(true)}
+        onCompositionEnd={() => setIsComposing(false)}
       />
       {!disableErrorMessage && error?.message && (
         <div className="text-red-500 pt-1 pl-2 text-[12px] sm:text-[8px]">{error.message}</div>
