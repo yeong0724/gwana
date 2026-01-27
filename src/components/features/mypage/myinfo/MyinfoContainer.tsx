@@ -5,6 +5,7 @@ import { ChangeEvent, useRef, useState } from 'react';
 import { Camera, PenLine, X } from 'lucide-react';
 import DaumPostcode, { Address } from 'react-daum-postcode';
 import { FieldErrors, FormProvider } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import ControllerInput from '@/components/common/ControllerInput';
 import SearchPostcodeModal from '@/components/common/modal/SearchPostcodeModal';
@@ -14,7 +15,6 @@ import { getIsMobile } from '@/lib/utils';
 import { useMypageService } from '@/service';
 import { useAlertStore, useUserStore } from '@/stores';
 import { MyinfoForm, ResultCode, UpdateMyinfoRequest } from '@/types';
-import { toast } from 'sonner';
 
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_FILE_SIZE = 2;
@@ -23,7 +23,7 @@ const MyinfoContainer = () => {
   const awsS3Domain = process.env.NEXT_PUBLIC_AWS_S3_DOMAIN || '';
   const isMobile = getIsMobile();
 
-  const { showAlert } = useAlertStore();
+  const { showAlert, showConfirmAlert } = useAlertStore();
   const { setUser } = useUserStore();
 
   const { form, setValue, handleSubmit, clearErrors, errors, watch } = useMyinfoForm();
@@ -105,7 +105,8 @@ const MyinfoContainer = () => {
   };
 
   const onSubmit = async (values: MyinfoForm) => {
-    const { email, phoneFirst, phoneMiddle, phoneLast, zonecode, roadAddress, detailAddress } = values;
+    const { email, phoneFirst, phoneMiddle, phoneLast, zonecode, roadAddress, detailAddress } =
+      values;
     const payload: UpdateMyinfoRequest = {
       email,
       zonecode,
@@ -114,6 +115,13 @@ const MyinfoContainer = () => {
       profileImage,
       phone: `${phoneFirst}${phoneMiddle}${phoneLast}`,
     };
+
+    const confirm = await showConfirmAlert({
+      title: '안내',
+      description: '회원 정보를 수정하시겠습니까?',
+    });
+
+    if (!confirm) return;
 
     if (selectedProfileImageFile) {
       const formData = new FormData();
@@ -130,10 +138,10 @@ const MyinfoContainer = () => {
       onSuccess: ({ code, data }) => {
         if (code === ResultCode.SUCCESS) {
           toast.success('회원정보가 수정되었습니다.');
-          setUser(data)
+          setUser(data);
         }
       },
-    })
+    });
   };
 
   const onError = (errors: FieldErrors<MyinfoForm>) => {
@@ -174,7 +182,9 @@ const MyinfoContainer = () => {
                     <div className="w-28 h-28 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200">
                       {!previewImg && !profileImage ? (
                         <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                          <span className="text-gray-400 text-4xl font-bold">{watch("username")?.substring(1, 3)}</span>
+                          <span className="text-gray-400 text-4xl font-bold">
+                            {watch('username')?.substring(1, 3)}
+                          </span>
                         </div>
                       ) : (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -273,10 +283,11 @@ const MyinfoContainer = () => {
                     />
                   </div>
                   <span
-                    className={`pl-2 text-[12px] sm:text-[8px] block ${errors.phoneFirst || errors.phoneMiddle || errors.phoneLast
-                      ? 'text-red-500'
-                      : 'invisible'
-                      }`}
+                    className={`pl-2 text-[12px] sm:text-[8px] block ${
+                      errors.phoneFirst || errors.phoneMiddle || errors.phoneLast
+                        ? 'text-red-500'
+                        : 'invisible'
+                    }`}
                   >
                     휴대폰 번호를 입력해주세요
                   </span>

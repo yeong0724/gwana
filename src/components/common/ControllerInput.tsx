@@ -1,4 +1,4 @@
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useState } from 'react';
 
 import { isEmpty } from 'lodash-es';
 import {
@@ -39,6 +39,8 @@ const ControllerInput = <T extends FieldValues>({
   callbackFn?: HandleChange<HTMLInputElement, FieldPathValue<T, FieldPath<T>>> | null;
   inputRef?: (el: HTMLInputElement | null) => void;
 }) => {
+  const [showPlaceholder, setShowPlaceholder] = useState<boolean>(true);
+
   const { setValue, control, clearErrors } = useFormContext<T>();
 
   const {
@@ -59,6 +61,9 @@ const ControllerInput = <T extends FieldValues>({
 
   const onChangeHandler = (event: ChangeEvent<ReactHookFormEventType<T> & HTMLInputElement>) => {
     const inputValue = event.target.value;
+
+    if (inputValue) setShowPlaceholder(false);
+    else setShowPlaceholder(true);
 
     const value = onFilterValue(inputValue) as FieldPathValue<T, FieldPath<T>>;
 
@@ -82,7 +87,7 @@ const ControllerInput = <T extends FieldValues>({
       <input
         ref={inputRef}
         name={name}
-        placeholder={placeholder}
+        placeholder={showPlaceholder ? placeholder : ''}
         value={field.value}
         onChange={onChangeHandler}
         className={`${className} outline-none ${error?.message ? '!border-red-500 focus:!border-red-500' : ''} ${disabled ? 'bg-gray-100 text-gray-300 cursor-not-allowed' : ''}`}
