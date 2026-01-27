@@ -3,13 +3,21 @@
 import { ReactNode, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
+import { toast } from 'sonner';
+
 import { CustomHeader } from '@/components/common';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import { menuGroup } from '@/constants';
-import { allClearPersistStore, clearLoginInfo, cn, getAccessToken, noMainHeaderPage, renewLoginInfo } from '@/lib/utils';
+import {
+  allClearPersistStore,
+  clearLoginInfo,
+  cn,
+  getAccessToken,
+  noMainHeaderPage,
+  renewLoginInfo,
+} from '@/lib/utils';
 import { useLoginService } from '@/service';
-import { useAlertStore } from '@/stores';
 import { ResultCode } from '@/types';
 
 interface Props {
@@ -24,13 +32,15 @@ const MainLayout = ({ children }: Props) => {
   const { useRefreshAccessToken } = useLoginService();
   const { mutate: refreshAccessToken } = useRefreshAccessToken();
 
-  const { showConfirmAlert } = useAlertStore();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const validateAuthorization = () => {
     const accessToken = getAccessToken();
 
-    // 토큰이 없다면 검증 미진행
+    /**
+     * 토큰이 없다면 검증 미진행
+     * - 비로그인 상태에서 새로고침 일수도 있으니 cart store reset은 skip
+     */
     if (!accessToken) {
       clearLoginInfo();
       return;
@@ -43,9 +53,12 @@ const MainLayout = ({ children }: Props) => {
           if (code === ResultCode.SUCCESS) {
             renewLoginInfo(data);
           } else {
-            await showConfirmAlert({ title: '알림', description: message || '' });
             allClearPersistStore();
-            router.push('/');
+
+            if (pathname.startsWith('/mypage') || pathname === '/payment') {
+              toast.info(message || '');
+              router.push('/');
+            }
           }
         },
         onError: () => {

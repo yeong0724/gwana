@@ -1,8 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { get } from 'lodash-es';
 
-import { allClearPersistStore, getAccessToken } from '@/lib/utils';
-import { alertStore } from '@/stores/useAlertStore';
+import { getAccessToken } from '@/lib/utils';
 import { HttpMethod } from '@/types';
 
 // API 인스턴스 생성
@@ -47,21 +45,20 @@ instance.interceptors.response.use(
     return response.data;
   },
   async (error) => {
-    const status = get(error, 'response.status', {});
+    // const status = get(error, 'response.status', {});
 
-    let description = get(error, 'message', '');
-    if (status === 401 || status === 403) {
-      description = '로그인이 만료되었습니다. 로그인 후 이용해주세요.';
-      await alertStore.getState().showConfirmAlert({
-        title: '알림',
-        description,
-        size: 'sm',
-      });
+    // let description = get(error, 'message', '');
+    // if (status === 401 || status === 403) {
+    //   description = '로그인이 만료되었습니다. 로그인 후 이용해주세요.';
+    //   await alertStore.getState().showConfirmAlert({
+    //     title: '알림',
+    //     description,
+    //     size: 'sm',
+    //   });
 
-      allClearPersistStore();
-      window.location.href = '/';
-    }
-
+    //   allClearPersistStore();
+    //   window.location.href = '/';
+    // }
     throw error;
   }
 );
