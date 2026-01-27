@@ -77,6 +77,7 @@ export interface User {
 export type InquiryListSearchRequest = {
   startDate: string | null;
   endDate: string | null;
+  isAnswered: string;
 }
 
 export type InquirySearchRequest = {

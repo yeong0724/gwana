@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { MessageSquareReply } from 'lucide-react';
 
 import useNativeRouter from '@/hooks/useNativeRouter';
-import { getCleanHtmlContent } from '@/lib/utils';
+import { getCleanHtmlContent, getPhoneNumber } from '@/lib/utils';
 import { useMypageService } from '@/service';
 import { useLoginStore, useUserStore } from '@/stores';
 import { Inquiry, ResultCode, RoleEnum, YesOrNoEnum } from '@/types';
@@ -40,6 +40,7 @@ const InquiryDetailContainer = ({ inquiryId }: Props) => {
     createdAt: '',
     createdBy: '',
     username: '',
+    phone: null,
     answer: {
       title: '',
       content: '',
@@ -67,86 +68,91 @@ const InquiryDetailContainer = ({ inquiryId }: Props) => {
   /**
    * 문의내용
    */
-  const { title, content, isAnswered, createdAt, username } = inquiry;
+  const { title, content, isAnswered, createdAt, username, phone } = inquiry;
 
   return (
     <div className="bg-white h-[calc(100dvh-56px)] flex flex-col overflow-hidden">
       <div className="mx-auto w-full flex-1 flex flex-col min-h-0 max-w-[600px] border-x border-gray-100 bg-white">
-        {/* 문의 헤더 영역 */}
-        <div className="px-3 py-3">
-          {/* 답변 상태 뱃지 + 제목 */}
-          <div className="flex items-center gap-3 mb-3">
-            <span
-              className={`shrink-0 text-[10px] px-2 py-1 rounded-full font-medium border ${
-                isAnswered === YesOrNoEnum.YES
-                  ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
-                  : 'bg-amber-50 text-amber-600 border-amber-200'
-              }`}
-            >
-              {isAnswered === YesOrNoEnum.YES ? '답변완료' : '답변대기'}
-            </span>
-            <div className="text-[14px] font-semibold text-gray-700 break-words">{title}</div>
-          </div>
-
-          {/* 작성일 | 작성자 */}
-          <div className="text-gray-500 text-[12px] px-1">
-            {createdAt} <span className="mx-2 text-gray-300">|</span> {username}
-          </div>
-        </div>
-
-        {/* 구분선 */}
-        <div className="w-[90%] mx-auto border-t border-gray-200" />
-
-        {/* 문의 내용 + 답변 영역 (스크롤 가능) */}
+        {/* 스크롤 영역 */}
         <div className="flex-1 min-h-0 overflow-y-auto">
-          {/* 문의 내용 */}
-          <div className="px-4 py-3">
-            <div
-              className="text-gray-700 leading-relaxed whitespace-pre-wrap break-words"
-              dangerouslySetInnerHTML={{ __html: getCleanHtmlContent(content) }}
-            />
+          {/* 문의 헤더 영역 */}
+          <div className="px-3 py-3">
+            {/* 답변 상태 뱃지 + 제목 */}
+            <div className="flex items-center gap-3 mb-3">
+              <span
+                className={`shrink-0 text-[10px] px-2 py-1 rounded-full font-medium border ${isAnswered === YesOrNoEnum.YES
+                    ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                    : 'bg-amber-50 text-amber-600 border-amber-200'
+                  }`}
+              >
+                {isAnswered === YesOrNoEnum.YES ? '답변완료' : '답변대기'}
+              </span>
+              <div className="text-[14px] font-semibold text-gray-700 break-words">{title}</div>
+            </div>
+
+            {/* 작성일 | 작성자 */}
+            <div className="text-gray-500 text-[12px] px-1">
+              {createdAt} <span className="mx-2 text-gray-300">|</span>{' '}
+              {user.role === RoleEnum.ADMIN ? `${username} (${getPhoneNumber(phone)})` : username}
+            </div>
           </div>
 
-          {/* 답변 내용 - 답변완료일 때만 표시 */}
-          {isAnswered === YesOrNoEnum.YES && inquiry.answer && (
-            <>
-              {/* 두꺼운 border 구분선 */}
-              <div className="w-full border-t-[1px] border-gray-200" />
+          {/* 구분선 */}
+          <div className="w-[90%] mx-auto border-t border-gray-200" />
 
-              {/* 답변 헤더 영역 - 문의와 동일한 구조 */}
-              <div className="px-3 py-3">
-                {/* 답변 뱃지 + 제목 */}
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="shrink-0 text-[11px] px-2 py-1 rounded-full font-medium border bg-amber-50 text-amber-600 border-amber-200">
-                    답변
-                  </span>
-                  {inquiry.answer.title && (
-                    <div className="text-[14px] font-semibold text-gray-700 break-words">
-                      {inquiry.answer.title}
-                    </div>
-                  )}
+          {/* 문의 내용 + 답변 영역 */}
+          <div>
+            {/* 문의 내용 */}
+            <div className="px-4 py-3">
+              <div
+                className="text-gray-700 leading-relaxed whitespace-pre-wrap break-words"
+                dangerouslySetInnerHTML={{ __html: getCleanHtmlContent(content) }}
+              />
+            </div>
+
+            {/* 답변 내용 - 답변완료일 때만 표시 */}
+            {isAnswered === YesOrNoEnum.YES && inquiry.answer && (
+              <>
+                {/* 두꺼운 border 구분선 */}
+                <div className="w-full border-t-[1px] border-gray-200" />
+
+                {/* 답변 헤더 영역 - 문의와 동일한 구조 */}
+                <div className="px-3 py-3">
+                  {/* 답변 뱃지 + 제목 */}
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="shrink-0 text-[11px] px-2 py-1 rounded-full font-medium border bg-amber-50 text-amber-600 border-amber-200">
+                      답변
+                    </span>
+                    {inquiry.answer.title && (
+                      <div className="text-[14px] font-semibold text-gray-700 break-words">
+                        {inquiry.answer.title}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 작성일 */}
+                  <div className="text-gray-500 text-[12px] px-1">{inquiry.answer.createdAt}</div>
                 </div>
 
-                {/* 작성일 */}
-                <div className="text-gray-500 text-[12px] px-1">{inquiry.answer.createdAt}</div>
-              </div>
+                {/* 구분선 */}
+                <div className="w-[92%] mx-auto border-t border-gray-200" />
 
-              {/* 구분선 */}
-              <div className="w-[92%] mx-auto border-t border-gray-200" />
-
-              {/* 답변 내용 */}
-              <div className="px-4 py-3">
-                <div
-                  className="text-gray-700 leading-relaxed whitespace-pre-wrap break-words"
-                  dangerouslySetInnerHTML={{ __html: getCleanHtmlContent(inquiry.answer.content) }}
-                />
-              </div>
-            </>
-          )}
+                {/* 답변 내용 */}
+                <div className="px-4 py-3">
+                  <div
+                    className="text-gray-700 leading-relaxed whitespace-pre-wrap break-words"
+                    dangerouslySetInnerHTML={{
+                      __html: getCleanHtmlContent(inquiry.answer.content),
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {/* 답변하기 버튼 - ADMIN만 표시, 하단 고정 */}
-        {isAdmin && (
+        {isAdmin && isAnswered === YesOrNoEnum.NO && (
           <div className="flex-shrink-0 bg-white p-4 border-t border-gray-200">
             <button
               onClick={moveToInquiryWritePage}

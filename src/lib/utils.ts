@@ -127,6 +127,11 @@ const setRedirectUrl = (redirectUrl: string) => {
   localStorage.setItem('redirectUrl', redirectUrl);
 };
 
+const getPhoneNumber = (phone: string | null) => {
+  if (!phone) return '';
+  return phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+};
+
 const renewLoginInfo = (refreshResponse: LoginResponse) => {
   const {
     accessToken,
@@ -192,4 +197,5 @@ export {
   setRedirectUrl,
   formatDate,
   getCleanHtmlContent,
+  getPhoneNumber
 };

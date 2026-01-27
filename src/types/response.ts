@@ -164,6 +164,7 @@ export type Inquiry = {
   createdAt: string;
   createdBy: string;
   username: string;
+  phone: string | null;
   answer: {
     title: string;
     content: string;

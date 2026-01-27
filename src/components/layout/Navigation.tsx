@@ -1,12 +1,14 @@
 'use client';
 
-import { useLoginStore, useUserStore } from '@/stores';
-import { MenuGroup } from '@/types';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+
 import { concat, filter, isEmpty } from 'lodash-es';
 import { ChevronDown, ChevronRight, LogOut, User, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+
+import { useLoginStore, useUserStore } from '@/stores';
+import { MenuGroup, RoleEnum } from '@/types';
 
 type Props = {
   isMenuOpen: boolean;
@@ -108,9 +110,19 @@ const Navigation = ({ isMenuOpen, moveToLoginPage, toggleMenu, menuGroup }: Prop
               className="flex items-center hover:bg-gray-100 rounded-md transition-colors cursor-pointer p-2"
               aria-label="홈으로 이동"
             >
-              <User size={26} className="text-gray-900 mr-3" />
-              <span className="text-[18px] font-semibold">{user?.username}</span>
-              <span className="text-[18px] ml-[2px]">님</span>
+              <User size={34} className="text-gray-900 mr-4" />
+              <div className="flex flex-col items-start">
+                {user.role === RoleEnum.ADMIN ? (
+                  <span className="text-[16px] font-semibold">
+                    {user?.username} <span className="text-[16px] text-gray-500">[관리자]</span>
+                  </span>
+                ) : (
+                  <>
+                    <span className="text-[16px] font-semibold">{user?.username} 님</span>
+                    <span className="text-[14px] text-gray-500">{user?.email}</span>
+                  </>
+                )}
+              </div>
             </button>
           ) : (
             <button
