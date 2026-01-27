@@ -12,6 +12,8 @@ import {
 import { validateByType } from '@/lib/utils';
 import type { FormatEnum, HandleChange, ReactHookFormEventType } from '@/types/type';
 
+import { Input } from '../ui/input';
+
 const ControllerInput = <T extends FieldValues>({
   required = false,
   name,
@@ -39,7 +41,7 @@ const ControllerInput = <T extends FieldValues>({
   callbackFn?: HandleChange<HTMLInputElement, FieldPathValue<T, FieldPath<T>>> | null;
   inputRef?: (el: HTMLInputElement | null) => void;
 }) => {
-  const [isComposing, setIsComposing] = useState<boolean>(false);
+  const [isFocus, setIsFocus] = useState<boolean>(false);
 
   const { setValue, control, clearErrors } = useFormContext<T>();
 
@@ -81,10 +83,10 @@ const ControllerInput = <T extends FieldValues>({
 
   return (
     <div className={wrapperClassName}>
-      <input
+      <Input
         ref={inputRef}
         name={name}
-        placeholder={isComposing ? '' : placeholder}
+        placeholder={isFocus ? '' : placeholder}
         value={field.value}
         onChange={onChangeHandler}
         className={`${className} outline-none ${error?.message ? '!border-red-500 focus:!border-red-500' : ''} ${disabled ? 'bg-gray-100 text-gray-300 cursor-not-allowed' : ''}`}
@@ -92,8 +94,8 @@ const ControllerInput = <T extends FieldValues>({
         disabled={disabled}
         type={type}
         maxLength={maxLength}
-        onCompositionStart={() => setIsComposing(true)}
-        onCompositionEnd={() => setIsComposing(false)}
+        onFocus={() => setIsFocus(true)}
+        onBlur={() => setIsFocus(false)}
       />
       {!disableErrorMessage && error?.message && (
         <div className="text-red-500 pt-1 pl-2 text-[12px] sm:text-[8px]">{error.message}</div>

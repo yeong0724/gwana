@@ -24,6 +24,7 @@ const InquiryWriteContainer = ({ inquiryId }: Props) => {
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
   const [isSecret, setIsSecret] = useState<YesOrNoEnum>(YesOrNoEnum.YES);
+  const [isFocus, setIsFocus] = useState<boolean>(false);
 
   const { useCreateInquiryMutation } = useMypageService();
   const { mutate: createInquiry } = useCreateInquiryMutation();
@@ -91,10 +92,12 @@ const InquiryWriteContainer = ({ inquiryId }: Props) => {
       <div className="flex shrink-0 items-center gap-2 border-x border-t border-gray-200 bg-white px-4 py-2.5">
         <Input
           type="text"
-          placeholder="제목 (20자 이내)"
+          placeholder={isFocus ? '' : '제목 (20자 이내)'}
           value={title}
           onChange={(event) => handleTitleChange(event)}
           className="h-8 flex-1 border-none p-0 text-base lg:text-[18px] shadow-none focus-visible:ring-0"
+          onFocus={() => setIsFocus(true)}
+          onBlur={() => setIsFocus(false)}
         />
         <button
           type="button"
