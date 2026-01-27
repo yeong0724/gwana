@@ -50,9 +50,7 @@ const ControllerInput = <T extends FieldValues>({
     name,
   });
 
-  const onFilterValue = (event: ChangeEvent<ReactHookFormEventType<T>>) => {
-    const { value } = event.target;
-
+  const onFilterValue = (value: FieldPathValue<T, FieldPath<T>>) => {
     if (!value || validateByType(value, type)) {
       return value;
     }
@@ -61,13 +59,14 @@ const ControllerInput = <T extends FieldValues>({
   };
 
   const onChangeHandler = (event: ChangeEvent<ReactHookFormEventType<T> & HTMLInputElement>) => {
-    if ((event.nativeEvent as KeyboardEvent).isComposing && event.target.value) {
-      setComposingValue(event.target.value);
+    const inputValue = event.target.value;
+
+    if ((event.nativeEvent as KeyboardEvent).isComposing) {
+      setComposingValue(inputValue);
       return;
     }
 
-    setComposingValue(null);
-    const value = onFilterValue(event) as FieldPathValue<T, FieldPath<T>>;
+    const value = onFilterValue(inputValue) as FieldPathValue<T, FieldPath<T>>;
 
     if (callbackFn) {
       callbackFn(null, { name, value });
@@ -82,6 +81,8 @@ const ControllerInput = <T extends FieldValues>({
       shouldDirty: false,
       shouldValidate: required, // required가 false면 검증하지 않음
     });
+
+    setComposingValue(null);
   };
 
   return (
