@@ -214,7 +214,7 @@ const InquiryContainer = () => {
               ))}
             </ul>
 
-            <div ref={ref} className="h-[1px]" />
+            {hasNextPage && !isFetchingNextPage && <div ref={ref} className="h-[50px]" />}
           </div>
         )}
 
