@@ -8,7 +8,6 @@ import {
   ChevronRight,
   ClipboardList,
   MessageCircleQuestion,
-  ShoppingCart,
   Truck,
   User,
   UserX2Icon,
@@ -50,7 +49,7 @@ const statsData = [
 const menuItems = [
   { icon: User, label: '개인 정보 수정', url: '/mypage/myinfo' },
   { icon: MessageCircleQuestion, label: '문의 내역', url: '/mypage/inquiry' },
-  { icon: ShoppingCart, label: '리뷰 작성', url: '/mypage/review' },
+  { icon: ClipboardList, label: '리뷰 작성', url: '/mypage/review' },
   { icon: Truck, label: '주문 내역', url: '/mypage/orders' },
 ];
 

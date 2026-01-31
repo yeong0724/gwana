@@ -128,28 +128,35 @@ const ProductContainer = ({ categoryId }: Props) => {
       </nav>
       {/* 메인 컨텐츠 영역 - 나머지 공간 차지 */}
       <div className="flex-1 px-[15px] pt-[10px] pb-40 min-w-0 lg:ml-80 bg-white">
-        <div className="lg:hidden  mb-5 md:-mx-8">
-          <div className="border-b border-gray-200 mb-4">
+        <div className="lg:hidden mb-5 md:-mx-8">
+          <div className="mb-4">
             <nav
               ref={categoryTabScroll.scrollRef}
-              className="flex space-x-2 overflow-x-auto scrollbar-hide px-2 cursor-grab active:cursor-grabbing"
+              className="flex overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing relative"
               {...categoryTabScroll.dragHandlers}
             >
               {productCategory.map(({ menuId, menuName }) => (
                 <button
                   key={menuId}
                   data-category-id={menuId}
-                  className={`pb-[10px] px-1 cursor-pointer text-[13px] min-w-[80px] font-medium transition-colors duration-200 relative flex-shrink-0 ${categoryId === menuId ? 'text-black' : 'text-gray-500 hover:text-gray-700'
+                  className={`pb-[12px] pt-[5px] cursor-pointer text-[13px] w-[100px] font-medium transition-colors duration-200 flex-shrink-0 text-center ${categoryId === menuId ? 'text-black' : 'text-gray-500 hover:text-gray-700'
                     }`}
                   onClick={() => onClickCategory(menuId)}
                 >
                   {menuName}
-                  {categoryId === menuId && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black" />
-                  )}
                 </button>
               ))}
+              {/* 탭 밑줄 인디케이터 - nav 안쪽에서 스크롤과 함께 이동 */}
+              <div
+                className="absolute bottom-0 h-[2px] bg-black transition-all duration-300 ease-out"
+                style={{
+                  width: '100px',
+                  left: `${productCategory.findIndex(({ menuId }) => menuId === categoryId) * 100}px`,
+                }}
+              />
             </nav>
+            {/* 하단 배경 라인 */}
+            <div className="h-[2px] bg-gray-200" />
           </div>
         </div>
         <div className="mb-6">

@@ -2,7 +2,7 @@
 
 import { Edges } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useIsFetching, useIsMutating } from '@tanstack/react-query';
+import { useIsMutating } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { Suspense, useRef } from 'react';
 import * as THREE from 'three';
@@ -72,9 +72,7 @@ const GlobalLoading = () => {
     },
   });
 
-  const isFetching = useIsFetching();
-
-  if (!isMutating && !isFetching) return null;
+  if (!isMutating) return null;
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/15">

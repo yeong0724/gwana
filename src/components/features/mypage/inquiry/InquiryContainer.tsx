@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import { useQueryClient } from '@tanstack/react-query';
 import { forEach } from 'lodash-es';
-import { ChevronRight, MessageCircleQuestion, PenLine, Search } from 'lucide-react';
+import { ChevronDown, ChevronRight, MessageCircleQuestion, PenLine, Search } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 
 import DatePicker from '@/components/common/DatePicker';
@@ -114,9 +114,9 @@ const InquiryContainer = () => {
       <div className="mx-auto w-full flex-1 flex flex-col min-h-0 max-w-[600px] border-x border-gray-100 bg-white">
         {/* 헤더: 타이틀 */}
         <div className="flex items-center justify-between py-2.5 border-b border-gray-100 px-4 bg-white sticky top-0 z-10">
-          <div className="flex items-center gap-2 pl-[5px]">
+          <div className="flex items-center gap-3 pl-[5px]">
             <MessageCircleQuestion className="size-6 text-[#A8BF6A]" />
-            <span className="text-xl font-bold text-gray-800">문의 내역</span>
+            <span className="text-[18px] font-bold text-gray-800">문의 내역</span>
           </div>
           <Select value={searchParams.isAnswered} onValueChange={onChangeIsAnsweredFilter}>
             <SelectTrigger className="w-[120px] h-9 text-sm">
@@ -184,7 +184,7 @@ const InquiryContainer = () => {
           </Card>
         ) : (
           // 문의 리스트
-          <div className="flex-1 min-h-0 overflow-y-auto">
+          <div className="flex-1 min-h-0 overflow-y-auto relative">
             <ul className="divide-y divide-gray-100 px-4">
               {inquiryList.map(({ inquiryId, title, createdAt, isAnswered }, index) => (
                 <li key={index} className="group">
@@ -215,6 +215,15 @@ const InquiryContainer = () => {
             </ul>
 
             {hasNextPage && !isFetchingNextPage && <div ref={ref} className="h-[50px]" />}
+
+            {/* 더 불러올 데이터 있음 표시 - 하단 고정 바운스 아이콘 */}
+            {hasNextPage && (
+              <div className="sticky bottom-0 left-0 right-0 flex justify-center pointer-events-none">
+                <div className="">
+                  <ChevronDown className="text-gray-400/90 animate-bounce" size={30} />
+                </div>
+              </div>
+            )}
           </div>
         )}
 

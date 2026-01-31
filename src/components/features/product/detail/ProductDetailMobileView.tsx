@@ -190,9 +190,9 @@ const ProductDetailMobileView = () => {
                   {/* 페이지 인디케이터 - 캐러셀 안쪽 하단 */}
                   {product.images.length > 1 && (
                     <div className="absolute bottom-4 left-4 right-4 flex justify-center">
-                      <div className="w-3/4 relative h-[3px] bg-black/30 overflow-hidden">
+                      <div className="w-3/4 relative h-[4px] border border-gray-600 overflow-hidden bg-gray-400">
                         <div
-                          className="absolute left-0 h-full bg-black transition-all duration-300 ease-out"
+                          className="absolute left-0 h-full bg-white transition-all duration-300 ease-out"
                           style={{
                             width: `${((current + 1) / product.images.length) * 100}%`,
                           }}
@@ -295,7 +295,7 @@ const ProductDetailMobileView = () => {
       </div>
 
       {/* 상세정보 섹션 - 모바일뷰 */}
-      <div ref={detailSectionRef} className="max-w-[800px] py-15 px-5">
+      <div ref={detailSectionRef} className="max-w-[800px] pt-18 pb-32 px-5">
         {/* 상세정보 타이틀 */}
         <div className="relative flex items-center justify-center mb-15">
           {/* 양쪽 라인 */}
@@ -365,8 +365,11 @@ const ProductDetailMobileView = () => {
         </div>
       </div>
 
+      {/* 섹션 구분라인 */}
+      <div className="h-2 bg-gray-100" />
+
       {/* 리뷰 섹션 */}
-      <div ref={reviewSectionRef} className="max-w-[800px] pt-15 px-5">
+      <div ref={reviewSectionRef} className="max-w-[800px] pt-6 pb-32 px-5">
         {/* 리뷰 타이틀 */}
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-[18px] font-medium text-gray-800">후기</h3>
@@ -388,65 +391,70 @@ const ProductDetailMobileView = () => {
         {/* 리뷰 목록 */}
         {!isEmpty(reviewList) ? (
           <>
-            {map(reviewList, (review: Review) => {
+            {map(reviewList, (review: Review, index: number) => {
               return (
-                <div key={review.reviewId} className="py-4 border-b border-gray-200">
-                  {/* 별점 및 작성일 */}
-                  <div className="flex items-center justify-between pb-4">
-                    <div className="flex items-center gap-0.5">
-                      {[1, 2, 3, 4, 5].map((star) => {
-                        const isFull = review.rating >= star;
-                        const isHalf = review.rating >= star - 0.5 && review.rating < star;
+                <>
+                  <div key={review.reviewId} className="py-4">
+                    {/* 별점 및 작성일 */}
+                    <div className="flex items-center justify-between pb-4">
+                      <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5].map((star) => {
+                          const isFull = review.rating >= star;
+                          const isHalf = review.rating >= star - 0.5 && review.rating < star;
 
-                        return (
-                          <div key={star} className="relative w-4 h-4">
-                            <Star className="absolute inset-0 w-4 h-4 fill-gray-200 text-gray-200" />
-                            {isHalf && (
-                              <div
-                                className="absolute inset-0 overflow-hidden"
-                                style={{ width: '50%' }}
-                              >
-                                <Star className="w-4 h-4 fill-[#F9BC36] text-[#F9BC36]" />
-                              </div>
-                            )}
-                            {isFull && (
-                              <Star className="absolute inset-0 w-4 h-4 fill-[#F9BC36] text-[#F9BC36]" />
-                            )}
+                          return (
+                            <div key={star} className="relative w-4 h-4">
+                              <Star className="absolute inset-0 w-4 h-4 fill-gray-200 text-gray-200" />
+                              {isHalf && (
+                                <div
+                                  className="absolute inset-0 overflow-hidden"
+                                  style={{ width: '50%' }}
+                                >
+                                  <Star className="w-4 h-4 fill-[#F9BC36] text-[#F9BC36]" />
+                                </div>
+                              )}
+                              {isFull && (
+                                <Star className="absolute inset-0 w-4 h-4 fill-[#F9BC36] text-[#F9BC36]" />
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <span className="text-xs text-gray-400">{review.createdAt}</span>
+                    </div>
+
+                    {/* 리뷰 내용 */}
+                    <p className="text-sm text-gray-700 mb-8 whitespace-pre-wrap">{review.content}</p>
+
+                    {/* 리뷰 이미지 */}
+                    {review.reviewImages && review.reviewImages.length > 0 && (
+                      <div className="flex gap-3 overflow-x-auto">
+                        {review.reviewImages.map((image, idx) => (
+                          <div
+                            key={idx}
+                            className="relative w-30 h-30 flex-shrink-0 cursor-pointer border border-gray-200 rounded-xs"
+                            onClick={() => {
+                              setSelectedImages(review.reviewImages!);
+                              setSelectedImageIndex(idx);
+                              setIsImageModalOpen(true);
+                            }}
+                          >
+                            <Image
+                              src={`${AWS_S3_DOMAIN}${image}`}
+                              alt={`리뷰 이미지 ${idx + 1}`}
+                              fill
+                              className="object-cover"
+                              sizes="80px"
+                            />
                           </div>
-                        );
-                      })}
-                    </div>
-                    <span className="text-xs text-gray-400">{review.createdAt}</span>
+                        ))}
+                      </div>
+                    )}
                   </div>
-
-                  {/* 리뷰 내용 */}
-                  <p className="text-sm text-gray-700 mb-8 whitespace-pre-wrap">{review.content}</p>
-
-                  {/* 리뷰 이미지 */}
-                  {review.reviewImages && review.reviewImages.length > 0 && (
-                    <div className="flex gap-4 overflow-x-auto">
-                      {review.reviewImages.map((image, idx) => (
-                        <div
-                          key={idx}
-                          className="relative w-30 h-30 flex-shrink-0 cursor-pointer border border-gray-200 rounded-xs"
-                          onClick={() => {
-                            setSelectedImages(review.reviewImages!);
-                            setSelectedImageIndex(idx);
-                            setIsImageModalOpen(true);
-                          }}
-                        >
-                          <Image
-                            src={`${AWS_S3_DOMAIN}${image}`}
-                            alt={`리뷰 이미지 ${idx + 1}`}
-                            fill
-                            className="object-cover rounded-md"
-                            sizes="80px"
-                          />
-                        </div>
-                      ))}
-                    </div>
+                  {index !== reviewList.length - 1 && (
+                    <div className="border-t border-gray-200" />
                   )}
-                </div>
+                </>
               );
             })}
 
@@ -464,12 +472,13 @@ const ProductDetailMobileView = () => {
             <p className="text-gray-400">작성된 후기가 없습니다.</p>
           </div>
         )}
-
-        <div className="border-t border-gray-200" />
       </div>
 
+      {/* 섹션 구분라인 */}
+      <div className="h-2 bg-gray-100" />
+
       {/* Q&A 섹션 */}
-      <div ref={qnaSectionRef} className="max-w-[800px] pt-30 px-5 mb-[200px]">
+      <div ref={qnaSectionRef} className="max-w-[800px] pt-6 px-5 mb-[200px]">
         {/* 질문 타이틀 */}
         <h3 className="text-[18px] font-medium text-gray-800 mb-4">질문</h3>
 
