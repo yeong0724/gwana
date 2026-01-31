@@ -24,6 +24,8 @@ const CustomHeader = () => {
         return '1:1 문의하기';
       case pathname === '/mypage/myinfo':
         return '개인 정보 수정';
+      case pathname === '/mypage/review':
+        return '리뷰 작성';
       default:
         return '';
     }

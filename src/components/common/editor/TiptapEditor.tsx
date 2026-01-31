@@ -26,7 +26,7 @@ import {
 import FontSize from 'tiptap-extension-font-size';
 import ImageResize from 'tiptap-extension-resize-image';
 
-import { cn } from '@/lib/utils';
+import { cn, compressImage } from '@/lib/utils';
 import { useAlertStore } from '@/stores';
 import { useMypageService } from '@/service';
 import { ResultCode } from '@/types';
@@ -459,8 +459,12 @@ export default function TiptapEditor({
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file && editor) {
+        const compressedFile = await compressImage(file, { maxWidth: 1024, quality: 0.85 });
+
+        const uploadFileSize = compressedFile.size;
+
         // 이미지 용량 체크
-        if (file.size > MAX_IMAGE_SIZE * 1024 * 1024) {
+        if (uploadFileSize > MAX_IMAGE_SIZE * 1024 * 1024) {
           await showConfirmAlert({
             title: '안내',
             description: `이미지는 장당 ${MAX_IMAGE_SIZE}MB까지 첨부 가능합니다`,
@@ -470,7 +474,7 @@ export default function TiptapEditor({
         }
 
         // 누적 이미지 총 용량 체크
-        if (totalImageSize + file.size > MAX_TOTAL_IMAGE_SIZE * 1024 * 1024) {
+        if (totalImageSize + uploadFileSize > MAX_TOTAL_IMAGE_SIZE * 1024 * 1024) {
           await showConfirmAlert({
             title: '안내',
             description: `문의글 이미지 총 용량은 ${MAX_TOTAL_IMAGE_SIZE}MB를 초과할 수 없습니다`,
@@ -481,7 +485,7 @@ export default function TiptapEditor({
 
         // S3 업로드
         const formData = new FormData();
-        formData.append('image', file);
+        formData.append('image', compressedFile);
         formData.append('folderPath', 'temp/inquiry');
 
         const { data, code, message } = await uploadTempImage(formData);

@@ -9,14 +9,21 @@ import { toast } from 'sonner';
 
 import { PurchaseGuideModal, ShareModal } from '@/components/common/modal';
 import ProductDetailMobileView from '@/components/features/product/detail/ProductDetailMobileView';
+import ProductDetailWebView from '@/components/features/product/detail/ProductDetailWebView';
 import { type CarouselApi } from '@/components/ui/carousel';
 import { Provider } from '@/context/productDetailContext';
-import { useCartService, useProductService } from '@/service';
+import { useCartService, useMypageService, useProductService } from '@/service';
 import { useAlertStore, useCartStore, useLoginStore } from '@/stores';
 import { cartActions } from '@/stores/useCartStore';
-import { Cart, CartOption, ProductDetailResponse, ProductOption, PurchaseList } from '@/types';
-
-import ProductDetailWebView from './ProductDetailWebView';
+import {
+  Cart,
+  CartOption,
+  ProductDetailResponse,
+  ProductOption,
+  PurchaseList,
+  ReviewListSearchRequest,
+  SortByEnum,
+} from '@/types';
 
 const purchasePick = [
   'productId',
@@ -68,14 +75,53 @@ const ProductDetailContainer = ({ productId }: Props) => {
     options: [],
   });
 
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+
   // 상품 선택 옵션
   const [purchaseList, setPurchaseList] = useState<PurchaseList[]>([]);
+
+  // 리뷰 검색 옵션
+  const [reviewSearchPayload, setReviewSearchPayload] = useState<Omit<ReviewListSearchRequest, 'page'>>({
+    productId,
+    sortBy: SortByEnum.LATEST,
+    photoOnly: false,
+    size: 5,
+  });
 
   const { useProductDetailQuery } = useProductService();
   const { data: productDetailData, error: productDetailError } = useProductDetailQuery(
     { productId },
+    { enabled: true, gcTime: 60 * 60 * 1000, staleTime: 60 * 60 * 1000 }
+  );
+
+  const { useGetReviewListInfiniteQuery } = useMypageService();
+  const { data: reviewListData } = useGetReviewListInfiniteQuery(
+    reviewSearchPayload,
     { enabled: true }
   );
+
+  const { reviewList, totalReviewCount } = useMemo(() => {
+    if (reviewListData) {
+      const { pages } = reviewListData;
+      return {
+        reviewList: pages.flatMap(({ data }) => data.data),
+        totalReviewCount: pages[0].data.totalCount,
+      };
+    }
+
+    return {
+      reviewList: [],
+      totalReviewCount: 0,
+    };
+  }, [reviewListData]);
+
+  const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+
+  useEffect(() => {
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // 클라이언트 마운트 감지 + 스크롤 최상단 이동
   useEffect(() => {
@@ -309,6 +355,8 @@ const ProductDetailContainer = ({ productId }: Props) => {
     }
   };
 
+  if (isMobile === null) return null;
+
   return (
     <>
       <Provider
@@ -320,6 +368,9 @@ const ProductDetailContainer = ({ productId }: Props) => {
           isBottomPanelOpen,
           purchaseList,
           totalPrice,
+          reviewList,
+          totalReviewCount,
+          reviewSearchPayload,
         }}
         controller={{
           setApi,
@@ -333,15 +384,16 @@ const ProductDetailContainer = ({ productId }: Props) => {
           onPurchaseMobileHandler,
           handleAddToCart,
           handlePurchase,
+          setReviewSearchPayload
         }}
       >
-        <>
-          {/* Web View */}
-          <ProductDetailWebView />
-
-          {/* Mobile View */}
+        {isMobile ? (
+          // Mobile View
           <ProductDetailMobileView />
-        </>
+        ) : (
+          // Web View
+          <ProductDetailWebView />
+        )}
       </Provider>
       {/* Modal Area */}
       <PurchaseGuideModal

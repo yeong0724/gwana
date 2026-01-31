@@ -1,6 +1,6 @@
 import { CarouselApi } from '@/components/ui/carousel';
 import createGenericContext from '@/providers/ContextProvider';
-import { ProductDetailResponse, ProductOption, PurchaseList } from '@/types';
+import { ProductDetailResponse, ProductOption, PurchaseList, Review, ReviewListSearchRequest } from '@/types';
 
 type ProductDetailStateContextType = {
   product: ProductDetailResponse;
@@ -10,6 +10,9 @@ type ProductDetailStateContextType = {
   isBottomPanelOpen: boolean;
   purchaseList: PurchaseList[];
   totalPrice: number;
+  reviewList: Review[];
+  totalReviewCount: number;
+  reviewSearchPayload: Omit<ReviewListSearchRequest, 'page'>;
 };
 
 type ProductDetailControllerContextType = {
@@ -24,6 +27,7 @@ type ProductDetailControllerContextType = {
   onPurchaseMobileHandler: () => void;
   handleAddToCart: () => void;
   handlePurchase: () => void;
+  setReviewSearchPayload: (reviewSearchPayload: Omit<ReviewListSearchRequest, 'page'>) => void;
 };
 
 export const { Provider, useStateContext, useControllerContext } = createGenericContext<

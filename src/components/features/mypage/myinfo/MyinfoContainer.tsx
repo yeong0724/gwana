@@ -89,12 +89,7 @@ const MyinfoContainer = () => {
     }
 
     // 미리보기 이미지 세팅
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreviewImg(reader.result as string);
-    };
-
-    reader.readAsDataURL(compressedFile);
+    setPreviewImg(URL.createObjectURL(compressedFile))
 
     setSelectedProfileImageFile(compressedFile);
 
@@ -102,7 +97,13 @@ const MyinfoContainer = () => {
   };
 
   const handleClearPreview = () => {
-    setPreviewImg(null);
+    if (previewImg) {
+      URL.revokeObjectURL(previewImg);
+      setPreviewImg(null);
+    }
+
+    setSelectedProfileImageFile(null);
+
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }

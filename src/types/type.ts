@@ -1,7 +1,7 @@
 import { ChangeEvent } from 'react';
 
 import { FieldPath, FieldPathValue, FieldValues } from 'react-hook-form';
-import { RoleEnum } from '@/types';
+import { RoleEnum, YesOrNoEnum } from '@/types';
 
 export type HandleChange<T, V> = (
   event: ChangeEvent<T> | null,
@@ -74,12 +74,43 @@ export interface User {
   role: RoleEnum;
 }
 
-export type InquiryListSearchRequest = {
-  startDate: string | null;
-  endDate: string | null;
-  isAnswered: string;
-}
+export type Inquiry = {
+  inquiryId: number;
+  productId: string | null;
+  productName: string | null;
+  title: string;
+  content: string;
+  isSecret: YesOrNoEnum;
+  isAnswered: YesOrNoEnum;
+  createdAt: string;
+  createdBy: string;
+  username: string;
+  phone: string | null;
+  answer: {
+    title: string;
+    content: string;
+    createdAt: string;
+  };
+};
 
-export type InquirySearchRequest = {
-  inquiryId: string;
+export type Review = {
+  reviewId: number;
+
+  // 리뷰 대상 상품 ID
+  productId: string;
+
+  // 리뷰 내용
+  content: string;
+
+  // 리뷰 사진
+  reviewImages: string[];
+
+  // 리뷰 별점
+  rating: number;
+
+  // 작성일
+  createdAt: string;
+
+  // 작성자 Id
+  createdBy: string;
 }

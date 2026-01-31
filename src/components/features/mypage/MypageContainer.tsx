@@ -50,8 +50,8 @@ const statsData = [
 const menuItems = [
   { icon: User, label: '개인 정보 수정', url: '/mypage/myinfo' },
   { icon: MessageCircleQuestion, label: '문의 내역', url: '/mypage/inquiry' },
+  { icon: ShoppingCart, label: '리뷰 작성', url: '/mypage/review' },
   { icon: Truck, label: '주문 내역', url: '/mypage/orders' },
-  { icon: ShoppingCart, label: '장바구니', url: '/cart' },
 ];
 
 const MypageContainer = () => {
@@ -69,7 +69,12 @@ const MypageContainer = () => {
 
   const handleMenuClick = (url: string) => {
     // router.push(url);
-    forward(url);
+    const productId = '1';
+    if (url === '/mypage/review') {
+      forward(`${url}?productId=${productId}`);
+    } else {
+      forward(url);
+    }
   };
 
   return (

@@ -1,4 +1,4 @@
-import { YesOrNoEnum } from "./enum";
+import { SortByEnum, YesOrNoEnum } from "./enum";
 
 export interface GetAccessTokenByKakaoCodeRequest {
   code: string;
@@ -95,4 +95,31 @@ export interface CreateInquiryRequest {
   isSecret: YesOrNoEnum;
   productId: string | null;
   upperInquiryId: string | null;
+}
+
+export interface ReviewCreateRequest {
+  productId: string;
+  content: string;
+  rating: number;
+  reviewImages: string[];
+}
+
+export type InquiryListSearchRequest = {
+  startDate: string | null;
+  endDate: string | null;
+  isAnswered: string;
+  page: number;
+  size: number;
+}
+
+export type InquirySearchRequest = {
+  inquiryId: string;
+}
+
+export type ReviewListSearchRequest = {
+  productId: string;
+  sortBy: SortByEnum;
+  photoOnly: boolean;
+  page: number;
+  size: number;
 }

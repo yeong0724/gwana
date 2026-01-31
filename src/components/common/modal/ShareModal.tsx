@@ -1,4 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AWS_S3_DOMAIN } from '@/constants';
 import { Check } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -46,7 +47,7 @@ const ShareModal = ({ modalOpen, setModalOpen, onKakaoShare }: Props) => {
               onClick={handleKakaoShare}
               className="flex flex-col items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
             >
-              <Image src="/images/kakao_logo.webp" alt="카카오톡" width={60} height={60} />
+              <Image src={`${AWS_S3_DOMAIN}images/socialLoginLogo/kakao_logo.webp`} alt="카카오톡" width={60} height={60} />
               <span className="text-sm text-gray-700">카카오톡</span>
             </button>
 

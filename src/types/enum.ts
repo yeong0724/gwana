@@ -44,3 +44,8 @@ export enum YesOrNoEnum {
   YES = 'Y',
   NO = 'N',
 }
+
+export enum SortByEnum {
+  RECOMMENDED = 'recommended',
+  LATEST = 'latest',
+}

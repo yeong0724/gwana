@@ -1,10 +1,13 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 
 import {
   createInquiry,
+  createReview,
   getInquiry,
   getInquiryList,
+  getReviewList,
   updateMyinfo,
+  uploadImages,
   uploadProfileImage,
   uploadTempImage,
 } from '@/api/mypage';
@@ -12,6 +15,8 @@ import {
   CreateInquiryRequest,
   InquiryListSearchRequest,
   InquirySearchRequest,
+  ReviewCreateRequest,
+  ReviewListSearchRequest,
   UpdateMyinfoRequest,
   UseQueryOptionsType,
 } from '@/types';
@@ -29,6 +34,12 @@ const useMypageService = () => {
     });
   };
 
+  const useImagesUploadMutation = () => {
+    return useMutation({
+      mutationFn: (param: FormData) => uploadImages(param),
+    });
+  };
+
   const useUpdateMyinfoMutation = () => {
     return useMutation({
       mutationFn: (param: UpdateMyinfoRequest) => updateMyinfo(param),
@@ -41,13 +52,15 @@ const useMypageService = () => {
     });
   };
 
-  const useGetInquiryListQuery = (
-    payload: InquiryListSearchRequest,
+  const useGetInquiryListInfiniteQuery = (
+    payload: Omit<InquiryListSearchRequest, 'page'>,
     options?: UseQueryOptionsType
   ) =>
-    useQuery({
+    useInfiniteQuery({
       queryKey: ['inquiryList', payload],
-      queryFn: () => getInquiryList(payload),
+      queryFn: ({ pageParam = 0 }) => getInquiryList({ ...payload, page: pageParam, size: 10 }),
+      getNextPageParam: (lastPage) => (lastPage.data.hasNext ? lastPage.data.page + 1 : undefined),
+      initialPageParam: 0,
       ...options,
     });
 
@@ -58,13 +71,34 @@ const useMypageService = () => {
       ...options,
     });
 
+  const useCreateReviewMutation = () => {
+    return useMutation({
+      mutationFn: (param: ReviewCreateRequest) => createReview(param),
+    });
+  };
+
+  const useGetReviewListInfiniteQuery = (
+    payload: Omit<ReviewListSearchRequest, 'page'>,
+    options?: UseQueryOptionsType
+  ) =>
+    useInfiniteQuery({
+      queryKey: ['reviewList', payload],
+      queryFn: ({ pageParam = 0 }) => getReviewList({ ...payload, page: pageParam, size: 10 }),
+      getNextPageParam: ({ data }) => (data.hasNext ? data.page + 1 : undefined),
+      initialPageParam: 0,
+      ...options,
+    });
+
   return {
     useProfileImageUploadMutation,
     useTempImageUploadMutation,
+    useImagesUploadMutation,
     useUpdateMyinfoMutation,
     useCreateInquiryMutation,
-    useGetInquiryListQuery,
+    useGetInquiryListInfiniteQuery,
     useGetInquiryQuery,
+    useCreateReviewMutation,
+    useGetReviewListInfiniteQuery,
   };
 };
 

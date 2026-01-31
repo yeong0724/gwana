@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { forEach } from 'lodash-es';
 import { ChevronRight, MessageCircleQuestion, PenLine, Search } from 'lucide-react';
+import { useInView } from 'react-intersection-observer';
 
 import DatePicker from '@/components/common/DatePicker';
 import { Button } from '@/components/ui/button';
@@ -20,7 +22,7 @@ import useNativeRouter from '@/hooks/useNativeRouter';
 import { formatDate } from '@/lib/utils';
 import { useMypageService } from '@/service';
 import { useLoginStore, useUserStore } from '@/stores';
-import { Inquiry, InquiryListSearchRequest, RoleEnum, YesOrNoEnum } from '@/types';
+import { InquiryListSearchRequest, RoleEnum, YesOrNoEnum } from '@/types';
 
 type SearchParams = {
   startDate: Date | undefined;
@@ -30,10 +32,12 @@ type SearchParams = {
 };
 
 const InquiryContainer = () => {
+  const queryClient = useQueryClient();
   const router = useRouter();
   const { forward } = useNativeRouter();
   const { isLoggedIn } = useLoginStore();
   const { user } = useUserStore();
+  const { ref, inView } = useInView();
 
   const [searchParams, setSearchParams] = useState<SearchParams>({
     startDate: undefined,
@@ -42,18 +46,22 @@ const InquiryContainer = () => {
     isAnswered: 'ALL',
   });
 
-  const [searchPayload, setSearchPayload] = useState<InquiryListSearchRequest>({
+  const [searchPayload, setSearchPayload] = useState<Omit<InquiryListSearchRequest, 'page'>>({
     startDate: null,
     endDate: null,
     isAnswered: '',
+    size: 10,
   });
 
-  const [inquiryList, setInquiryList] = useState<Inquiry[]>([]);
+  const { useGetInquiryListInfiniteQuery } = useMypageService();
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetInquiryListInfiniteQuery(
+    searchPayload,
+    {
+      enabled: isLoggedIn,
+    }
+  );
 
-  const { useGetInquiryListQuery } = useMypageService();
-  const { data: inquiryListData, refetch } = useGetInquiryListQuery(searchPayload, {
-    enabled: isLoggedIn,
-  });
+  const inquiryList = data?.pages.flatMap(({ data }) => data.data) ?? [];
 
   const moveToInquiryWritePage = () => {
     forward('/mypage/inquiry/write');
@@ -74,22 +82,18 @@ const InquiryContainer = () => {
   const onSearch = () => {
     if (searchParams.isChanged) {
       setSearchPayload({
+        ...searchPayload,
         startDate: formatDate(searchParams.startDate),
         endDate: formatDate(searchParams.endDate),
         isAnswered: searchParams.isAnswered === 'ALL' ? '' : searchParams.isAnswered,
       });
     } else {
-      refetch();
+      // refetch();
+      queryClient.resetQueries({ queryKey: ['inquiryList'] });
     }
 
     setSearchParams((prev) => ({ ...prev, isChanged: false }));
   };
-
-  useEffect(() => {
-    if (inquiryListData) {
-      setInquiryList(inquiryListData.data);
-    }
-  }, [inquiryListData]);
 
   useEffect(() => {
     router.prefetch('/mypage/inquiry/write');
@@ -98,6 +102,12 @@ const InquiryContainer = () => {
       router.prefetch(`/mypage/inquiry/${inquiryId.toString()}`);
     });
   }, [inquiryList]);
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
     <div className="bg-white h-[calc(100dvh-56px)] flex flex-col overflow-hidden">
@@ -147,7 +157,9 @@ const InquiryContainer = () => {
               align="end"
               placeholder="종료일"
               captionLayout="dropdown"
-              disabled={searchParams.startDate ? (date) => date < searchParams.startDate! : undefined}
+              disabled={
+                searchParams.startDate ? (date) => date < searchParams.startDate! : undefined
+              }
               useReset
             />
           </div>
@@ -201,19 +213,23 @@ const InquiryContainer = () => {
                 </li>
               ))}
             </ul>
+
+            <div ref={ref} className="h-[1px]" />
           </div>
         )}
 
         {/* 문의 작성 버튼 - 하단 고정 */}
-        {user.role !== RoleEnum.ADMIN && <div className="flex-shrink-0 bg-white p-4 border-t border-gray-200">
-          <button
-            onClick={moveToInquiryWritePage}
-            className="w-full bg-[#A8BF6A] hover:bg-[#96ad5c] text-white rounded-full py-3 flex items-center justify-center gap-2 transition-colors"
-          >
-            <PenLine className="size-4" />
-            <span className="text-[15px] font-semibold">문의 하기</span>
-          </button>
-        </div>}
+        {user.role !== RoleEnum.ADMIN && (
+          <div className="flex-shrink-0 bg-white p-4 border-t border-gray-200">
+            <button
+              onClick={moveToInquiryWritePage}
+              className="w-full bg-[#A8BF6A] hover:bg-[#96ad5c] text-white rounded-full py-3 flex items-center justify-center gap-2 transition-colors"
+            >
+              <PenLine className="size-4" />
+              <span className="text-[15px] font-semibold">문의 하기</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
